@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DFI.FaultReporting.API.Controllers
 {
     [ApiController]
-    [Route("/")]
+    [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
