@@ -12,4 +12,8 @@
     <ProjectReference Include="..\DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\lib\azure-maps\" />
+  </ItemGroup>
+
 </Project>

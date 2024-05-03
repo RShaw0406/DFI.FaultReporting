@@ -77,6 +77,17 @@ function initMap() {
         position: 'bottom-right'
     });
 
+    // Add full screen control to the map
+    map.controls.add(new atlas.control.FullscreenControl(), {
+        position: 'top-right',
+        style: 'auto'
+    });
+
+    map.controls.add(new atlas.control.StyleControl(), {
+        position: 'top-left',
+        mapStyles: 'all'
+    });
+
     // Add click event to the map
     map.events.add('click', function (e) {
         // Get the lat/long position of the click event
