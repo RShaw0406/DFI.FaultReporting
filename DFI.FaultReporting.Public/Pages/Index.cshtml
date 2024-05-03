@@ -4,7 +4,42 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>HELLLO Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core hello dev</a>.</p>
-</div>
+<body onload="initMap()">
+    <div class="text-center">
+        <h1 class="display-4">Welcome</h1>
+        <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="autocomplete" style="width:300px;">
+                    <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <div id="map" style="height: 1000px; width: 100%;"></div>
+                <br />
+                <label id="LatLabel" style="font-weight: bold;">Lat:</label>
+                <br />
+                <label id="LabelLat"></label>
+                <br />
+                <label id="LongLabel" style="font-weight: bold;">Long:</label>
+                <br />
+                <label id="LabelLong"></label>
+                <br />
+                <label id="PlaceLabel" style="font-weight: bold;">PlaceID:</label>
+                <br />
+                <label id="LabelPlace"></label>
+                <br />
+                <label id="RoadLabel" style="font-weight: bold;">Road:</label>
+                <br />
+                <label id="LabelRoad"></label>
+            </div>
+        </div>
+    </div>
+    <script src="~/js/mapping/ReportFault.js"></script>
+</body>
