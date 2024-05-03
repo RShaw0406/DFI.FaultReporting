@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DFI.FaultReporting.CommonInterfaces\DFI.FaultReporting.CommonInterfaces.csproj" />
+    <ProjectReference Include="..\DFI.FaultReporting.Common\DFI.FaultReporting.Common.csproj" />
+    <ProjectReference Include="..\DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj" />
+  </ItemGroup>
+
 </Project>

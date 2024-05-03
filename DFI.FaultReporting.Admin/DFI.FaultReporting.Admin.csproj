@@ -6,4 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DFI.FaultReporting.DataAccess.HttpRepository\DFI.FaultReporting.DataAccess.HttpRepository.csproj" />
+    <ProjectReference Include="..\DFI.FaultReporting.Models\DFI.FaultReporting.Models.csproj" />
+    <ProjectReference Include="..\DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj" />
+  </ItemGroup>
+
 </Project>

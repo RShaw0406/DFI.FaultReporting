@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DFI.FaultReporting.Models\DFI.FaultReporting.Models.csproj" />
+  </ItemGroup>
+
 </Project>
