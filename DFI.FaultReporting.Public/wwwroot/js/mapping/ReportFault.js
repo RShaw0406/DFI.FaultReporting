@@ -307,6 +307,9 @@ function snapMarkerToRoad(position) {
             //Ensure that the closest point is closer than the previously calculated snapped coordinates for the point.
             if (cp && cp.properties.distance <= maxSnappingDistance && cp.properties.distance < minDistance) {
 
+                //console.log("Point Details:")
+                //console.log(cp);
+
                 console.log("Marker Location Details:")
                 console.log(cp);
 
@@ -317,9 +320,7 @@ function snapMarkerToRoad(position) {
                 document.getElementById('LabelLong').innerHTML = closestCoord[0];
                 document.getElementById('LabelPlace').innerHTML = closestCoord;
 
-                placeMarker(closestCoord)
-
-                reverseAddressSearch(closestCoord);
+                reverseAddressSearch(closestCoord);   
             }
         }
     }
@@ -352,14 +353,22 @@ function reverseAddressSearch(position) {
 
         console.log(result);
 
-        if (result.features.length > 0 && result.features[0].properties && result.features[0].properties.address) {
-            var road1 = (result.features[0].properties.address.streetName);
-            var road2 = (result.features[0].properties.address.localName);
-            var road3 = (result.features[0].properties.address.countrySecondarySubdivision);
-            document.getElementById('LabelRoad').innerHTML = road1 + ", " + road2 + ", " + road3;
-            console.log(result.features[0].properties.address.freeformAddress);
-        } else {
-            console.log("No address for that location!");
+        if (result.features[0].properties.address.countrySubdivisionName == "Northern Ireland") {
+
+            placeMarker(position);
+
+            if (result.features.length > 0 && result.features[0].properties && result.features[0].properties.address) {
+                var road1 = (result.features[0].properties.address.streetName);
+                var road2 = (result.features[0].properties.address.localName);
+                var road3 = (result.features[0].properties.address.countrySecondarySubdivision);
+                document.getElementById('LabelRoad').innerHTML = road1 + ", " + road2 + ", " + road3;
+                console.log(result.features[0].properties.address.freeformAddress);
+            } else {
+                console.log("No address for that location!");
+            }
+        }
+        else {
+            alert('Please select a road within Northern Ireland')
         }
     });
 }
