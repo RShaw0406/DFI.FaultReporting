@@ -72,19 +72,19 @@ function initMap() {
         style: 'road'
     });
 
+    // Add full screen control to the map
+    map.controls.add(new atlas.control.FullscreenControl(), {
+        position: 'bottom-right',
+        style: 'auto'
+    });
+
     // Add zoom control to the map
     map.controls.add(new atlas.control.ZoomControl(), {
         position: 'bottom-right'
     });
 
-    // Add full screen control to the map
-    map.controls.add(new atlas.control.FullscreenControl(), {
-        position: 'top-right',
-        style: 'auto'
-    });
-
     map.controls.add(new atlas.control.StyleControl(), {
-        position: 'top-left',
+        position: 'bottom-right',
         mapStyles: 'all'
     });
 
@@ -320,7 +320,7 @@ function snapMarkerToRoad(position) {
                 document.getElementById('LabelLong').innerHTML = closestCoord[0];
                 document.getElementById('LabelPlace').innerHTML = closestCoord;
 
-                reverseAddressSearch(closestCoord);   
+                reverseAddressSearch(closestCoord);
             }
         }
     }

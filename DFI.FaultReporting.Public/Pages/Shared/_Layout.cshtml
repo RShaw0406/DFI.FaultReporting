@@ -14,9 +14,18 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">DFI.FaultReporting.Public</a>
+                <div class="d-none d-xl-block">
+                    <a class="navbar-brand" asp-area="" asp-page="/Index">
+                        <img src="~/images/infrastructure-full_0.png" alt="Department for Infrastructure Logo" width="650" height="75" />
+                    </a>
+                </div>
+                <div class="d-block d-xl-none d-xxl-none">
+                    <a class="navbar-brand" asp-area="" asp-page="/Index">
+                        <img src="~/images/dfi-logo-sm.png" alt="Department for Infrastructure Logo" />
+                    </a>
+                </div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -40,9 +49,12 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="navbar-light bg-light border-top footer text-muted box-shadow mb-3">
         <div class="container">
-            &copy; 2024 - DFI.FaultReporting.Public - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2024 - DFI Fault Reporting | <a asp-area="" asp-page="/Privacy">Privacy</a> |
+            <a class="navbar-brand" asp-area="" asp-page="/Index">
+                <img src="~/images/dfi-logo-sm.png" alt="Department for Infrastructure Logo" />
+            </a>
         </div>
     </footer>
 
