@@ -11,17 +11,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Admin", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Common", "DFI.FaultReporting.Common\DFI.FaultReporting.Common.csproj", "{018687CE-7719-4052-A7B6-0911CF9F6B89}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.CommonInterfaces", "DFI.FaultReporting.CommonInterfaces\DFI.FaultReporting.CommonInterfaces.csproj", "{630C70EA-4443-4A9A-BDF9-63483DEB8AA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.DataAccess.Http.Repository", "DFI.FaultReporting.DataAccess.HttpRepository\DFI.FaultReporting.DataAccess.Http.Repository.csproj", "{39B185E7-6F03-40D2-9DCD-E914986C1AB8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.DataAccess.HttpRepository", "DFI.FaultReporting.DataAccess.HttpRepository\DFI.FaultReporting.DataAccess.HttpRepository.csproj", "{39B185E7-6F03-40D2-9DCD-E914986C1AB8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.DataAccess.SQLRepository", "DFI.FaultReporting.DataAccess.SQLRepository\DFI.FaultReporting.DataAccess.SQLRepository.csproj", "{72D6EA59-FB57-4E9E-B2DD-7FF278874ACA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.DataAccess.SQL.Repository", "DFI.FaultReporting.DataAccess.SQLRepository\DFI.FaultReporting.DataAccess.SQL.Repository.csproj", "{72D6EA59-FB57-4E9E-B2DD-7FF278874ACA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Models", "DFI.FaultReporting.Models\DFI.FaultReporting.Models.csproj", "{C811076F-9D46-473E-9EEC-1B3B31484AE5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Services", "DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj", "{816A1132-CC43-4837-A0F8-8C01B8B16D68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFI.FaultReporting.Interfaces", "DFI.FaultReporting.Interfaces\DFI.FaultReporting.Interfaces.csproj", "{261A254F-2EA4-4220-AB1A-D6772020455E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Services.Interfaces", "DFI.FaultReporting.Interfaces\DFI.FaultReporting.Services.Interfaces.csproj", "{261A254F-2EA4-4220-AB1A-D6772020455E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFI.FaultReporting.DataAccess.SQL.Repository.Interfaces", "DFI.FaultReporting.DataAccess.SQL.Repository.Interfaces\DFI.FaultReporting.DataAccess.SQL.Repository.Interfaces.csproj", "{592C2563-3D3F-4682-A9A4-A3D9AB4D28B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +45,6 @@ Global
 		{018687CE-7719-4052-A7B6-0911CF9F6B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{018687CE-7719-4052-A7B6-0911CF9F6B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{018687CE-7719-4052-A7B6-0911CF9F6B89}.Release|Any CPU.Build.0 = Release|Any CPU
-		{630C70EA-4443-4A9A-BDF9-63483DEB8AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{630C70EA-4443-4A9A-BDF9-63483DEB8AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{630C70EA-4443-4A9A-BDF9-63483DEB8AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{630C70EA-4443-4A9A-BDF9-63483DEB8AA1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{39B185E7-6F03-40D2-9DCD-E914986C1AB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{39B185E7-6F03-40D2-9DCD-E914986C1AB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39B185E7-6F03-40D2-9DCD-E914986C1AB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -69,6 +65,10 @@ Global
 		{261A254F-2EA4-4220-AB1A-D6772020455E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{261A254F-2EA4-4220-AB1A-D6772020455E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{261A254F-2EA4-4220-AB1A-D6772020455E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{592C2563-3D3F-4682-A9A4-A3D9AB4D28B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{592C2563-3D3F-4682-A9A4-A3D9AB4D28B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{592C2563-3D3F-4682-A9A4-A3D9AB4D28B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{592C2563-3D3F-4682-A9A4-A3D9AB4D28B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
