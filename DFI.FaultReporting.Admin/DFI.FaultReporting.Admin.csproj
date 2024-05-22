@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DFI.FaultReporting.DataAccess.HttpRepository\DFI.FaultReporting.DataAccess.Http.Repository.csproj" />
     <ProjectReference Include="..\DFI.FaultReporting.Models\DFI.FaultReporting.Models.csproj" />
     <ProjectReference Include="..\DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj" />
   </ItemGroup>

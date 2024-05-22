@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Interfaces.Admin
+namespace DFI.FaultReporting.SQL.Repository.Interfaces.Admin
 {
-    public interface IClaimStatusService
+    public interface IClaimStatusSQLRepository
     {
         Task<List<ClaimStatus>> GetClaimStatuses();
 

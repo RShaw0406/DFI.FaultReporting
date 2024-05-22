@@ -1,7 +1,27 @@
+using DFI.FaultReporting.Http.Admin;
+using DFI.FaultReporting.Interfaces.Admin;
+using DFI.FaultReporting.Services.Admin;
+using DFI.FaultReporting.Services.Interfaces.Settings;
+using DFI.FaultReporting.Services.Settings;
+using Microsoft.Extensions.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddHttpClient("API", api =>
+{
+    api.BaseAddress = new Uri(builder.Configuration.GetValue<string>("API:BaseURL"));
+});
+
+builder.Services.AddScoped<IClaimStatusService, ClaimStatusService>();
+
+builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
+
+builder.Services.AddScoped<ISettingsService, SettingsService>();
 
 var app = builder.Build();
 

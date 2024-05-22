@@ -1,15 +1,24 @@
-using DFI.FaultReporting.DataAccess.SQL.Repository.Contexts;
+
+using DFI.FaultReporting.SQL.Repository.Contexts;
+using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using Microsoft.EntityFrameworkCore;
+using DFI.FaultReporting.SQL.Repository.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<DFIFaultReportingDataContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DFIFaultReportingContext") ?? throw new InvalidOperationException("Connection string 'DFIFaultReportingContext' not found.")));
+
+builder.Services.AddDbContext<DFIFaultReportingDataContext>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddScoped<DFIFaultReportingDataContext, DFIFaultReportingDataContext>();
+
+builder.Services.AddScoped<IClaimStatusSQLRepository, ClaimStatusSQLRepository>();
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();

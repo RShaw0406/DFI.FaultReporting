@@ -13,11 +13,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DFI.FaultReporting.Common\DFI.FaultReporting.Common.csproj" />
-    <ProjectReference Include="..\DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj" />
+    <ProjectReference Include="..\DFI.FaultReporting.Models\DFI.FaultReporting.Models.csproj" />
+    <ProjectReference Include="..\DFI.FaultReporting.SQL.Repository.Interfaces\DFI.FaultReporting.SQL.Repository.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>
