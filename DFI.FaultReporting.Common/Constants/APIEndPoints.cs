@@ -9,5 +9,6 @@ namespace DFI.FaultReporting.Common.Constants
     public static class APIEndPoints
     {
         public const string ClaimStatus = "/api/ClaimStatus";
+        public const string ClaimType = "/api/ClaimTypes";
     }
 }

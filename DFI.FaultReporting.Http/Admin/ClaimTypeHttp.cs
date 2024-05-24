@@ -2,32 +2,30 @@
 using DFI.FaultReporting.Common.Exceptions;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Services.Interfaces.Settings;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DFI.FaultReporting.Http.Admin
 {
-    public class ClaimStatusHttp
+    public class ClaimTypeHttp
     {
         public IHttpClientFactory _client { get; }
 
         public ISettingsService _settings { get; }
 
-        public List<ClaimStatus>? ClaimStatuses { get; set; }
-
-        public ClaimStatusHttp(IHttpClientFactory client, ISettingsService settings)
+        public ClaimTypeHttp(IHttpClientFactory client, ISettingsService settings)
         {
             _client = client;
             _settings = settings;
         }
 
-        public async Task<List<ClaimStatus>> GetClaimStatuses()
+        public List<ClaimType>? ClaimTypes { get; set; }
+
+        public async Task<List<ClaimType>> GetClaimTypes()
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
@@ -36,7 +34,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.ClaimStatus)
+                RequestUri = new Uri(baseURL + APIEndPoints.ClaimType)
             };
 
             var result = await client.SendAsync(request);
@@ -45,22 +43,22 @@ namespace DFI.FaultReporting.Http.Admin
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                ClaimStatuses = JsonConvert.DeserializeObject<List<ClaimStatus>>(response);
+                ClaimTypes = JsonConvert.DeserializeObject<List<ClaimType>>(response);
 
-                return ClaimStatuses;
+                return ClaimTypes;
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Claim Statuses data from API")
+                throw new CustomHttpException("Error when attempting to GET Claim Types data from API")
                 {
                     ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "GetClaimStatuses",
+                    ExceptionClass = "ClaimTypeHttp",
+                    ExceptionFunction = "GetClaimType",
                 };
             }
         }
 
-        public async Task<ClaimStatus> GetClaimStatus(int ID)
+        public async Task<ClaimType> GetClaimType(int ID)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
@@ -69,44 +67,44 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.ClaimStatus + "/" + ID.ToString())
+                RequestUri = new Uri(baseURL + APIEndPoints.ClaimType + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
 
-            if (result.IsSuccessStatusCode) 
+            if (result.IsSuccessStatusCode)
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                ClaimStatus claimStatus = JsonConvert.DeserializeObject<ClaimStatus>(response);
+                ClaimType claimType = JsonConvert.DeserializeObject<ClaimType>(response);
 
-                return claimStatus;
+                return claimType;
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Claim Status data from API")
+                throw new CustomHttpException("Error when attempting to GET Claim Type data from API")
                 {
                     ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "GetClaimStatus",
+                    ExceptionClass = "ClaimTypeHttp",
+                    ExceptionFunction = "GetClaimType",
                 };
             }
         }
 
-        public async Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus)
+        public async Task<ClaimType> CreateClaimType(ClaimType claimType)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
 
-            var claimStatusJSON = JsonConvert.SerializeObject(claimStatus);
+            var claimTypeJSON = JsonConvert.SerializeObject(claimType);
 
-            var content = new StringContent(claimStatusJSON, Encoding.UTF8, "application/json");
+            var content = new StringContent(claimTypeJSON, Encoding.UTF8, "application/json");
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.ClaimStatus),
+                RequestUri = new Uri(baseURL + APIEndPoints.ClaimType),
                 Content = content
             };
 
@@ -116,37 +114,39 @@ namespace DFI.FaultReporting.Http.Admin
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                claimStatus = JsonConvert.DeserializeObject<ClaimStatus>(response);
+                claimType = JsonConvert.DeserializeObject<ClaimType>(response);
 
-                return claimStatus;
+                return claimType;
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Claim Status data to API")
+                throw new CustomHttpException("Error when attempting to POST Claim Type data to API")
                 {
                     ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "CreateClaimStatus",
+                    ExceptionClass = "ClaimTypeHttp",
+                    ExceptionFunction = "CreateClaimType",
                 };
             }
         }
 
-        public async Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus)
+        public async Task<ClaimType> UpdateClaimType(ClaimType claimType)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
 
-            var claimStatusJSON = JsonConvert.SerializeObject(claimStatus);
+            var claimTypeJSON = JsonConvert.SerializeObject(claimType);
 
-            var content = new StringContent(claimStatusJSON, Encoding.UTF8, "application/json");
+            var content = new StringContent(claimTypeJSON, Encoding.UTF8, "application/json");
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.ClaimStatus),
+                RequestUri = new Uri(baseURL + APIEndPoints.ClaimType),
                 Content = content
             };
+
+            //request.Headers.Add("Accept", "application/json");
 
             var result = await client.SendAsync(request);
 
@@ -154,22 +154,22 @@ namespace DFI.FaultReporting.Http.Admin
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                claimStatus = JsonConvert.DeserializeObject<ClaimStatus>(response);
+                claimType = JsonConvert.DeserializeObject<ClaimType>(response);
 
-                return claimStatus;
+                return claimType;
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Claim Status data to API")
+                throw new CustomHttpException("Error when attempting to PUT Claim Type data to API")
                 {
                     ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "PutClaimStatus",
+                    ExceptionClass = "ClaimTypeHttp",
+                    ExceptionFunction = "PutClaimType",
                 };
             }
         }
 
-        public async Task<int> DeleteClaimStatus(int ID)
+        public async Task<int> DeleteClaimType(int ID)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
@@ -178,7 +178,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.ClaimStatus + "/" + ID.ToString())
+                RequestUri = new Uri(baseURL + APIEndPoints.ClaimType + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -189,11 +189,11 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to DELETE Claim Status data from API")
+                throw new CustomHttpException("Error when attempting to DELETE Claim Type data from API")
                 {
                     ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "DeleteClaimStatus",
+                    ExceptionClass = "ClaimTypeHttp",
+                    ExceptionFunction = "DeleteClaimType",
                 };
             }
         }

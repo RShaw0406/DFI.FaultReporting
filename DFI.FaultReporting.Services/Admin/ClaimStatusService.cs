@@ -44,7 +44,7 @@ namespace DFI.FaultReporting.Services.Admin
 
         public async Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus)
         {
-            claimStatus = await _claimStatusHttp.PutClaimStatus(claimStatus);
+            claimStatus = await _claimStatusHttp.UpdateClaimStatus(claimStatus);
 
             return claimStatus;
         }

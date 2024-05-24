@@ -27,5 +27,7 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         }
 
         public DbSet<ClaimStatus> ClaimStatus { get; set; } = null!;
+
+        public DbSet<ClaimType> ClaimType { get; set; } = null!;
     }
 }

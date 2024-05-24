@@ -18,11 +18,8 @@ namespace DFI.FaultReporting.API.Controllers
         private IClaimStatusSQLRepository _claimStatusSQLRepository;
         public ILogger<ClaimStatusController> _logger;
 
-        private readonly DFIFaultReportingDataContext _context;
-
-        public ClaimStatusController(DFIFaultReportingDataContext context, IClaimStatusSQLRepository claimStatusSQLRepository, ILogger<ClaimStatusController> logger)
+        public ClaimStatusController(IClaimStatusSQLRepository claimStatusSQLRepository, ILogger<ClaimStatusController> logger)
         {
-            _context = context;
             _claimStatusSQLRepository = claimStatusSQLRepository;
             _logger = logger;
         }
@@ -61,7 +58,7 @@ namespace DFI.FaultReporting.API.Controllers
             return CreatedAtAction("GetClaimStatus", new { claimStatus.ID }, claimStatus);
         }
 
-        // PUT: api/ClaimStatus/
+        // PUT: api/ClaimStatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         public async Task<ActionResult<ClaimStatus>> PutClaimStatus(ClaimStatus claimStatus)
