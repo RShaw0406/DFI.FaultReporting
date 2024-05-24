@@ -17,6 +17,8 @@ builder.Services.AddScoped<DFIFaultReportingDataContext, DFIFaultReportingDataCo
 
 builder.Services.AddScoped<IClaimStatusSQLRepository, ClaimStatusSQLRepository>();
 builder.Services.AddScoped<IClaimTypeSQLRepository, ClaimTypeSQLRepository>();
+builder.Services.AddScoped<IFaultStatusSQLRepository, FaultStatusSQLRepository>();
+builder.Services.AddScoped<IFaultTypeSQLRepository, FaultTypeSQLRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 

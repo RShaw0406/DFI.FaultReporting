@@ -164,7 +164,7 @@ namespace DFI.FaultReporting.Http.Admin
                 {
                     ResponseStatus = result.StatusCode,
                     ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "PutClaimStatus",
+                    ExceptionFunction = "UpdateClaimStatus",
                 };
             }
         }

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Interfaces.Admin
+namespace DFI.FaultReporting.SQL.Repository.Interfaces.Admin
 {
-    public interface IFaultTypeService
+    public interface IFaultTypeSQLRepository
     {
         Task<List<FaultType>> GetFaultTypes();
 
