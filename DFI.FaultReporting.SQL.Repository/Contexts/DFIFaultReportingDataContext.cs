@@ -1,4 +1,5 @@
 ﻿using DFI.FaultReporting.Models.Admin;
+using DFI.FaultReporting.Models.FaultReports;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -26,5 +27,7 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         public DbSet<FaultStatus> FaultStatus { get; set; } = null!;
 
         public DbSet<FaultType> FaultType { get; set; } = null!;
+
+        public DbSet<Fault> Fault { get; set; } = null!;
     }
 }

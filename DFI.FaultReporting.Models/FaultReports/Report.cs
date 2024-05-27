@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DFI.FaultReporting.Models.Users;
 
 namespace DFI.FaultReporting.Models.FaultReports
 {
@@ -21,6 +22,10 @@ namespace DFI.FaultReporting.Models.FaultReports
         [StringLength(1000, ErrorMessage = "Additional info must not be more than 1000 characters")]
         public string? AdditionalInfo { get; set; }
 
+        [DisplayName("Reporting User")]
+        [Required(ErrorMessage = "You must enter a user")]
+        public required int UserID { get; set; }
+
         [DisplayName("Input By")]
         [Required(ErrorMessage = "You must provide an input by")]
         public required string InputBy { get; set; }
@@ -34,5 +39,7 @@ namespace DFI.FaultReporting.Models.FaultReports
         public required bool Active { get; set; }
 
         public virtual Fault? Fault { get; set; }
+
+        public virtual PublicUser? User { get; set; }
     }
 }

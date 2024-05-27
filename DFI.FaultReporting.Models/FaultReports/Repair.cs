@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
+using DFI.FaultReporting.Models.Users;
 
 namespace DFI.FaultReporting.Models.FaultReports
 {
@@ -30,6 +32,10 @@ namespace DFI.FaultReporting.Models.FaultReports
         [StringLength(1000, ErrorMessage = "Notes must not be more than 1000 characters")]
         public string? RepairNotes { get; set; }
 
+        [DisplayName("Assigned Contractor")]
+        [Required(ErrorMessage = "You must provide a contractor")]
+        public required int ContractorID { get; set; }
+
         [DisplayName("Input By")]
         [Required(ErrorMessage = "You must provide an input by")]
         public required string InputBy { get; set; }
@@ -43,5 +49,7 @@ namespace DFI.FaultReporting.Models.FaultReports
         public required bool Active { get; set; }
 
         public virtual Fault? Fault { get; set; }
+
+        public virtual Contractor? Contractor { get; set; }
     }
 }

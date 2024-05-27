@@ -12,5 +12,6 @@ namespace DFI.FaultReporting.Common.Constants
         public const string ClaimType = "/api/ClaimTypes";
         public const string FaultStatus = "/api/FaultStatus";
         public const string FaultType = "/api/FaultTypes";
+        public const string Fault = "/api/Faults";
     }
 }
