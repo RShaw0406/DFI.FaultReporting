@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Interfaces.FaultReports
+namespace DFI.FaultReporting.SQL.Repository.Interfaces.FaultReports
 {
-    public interface IReportService
+    public interface IReportSQLRepository
     {
         Task<List<Report>> GetReports();
 

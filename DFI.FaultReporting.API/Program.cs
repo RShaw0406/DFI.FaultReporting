@@ -23,6 +23,7 @@ builder.Services.AddScoped<IFaultPrioritySQLRepository, FaultPrioritySQLReposito
 builder.Services.AddScoped<IFaultStatusSQLRepository, FaultStatusSQLRepository>();
 builder.Services.AddScoped<IFaultTypeSQLRepository, FaultTypeSQLRepository>();
 builder.Services.AddScoped<IFaultSQLRepository, FaultSQLRepository>();
+builder.Services.AddScoped<IReportSQLRepository, ReportSQLRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 

@@ -28,11 +28,15 @@ namespace DFI.FaultReporting.Models.FaultReports
         [StringLength(250, ErrorMessage = "Road must not be more than 250 characters")]
         public required string RoadName { get; set; }
 
-        [DisplayName("Fault Type")]
+        [DisplayName("Priority")]
+        [Required(ErrorMessage = "You must enter a fault priority")]
+        public required int FaultPriorityID { get; set; }
+
+        [DisplayName("Type")]
         [Required(ErrorMessage = "You must enter a fault type")]
         public required int FaultTypeID { get; set; }
 
-        [DisplayName("Fault Status")]
+        [DisplayName("Status")]
         [Required(ErrorMessage = "You must enter a fault status")]
         public required int FaultStatusID { get; set; }
 
@@ -50,6 +54,8 @@ namespace DFI.FaultReporting.Models.FaultReports
 
         [Required(ErrorMessage = "You must provide an active")]
         public required bool Active { get; set; }
+
+        //public virtual FaultPriority? FaultPriority { get; set; }
 
         //public virtual FaultType? FaultType { get; set; }
 

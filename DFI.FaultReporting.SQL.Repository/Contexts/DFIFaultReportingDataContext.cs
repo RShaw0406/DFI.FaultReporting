@@ -31,5 +31,7 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         public DbSet<FaultPriority> FaultPriority { get; set; } = null!;
 
         public DbSet<Fault> Fault { get; set; } = null!;
+
+        public DbSet<Report> Report { get; set; } = null!;
     }
 }

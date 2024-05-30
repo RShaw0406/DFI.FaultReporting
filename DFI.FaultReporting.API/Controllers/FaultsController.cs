@@ -55,7 +55,7 @@ namespace DFI.FaultReporting.API.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Fault>> PostFault(Fault fault)
-        {
+        {          
             fault = await _faultSQLRepository.CreateFault(fault);
 
             return CreatedAtAction("GetFault", new { fault.ID }, fault);

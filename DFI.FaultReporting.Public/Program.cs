@@ -27,6 +27,7 @@ builder.Services.AddScoped<IFaultPriorityService, FaultPriorityService>();
 builder.Services.AddScoped<IFaultStatusService, FaultStatusService>();
 builder.Services.AddScoped<IFaultTypeService, FaultTypeService>();
 builder.Services.AddScoped<IFaultService, FaultService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -34,6 +35,7 @@ builder.Services.AddScoped<FaultPriorityHttp, FaultPriorityHttp>();
 builder.Services.AddScoped<FaultStatusHttp, FaultStatusHttp>();
 builder.Services.AddScoped<FaultTypeHttp, FaultTypeHttp>();
 builder.Services.AddScoped<FaultHttp, FaultHttp>();
+builder.Services.AddScoped<ReportHttp, ReportHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 

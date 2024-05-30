@@ -38,8 +38,8 @@ namespace DFI.FaultReporting.Models.FaultReports
         [Required(ErrorMessage = "You must provide an active")]
         public required bool Active { get; set; }
 
-        public virtual Fault? Fault { get; set; }
+        //public virtual Fault? Fault { get; set; }
 
-        public virtual PublicUser? User { get; set; }
+        //public virtual PublicUser? User { get; set; }
     }
 }
