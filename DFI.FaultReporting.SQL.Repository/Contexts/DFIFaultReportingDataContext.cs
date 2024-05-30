@@ -28,6 +28,8 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
 
         public DbSet<FaultType> FaultType { get; set; } = null!;
 
+        public DbSet<FaultPriority> FaultPriority { get; set; } = null!;
+
         public DbSet<Fault> Fault { get; set; } = null!;
     }
 }

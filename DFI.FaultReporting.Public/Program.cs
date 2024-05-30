@@ -4,6 +4,7 @@ using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Services.Admin;
 using DFI.FaultReporting.Services.FaultReports;
+using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Settings;
 using Microsoft.Extensions.Configuration;
@@ -22,12 +23,14 @@ builder.Services.AddHttpClient("API", api =>
 
 builder.Services.AddScoped<IClaimStatusService, ClaimStatusService>();
 builder.Services.AddScoped<IClaimTypeService, ClaimTypeService>();
+builder.Services.AddScoped<IFaultPriorityService, FaultPriorityService>();
 builder.Services.AddScoped<IFaultStatusService, FaultStatusService>();
 builder.Services.AddScoped<IFaultTypeService, FaultTypeService>();
 builder.Services.AddScoped<IFaultService, FaultService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
+builder.Services.AddScoped<FaultPriorityHttp, FaultPriorityHttp>();
 builder.Services.AddScoped<FaultStatusHttp, FaultStatusHttp>();
 builder.Services.AddScoped<FaultTypeHttp, FaultTypeHttp>();
 builder.Services.AddScoped<FaultHttp, FaultHttp>();
