@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Interfaces.Files
+namespace DFI.FaultReporting.SQL.Repository.Interfaces.Files
 {
-    public interface IReportPhotoService
+    public interface IReportPhotoSQLRepository
     {
         Task<List<ReportPhoto>> GetReportPhotos();
 

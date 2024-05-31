@@ -15,5 +15,6 @@ namespace DFI.FaultReporting.Common.Constants
         public const string FaultType = "/api/FaultTypes";
         public const string Fault = "/api/Faults";
         public const string Report = "/api/Reports";
+        public const string ReportPhoto = "/api/ReportPhotos";
     }
 }

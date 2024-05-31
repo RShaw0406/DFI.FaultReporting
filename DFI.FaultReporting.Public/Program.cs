@@ -1,9 +1,12 @@
 using DFI.FaultReporting.Http.Admin;
 using DFI.FaultReporting.Http.FaultReports;
+using DFI.FaultReporting.Http.Files;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
+using DFI.FaultReporting.Interfaces.Files;
 using DFI.FaultReporting.Services.Admin;
 using DFI.FaultReporting.Services.FaultReports;
+using DFI.FaultReporting.Services.Files;
 using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Settings;
@@ -28,6 +31,7 @@ builder.Services.AddScoped<IFaultStatusService, FaultStatusService>();
 builder.Services.AddScoped<IFaultTypeService, FaultTypeService>();
 builder.Services.AddScoped<IFaultService, FaultService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IReportPhotoService, ReportPhotoService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -36,6 +40,7 @@ builder.Services.AddScoped<FaultStatusHttp, FaultStatusHttp>();
 builder.Services.AddScoped<FaultTypeHttp, FaultTypeHttp>();
 builder.Services.AddScoped<FaultHttp, FaultHttp>();
 builder.Services.AddScoped<ReportHttp, ReportHttp>();
+builder.Services.AddScoped<ReportPhotoHttp, ReportPhotoHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 

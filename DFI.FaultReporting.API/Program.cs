@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.SQL.Repository.Admin;
 using DFI.FaultReporting.SQL.Repository.Interfaces.FaultReports;
 using DFI.FaultReporting.SQL.Repository.FaultReports;
+using DFI.FaultReporting.SQL.Repository.Interfaces.Files;
+using DFI.FaultReporting.SQL.Repository.Files;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,7 @@ builder.Services.AddScoped<IFaultStatusSQLRepository, FaultStatusSQLRepository>(
 builder.Services.AddScoped<IFaultTypeSQLRepository, FaultTypeSQLRepository>();
 builder.Services.AddScoped<IFaultSQLRepository, FaultSQLRepository>();
 builder.Services.AddScoped<IReportSQLRepository, ReportSQLRepository>();
+builder.Services.AddScoped<IReportPhotoSQLRepository, ReportPhotoSQLRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 

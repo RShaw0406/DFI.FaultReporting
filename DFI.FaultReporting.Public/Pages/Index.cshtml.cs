@@ -1,8 +1,11 @@
 using DFI.FaultReporting.Interfaces.Admin;
+using DFI.FaultReporting.Interfaces.Files;
 using DFI.FaultReporting.Models.Admin;
+using DFI.FaultReporting.Models.Files;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
+using System.Text;
 
 namespace DFI.FaultReporting.Public.Pages
 {
@@ -10,12 +13,12 @@ namespace DFI.FaultReporting.Public.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        private readonly IClaimStatusService _claimStatusService;
+        private readonly IReportPhotoService _reportPhotoService;
 
-        public IndexModel(ILogger<IndexModel> logger, IClaimStatusService claimStatusService)
+        public IndexModel(ILogger<IndexModel> logger, IReportPhotoService reportPhotoService)
         {
             _logger = logger;
-            _claimStatusService = claimStatusService;
+            _reportPhotoService = reportPhotoService;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -28,9 +31,11 @@ namespace DFI.FaultReporting.Public.Pages
 
             //Debug.WriteLine(claimStatus.ToString());
 
-            //ClaimStatus claimStatusNew = new ClaimStatus { ClaimStatusDescription = "Test New", InputBy = "Me", InputOn = DateTime.Now, Active = true };
+            //byte[] bytes = Encoding.ASCII.GetBytes("0x0123456789ABCDEF");
 
-            //await _claimStatusService.CreateClaimStatus(claimStatusNew);
+            //ReportPhoto reportPhotoNew = new ReportPhoto { ReportID = 1, Description = "Test", Type = "TEST", Data = bytes, InputBy = "Me", InputOn = DateTime.Now, Active = true };
+
+            //await _reportPhotoService.CreateReportPhoto(reportPhotoNew);
 
             //claimStatus.ClaimStatusDescription = "NEW";
             //claimStatus.InputBy = "Me";

@@ -5,17 +5,12 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DFI.FaultReporting.Models.FaultReports;
 
 namespace DFI.FaultReporting.Models.Files
 {
-    public class ReportPhoto
+    public class File
     {
         public int ID { get; set; }
-
-        [DisplayName("Report")]
-        [Required(ErrorMessage = "You must enter a report")]
-        public required int ReportID { get; set; }
 
         [Required(ErrorMessage = "You must enter a description")]
         [StringLength(200, ErrorMessage = "Description must not be more than 200 characters")]
@@ -39,7 +34,5 @@ namespace DFI.FaultReporting.Models.Files
 
         [Required(ErrorMessage = "You must provide an active")]
         public required bool Active { get; set; }
-
-        //public virtual Report? Report { get; set; }
     }
 }
