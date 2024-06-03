@@ -8,19 +8,22 @@ using System.Threading.Tasks;
 
 namespace DFI.FaultReporting.Models.Users
 {
-    public class Contractor
+    public class User
     {
         public int ID { get; set; }
 
-        [Required(ErrorMessage = "You must enter a username")]
-        [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,8}$", ErrorMessage = "Username must not contain special characters")]
-        [StringLength(8, ErrorMessage = "Username must not be more than 8 characters")]
-        public required string Username { get; set; }
+        //[Required(ErrorMessage = "You must enter a username")]
+        //[RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,8}$", ErrorMessage = "Username must not contain special characters")]
+        //[StringLength(8, ErrorMessage = "Username must not be more than 8 characters")]
+        //public string? Username { get; set; }
 
         [DisplayName("Email Address")]
         [Required(ErrorMessage = "You must enter an email address")]
         [DataType(DataType.EmailAddress, ErrorMessage = "You must enter a valid email address")]
-        public required string Email { get; set; }
+        public string? Email { get; set; }
+
+        [DisplayName("Email Confirmed")]
+        public bool EmailConfirmed { get; set; }
 
         [Required(ErrorMessage = "You must enter a password")]
         // Password should contain the following:
@@ -32,51 +35,70 @@ namespace DFI.FaultReporting.Models.Users
         // At most 127 characters
         [RegularExpression(@"^(?=.*\d)(?=(.*\W){1})(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,127}$", ErrorMessage = "Password does not meet all requirements")]
         [DataType(DataType.Password)]
-        public required string Password { get; set; }
+        public string? Password { get; set; }
 
-        [Required(ErrorMessage = "You must enter a company name")]
-        [RegularExpression(@"^[a-zA-Z''-'\s]{1,250}$", ErrorMessage = "Company name must not contain special characters or numbers")]
-        [StringLength(250, ErrorMessage = "Company name must not be more than 250 characters")]
-        public required string CompanyName { get; set; }
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "Prefix must not contain special characters or numbers")]
+        [StringLength(8, ErrorMessage = "Prefix name must not be more than 8 characters")]
+        public string? Prefix { get; set; }
+
+        [Required(ErrorMessage = "You must enter a first name")]
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "First name must not contain special characters or numbers")]
+        [StringLength(125, ErrorMessage = "First name must not be more than 125 characters")]
+        public string? FirstName { get; set; }
+
+        [Required(ErrorMessage = "You must enter a last name")]
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "Last name must not contain special characters or numbers")]
+        [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
+        public string? LastName { get; set; }
+
+        [DisplayName("Date of Birth")]
+        [DataType(DataType.Date)]
+        public DateTime? DOB { get; set; }
 
         [DisplayName("Address Line 1")]
-        [Required(ErrorMessage = "You must enter an address line 1")]
         [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "Address line 1 must not contain special characters")]
         [StringLength(100, ErrorMessage = "Address line 1 must not be more than 100 characters")]
-        public required string AddressLine1 { get; set; }
+        public string? AddressLine1 { get; set; }
 
         [DisplayName("Address Line 2")]
         [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "Address line 2 must not contain special characters")]
         [StringLength(100, ErrorMessage = "Address line 2 must not be more than 100 characters")]
-        public required string AddressLine2 { get; set; }
+        public string? AddressLine2 { get; set; }
 
         [DisplayName("Address Line 3")]
         [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "Address line 3 must not contain special characters")]
         [StringLength(100, ErrorMessage = "Address line 3 must not be more than 100 characters")]
-        public required string AddressLine3 { get; set; }
+        public string? AddressLine3 { get; set; }
 
         [Required(ErrorMessage = "You must enter a postcode")]
         [RegularExpression(@"^(([Bb][Tt][0-9]{1,2})\s?[0-9][A-Za-z]{2})$", ErrorMessage = "You must enter a valid Northern Ireland postcode")]
-        public required string Postcode { get; set; }
+        public string? Postcode { get; set; }
 
         [DisplayName("Contact Number")]
-        [Required(ErrorMessage = "You must enter a contact number")]
+        [RegularExpression(@"^[\d +]{11,15}$", ErrorMessage = "You must enter a valid telephone number")]
         [DataType(DataType.PhoneNumber, ErrorMessage = "You must enter a valid contact number")]
-        public required string ContactNumber { get; set; }
+        public string? ContactNumber { get; set; }
 
         [DisplayName("Account Locked")]
-        public bool AccountLocked { get; set; }
+        public bool? AccountLocked { get; set; }
+
+        [DisplayName("Account Locked End")]
+        [DataType(DataType.Date)]
+        public DateTime? AccountLockedEnd { get; set; }
+
+        [DisplayName("Incorrect Attempts")]
+        public int? IncorrectAttempts { get; set; }
 
         [DisplayName("Input By")]
         [Required(ErrorMessage = "You must provide an input by")]
-        public required string InputBy { get; set; }
+        public string? InputBy { get; set; }
 
         [DisplayName("Input On")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
-        public required DateTime InputOn { get; set; }
+        public DateTime InputOn { get; set; }
 
         [Required(ErrorMessage = "You must provide an active")]
-        public required bool Active { get; set; }
+        public bool Active { get; set; }
     }
 }

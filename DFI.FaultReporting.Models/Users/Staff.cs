@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Models.Admin
+namespace DFI.FaultReporting.Models.Users
 {
     public class Staff
     {

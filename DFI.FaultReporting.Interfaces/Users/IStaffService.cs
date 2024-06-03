@@ -1,11 +1,11 @@
-﻿using DFI.FaultReporting.Models.Admin;
+﻿using DFI.FaultReporting.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Interfaces.Admin
+namespace DFI.FaultReporting.Services.Interfaces.Users
 {
     public interface IStaffService
     {

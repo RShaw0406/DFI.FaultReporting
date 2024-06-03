@@ -7,6 +7,10 @@ using DFI.FaultReporting.SQL.Repository.Interfaces.FaultReports;
 using DFI.FaultReporting.SQL.Repository.FaultReports;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Files;
 using DFI.FaultReporting.SQL.Repository.Files;
+using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
+using DFI.FaultReporting.SQL.Repository.Roles;
+using DFI.FaultReporting.SQL.Repository.Interfaces.Users;
+using DFI.FaultReporting.SQL.Repository.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +31,9 @@ builder.Services.AddScoped<IFaultTypeSQLRepository, FaultTypeSQLRepository>();
 builder.Services.AddScoped<IFaultSQLRepository, FaultSQLRepository>();
 builder.Services.AddScoped<IReportSQLRepository, ReportSQLRepository>();
 builder.Services.AddScoped<IReportPhotoSQLRepository, ReportPhotoSQLRepository>();
+builder.Services.AddScoped<IRoleSQLRepository, RoleSQLRepository>();
+builder.Services.AddScoped<IUserSQLRepository, UserSQLRepository>();
+builder.Services.AddScoped<IUserRoleSQLRepository, UserRoleSQLRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -42,7 +49,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

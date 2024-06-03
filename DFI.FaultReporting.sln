@@ -17,11 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Services
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Services.Interfaces", "DFI.FaultReporting.Interfaces\DFI.FaultReporting.Services.Interfaces.csproj", "{261A254F-2EA4-4220-AB1A-D6772020455E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFI.FaultReporting.Http", "DFI.FaultReporting.Http\DFI.FaultReporting.Http.csproj", "{1375D597-AEB5-4DC7-BF91-4C2239714246}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Http", "DFI.FaultReporting.Http\DFI.FaultReporting.Http.csproj", "{1375D597-AEB5-4DC7-BF91-4C2239714246}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFI.FaultReporting.SQL.Repository", "DFI.FaultReporting.SQL.Repository\DFI.FaultReporting.SQL.Repository.csproj", "{A9CB672D-7D73-472D-ADF2-713135417CFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.SQL.Repository", "DFI.FaultReporting.SQL.Repository\DFI.FaultReporting.SQL.Repository.csproj", "{A9CB672D-7D73-472D-ADF2-713135417CFA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DFI.FaultReporting.SQL.Repository.Interfaces", "DFI.FaultReporting.SQL.Repository.Interfaces\DFI.FaultReporting.SQL.Repository.Interfaces.csproj", "{DF605D8E-F28F-4E4F-A06C-D35BED4DC8F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.SQL.Repository.Interfaces", "DFI.FaultReporting.SQL.Repository.Interfaces\DFI.FaultReporting.SQL.Repository.Interfaces.csproj", "{DF605D8E-F28F-4E4F-A06C-D35BED4DC8F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

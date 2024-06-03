@@ -1,6 +1,8 @@
 ﻿using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Files;
+using DFI.FaultReporting.Models.Roles;
+using DFI.FaultReporting.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -36,5 +38,11 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         public DbSet<Report> Report { get; set; } = null!;
 
         public DbSet<ReportPhoto> ReportPhoto { get; set; } = null!;
+
+        public DbSet<Role> Role { get; set; } = null!;
+
+        public DbSet<User> User { get; set; } = null!;
+
+        public DbSet<UserRole> UserRole { get; set; } = null!;
     }
 }

@@ -1,6 +1,8 @@
 using DFI.FaultReporting.Http.Admin;
 using DFI.FaultReporting.Http.FaultReports;
 using DFI.FaultReporting.Http.Files;
+using DFI.FaultReporting.Http.Roles;
+using DFI.FaultReporting.Http.Users;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Interfaces.Files;
@@ -8,8 +10,12 @@ using DFI.FaultReporting.Services.Admin;
 using DFI.FaultReporting.Services.FaultReports;
 using DFI.FaultReporting.Services.Files;
 using DFI.FaultReporting.Services.Interfaces.Admin;
+using DFI.FaultReporting.Services.Interfaces.Roles;
 using DFI.FaultReporting.Services.Interfaces.Settings;
+using DFI.FaultReporting.Services.Interfaces.Users;
+using DFI.FaultReporting.Services.Roles;
 using DFI.FaultReporting.Services.Settings;
+using DFI.FaultReporting.Services.Users;
 using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +38,9 @@ builder.Services.AddScoped<IFaultTypeService, FaultTypeService>();
 builder.Services.AddScoped<IFaultService, FaultService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IReportPhotoService, ReportPhotoService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -41,6 +50,9 @@ builder.Services.AddScoped<FaultTypeHttp, FaultTypeHttp>();
 builder.Services.AddScoped<FaultHttp, FaultHttp>();
 builder.Services.AddScoped<ReportHttp, ReportHttp>();
 builder.Services.AddScoped<ReportPhotoHttp, ReportPhotoHttp>();
+builder.Services.AddScoped<RoleHttp, RoleHttp>();
+builder.Services.AddScoped<UserHttp, UserHttp>();
+builder.Services.AddScoped<UserRoleHttp, UserRoleHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 
