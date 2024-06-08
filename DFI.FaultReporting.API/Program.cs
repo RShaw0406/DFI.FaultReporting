@@ -11,6 +11,19 @@ using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Roles;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Users;
 using DFI.FaultReporting.SQL.Repository.Users;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using DFI.FaultReporting.Services.Interfaces.Settings;
+using DFI.FaultReporting.Services.Settings;
+using DFI.FaultReporting.Services.Interfaces.Token;
+using DFI.FaultReporting.Services.Token;
+using Microsoft.Data.SqlClient;
+using DFI.FaultReporting.JWT.Requests;
+using DFI.FaultReporting.JWT.Response;
+//using DFI.FaultReporting.Services.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,11 +48,64 @@ builder.Services.AddScoped<IRoleSQLRepository, RoleSQLRepository>();
 builder.Services.AddScoped<IUserSQLRepository, UserSQLRepository>();
 builder.Services.AddScoped<IUserRoleSQLRepository, UserRoleSQLRepository>();
 
+builder.Services.AddScoped<DFI.FaultReporting.JWT.Requests.LoginRequest, DFI.FaultReporting.JWT.Requests.LoginRequest>();
+builder.Services.AddScoped<RegistrationRequest, RegistrationRequest>();
+builder.Services.AddScoped<AuthResponse, AuthResponse>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddScoped<ISettingsService, SettingsService>();
+
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        };
+    });
+
+builder.Services.AddSwaggerGen(c =>
+{
+    // Define the OAuth2.0 scheme that's in use (i.e., Implicit Flow)
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
+});
+
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 var app = builder.Build();
+
 
 //Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

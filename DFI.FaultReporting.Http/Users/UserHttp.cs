@@ -1,8 +1,12 @@
 ﻿using DFI.FaultReporting.Common.Constants;
 using DFI.FaultReporting.Common.Exceptions;
+using DFI.FaultReporting.JWT;
+using DFI.FaultReporting.JWT.Requests;
+using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Settings;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,11 +30,59 @@ namespace DFI.FaultReporting.Http.Users
 
         public List<User>? Users { get; set; }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<AuthResponse> Login(LoginRequest loginRequest)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            var loginRequestJSON = JsonConvert.SerializeObject(loginRequest);
+
+            var content = new StringContent(loginRequestJSON, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(baseURL + APIEndPoints.AuthLogin),
+                Content = content
+            };
+
+            var result = await client.SendAsync(request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+
+                AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
+
+                return authResponse;
+            }
+            else
+            {
+                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    return null;
+                }
+                else
+                {
+
+                    throw new CustomHttpException("Error when attempting to Post login to API")
+                    {
+                        ResponseStatus = result.StatusCode,
+                        ExceptionClass = "UserHttp",
+                        ExceptionFunction = "Login",
+                    };
+                }
+            }
+        }
+
+        public async Task<List<User>> GetUsers(string token)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -50,12 +102,20 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Users data from API")
+                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserHttp",
-                    ExceptionFunction = "GetUsers",
-                };
+                    return null;
+                }
+                else
+                {
+
+                    throw new CustomHttpException("Error when attempting to GET Users data from API")
+                    {
+                        ResponseStatus = result.StatusCode,
+                        ExceptionClass = "UserHttp",
+                        ExceptionFunction = "GetUsers",
+                    };
+                }
             }
         }
 

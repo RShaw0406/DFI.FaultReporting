@@ -1,5 +1,7 @@
 ﻿using DFI.FaultReporting.Http.Roles;
 using DFI.FaultReporting.Http.Users;
+using DFI.FaultReporting.JWT.Requests;
+using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Users;
@@ -22,9 +24,16 @@ namespace DFI.FaultReporting.Services.Users
             _userHttp = userHttp;
         }
 
-        public async Task<List<User>> GetUsers()
+        public async Task<AuthResponse> Login(LoginRequest loginRequest)
         {
-            Users = await _userHttp.GetUsers();
+            AuthResponse authResponse = await _userHttp.Login(loginRequest);
+
+            return authResponse;
+        }
+
+        public async Task<List<User>> GetUsers(string token)
+        {
+            Users = await _userHttp.GetUsers(token);
 
             return Users;
         }

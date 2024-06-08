@@ -8,16 +8,17 @@ namespace DFI.FaultReporting.Common.Constants
 {
     public static class APIEndPoints
     {
-        public const string ClaimStatus = "/api/ClaimStatus";
-        public const string ClaimType = "/api/ClaimTypes";
-        public const string FaultPriority = "/api/FaultPriorities";
-        public const string FaultStatus = "/api/FaultStatus";
-        public const string FaultType = "/api/FaultTypes";
-        public const string Fault = "/api/Faults";
-        public const string Report = "/api/Reports";
-        public const string ReportPhoto = "/api/ReportPhotos";
-        public const string Role = "/api/Roles";
-        public const string User = "/api/Users";
-        public const string UserRole = "/api/UserRoles";
+        public const string ClaimStatus = "/api/claimstatus";
+        public const string ClaimType = "/api/claimtypes";
+        public const string FaultPriority = "/api/faultpriorities";
+        public const string FaultStatus = "/api/faultstatus";
+        public const string FaultType = "/api/faulttypes";
+        public const string Fault = "/api/faults";
+        public const string Report = "/api/reports";
+        public const string ReportPhoto = "/api/reportphotos";
+        public const string Role = "/api/roles";
+        public const string User = "/api/users";
+        public const string UserRole = "/api/userroles";
+        public const string AuthLogin = "/api/auth/login";
     }
 }

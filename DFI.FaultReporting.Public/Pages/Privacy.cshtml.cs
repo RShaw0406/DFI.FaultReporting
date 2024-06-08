@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Diagnostics;
 
 namespace DFI.FaultReporting.Public.Pages
 {
@@ -12,9 +13,17 @@ namespace DFI.FaultReporting.Public.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public async Task<IActionResult> OnGetAsync()
         {
+            TempData.Keep();
+
+            if (TempData["isAuth"] != null)
+            {
+                ViewData["isAuth"] = true;
+                ViewData["UserName"] = TempData["UserName"];
+            }
+
+            return Page();
         }
     }
-
 }

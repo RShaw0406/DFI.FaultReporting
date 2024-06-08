@@ -1,10 +1,16 @@
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.Files;
+using DFI.FaultReporting.JWT.Requests;
+using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.Files;
+using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.Interfaces.Users;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Text;
 
 namespace DFI.FaultReporting.Public.Pages
@@ -13,40 +19,23 @@ namespace DFI.FaultReporting.Public.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
-        private readonly IReportPhotoService _reportPhotoService;
+        private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public IndexModel(ILogger<IndexModel> logger, IReportPhotoService reportPhotoService)
+        public IndexModel(ILogger<IndexModel> logger, IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
-            _reportPhotoService = reportPhotoService;
+            _userService = userService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            //List<ClaimStatus> claimStatuses = await _claimStatusService.GetClaimStatuses();
+            if (HttpContext.User.Identity.IsAuthenticated == true) {
+                string? userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            //Debug.WriteLine(claimStatuses.ToString());
-
-            //ClaimStatus claimStatus = await _claimStatusService.GetClaimStatus(2);
-
-            //Debug.WriteLine(claimStatus.ToString());
-
-            //byte[] bytes = Encoding.ASCII.GetBytes("0x0123456789ABCDEF");
-
-            //ReportPhoto reportPhotoNew = new ReportPhoto { ReportID = 1, Description = "Test", Type = "TEST", Data = bytes, InputBy = "Me", InputOn = DateTime.Now, Active = true };
-
-            //await _reportPhotoService.CreateReportPhoto(reportPhotoNew);
-
-            //claimStatus.ClaimStatusDescription = "NEW";
-            //claimStatus.InputBy = "Me";
-            //claimStatus.InputOn = DateTime.Now;
-            //claimStatus.Active = false;
-
-            //await _claimStatusService.UpdateClaimStatus(claimStatus);
-
-            //await _claimStatusService.DeleteClaimStatus(7);
-
-            //await _claimStatusService.DeleteClaimStatus(8);
+                Debug.WriteLine(userId);
+            }
 
             return Page();
         }

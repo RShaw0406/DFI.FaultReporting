@@ -12,6 +12,8 @@ using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Users;
 using DFI.FaultReporting.SQL.Repository.Roles;
 using System.Data;
+using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -32,6 +34,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/Users
         [HttpGet]
+        [Authorize(Roles = "User")]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
             Users = await _userSQLRepository.GetUsers();
@@ -57,6 +60,10 @@ namespace DFI.FaultReporting.API.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
+
+            user.Password = passwordHash;
+
             user = await _userSQLRepository.CreateUser(user);
 
             return CreatedAtAction("GetUser", new { user.ID }, user);

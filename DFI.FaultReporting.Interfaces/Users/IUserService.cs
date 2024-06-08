@@ -1,4 +1,6 @@
-﻿using DFI.FaultReporting.Models.Users;
+﻿using DFI.FaultReporting.JWT.Requests;
+using DFI.FaultReporting.JWT.Response;
+using DFI.FaultReporting.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,10 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
 {
     public interface IUserService
     {
-        Task<List<User>> GetUsers();
+
+        Task<AuthResponse> Login(LoginRequest loginRequest);
+
+        Task<List<User>> GetUsers(string token);
 
         Task<User> GetUser(int ID);
 

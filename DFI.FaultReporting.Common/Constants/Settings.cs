@@ -9,5 +9,8 @@ namespace DFI.FaultReporting.Common.Constants
     public static class Settings
     {
         public const string APIURL = "API:BaseURL";
+        public const string JWTKEY = "JWT:Key";
+        public const string JWTISSUER = "JWT:Issuer";
+        public const string JWTAUDIENCE = "JWT:Audience";
     }
 }

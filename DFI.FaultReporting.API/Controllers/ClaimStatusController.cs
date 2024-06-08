@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -28,6 +30,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/ClaimStatus
         [HttpGet]
+        [Authorize(Roles = "User")]
         public async Task<ActionResult<IEnumerable<ClaimStatus>>> GetClaimStatus()
         {
             ClaimStatuses = await _claimStatusSQLRepository.GetClaimStatuses();

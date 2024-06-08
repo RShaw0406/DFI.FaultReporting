@@ -16,7 +16,11 @@ using DFI.FaultReporting.Services.Interfaces.Users;
 using DFI.FaultReporting.Services.Roles;
 using DFI.FaultReporting.Services.Settings;
 using DFI.FaultReporting.Services.Users;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +33,8 @@ builder.Services.AddHttpClient("API", api =>
 {
     api.BaseAddress = new Uri(builder.Configuration.GetValue<string>("API:BaseURL"));
 });
+
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IClaimStatusService, ClaimStatusService>();
 builder.Services.AddScoped<IClaimTypeService, ClaimTypeService>();
@@ -56,6 +62,13 @@ builder.Services.AddScoped<UserRoleHttp, UserRoleHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.AccessDeniedPath = "/Error/";
+    });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -71,6 +84,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();

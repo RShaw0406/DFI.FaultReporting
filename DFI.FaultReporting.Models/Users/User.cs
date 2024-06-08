@@ -37,6 +37,8 @@ namespace DFI.FaultReporting.Models.Users
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 
+        public byte[] PasswordSalt { get; set; }
+
         [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "Prefix must not contain special characters or numbers")]
         [StringLength(8, ErrorMessage = "Prefix name must not be more than 8 characters")]
         public string? Prefix { get; set; }

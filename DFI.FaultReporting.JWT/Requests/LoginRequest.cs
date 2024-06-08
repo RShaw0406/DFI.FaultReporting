@@ -5,15 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Common.JWT
+namespace DFI.FaultReporting.JWT.Requests
 {
     public class LoginRequest
     {
         [Required]
-        [EmailAddress]
+        [DataType(DataType.EmailAddress)]
         public string? Email { get; set; }
 
         [Required]
+        [DataType(DataType.Password)]
         public string? Password { get; set; }
     }
 }
