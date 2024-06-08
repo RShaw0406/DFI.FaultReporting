@@ -20,8 +20,4 @@
     <ProjectReference Include="..\DFI.FaultReporting.SQL.Repository.Interfaces\DFI.FaultReporting.SQL.Repository.Interfaces.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="JWT\" />
-  </ItemGroup>
-
 </Project>

@@ -14,6 +14,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using SendGrid.Helpers.Mail;
+using SendGrid;
+using DFI.FaultReporting.Services.Interfaces.Settings;
 
 namespace DFI.FaultReporting.Public.Pages.Account
 {
@@ -24,14 +27,16 @@ namespace DFI.FaultReporting.Public.Pages.Account
         private IRoleService _roleService;
         private readonly ILogger<LoginModel> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ISettingsService _settingsService;
 
-        public LoginModel(IUserService userService, IUserRoleService userRoleService, IRoleService roleService, ILogger<LoginModel> logger, IHttpContextAccessor httpContextAccessor)
+        public LoginModel(IUserService userService, IUserRoleService userRoleService, IRoleService roleService, ILogger<LoginModel> logger, IHttpContextAccessor httpContextAccessor, ISettingsService settingsService)
         {
             _userService = userService;
             _userRoleService = userRoleService;
             _roleService = roleService;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _settingsService = settingsService;
         }
 
         [BindProperty]
@@ -108,6 +113,25 @@ namespace DFI.FaultReporting.Public.Pages.Account
 
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, currentUser);
 
+                    var apiKey = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.EMAILKEY);
+                    var client = new SendGridClient(apiKey);
+                    var from = new EmailAddress("");
+                    var subject = "Sending with SendGrid is Fun";
+                    var to = new EmailAddress(loginRequest.Email);
+                    var plainTextContent = "and easy to do anywhere, even with C#";
+                    var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
+                    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                    var response = await client.SendEmailAsync(msg);
+
+                    //var apiKey = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.EMAILKEY);
+                    //var client = new SendGridClient(apiKey);
+                    //var from = new EmailAddress(await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.EMAILFROM));
+                    //var subject = "Sending with SendGrid is Fun";
+                    //var to = new EmailAddress(loginRequest.Email);
+                    //var plainTextContent = "and easy to do anywhere, even with C#";
+                    //var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
+                    //var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+                    //var response = await client.SendEmailAsync(msg);
 
                     TempData["isAuth"] = true;
                     TempData["UserName"] = authResponse.UserName;
