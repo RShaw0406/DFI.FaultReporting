@@ -2,7 +2,7 @@
 using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
-using DFI.FaultReporting.Services.Interfaces.Token;
+using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Users;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
@@ -23,10 +23,10 @@ namespace DFI.FaultReporting.API.Controllers
         private IUserSQLRepository _userSQLRepository;
         private IRoleSQLRepository _roleSQLRepository;
         private IUserRoleSQLRepository _userRoleSQLRepository;
-        private ITokenService _tokenService;
+        private IJWTTokenService _tokenService;
         public ILogger<AuthController> _logger;
 
-        public AuthController(IUserSQLRepository userSQLRepository, IRoleSQLRepository roleSQLRepository, IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, ITokenService tokenService)
+        public AuthController(IUserSQLRepository userSQLRepository, IRoleSQLRepository roleSQLRepository, IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, IJWTTokenService tokenService)
         {
             _userSQLRepository = userSQLRepository;
             _roleSQLRepository = roleSQLRepository;

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Services.Interfaces.Token
+namespace DFI.FaultReporting.Services.Interfaces.Tokens
 {
-    public interface ITokenService
+    public interface IJWTTokenService
     {
-        public Task<string> GenerateToken(User user);
+        Task<string> GenerateToken(User user);
     }
 }

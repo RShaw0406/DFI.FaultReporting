@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using DFI.FaultReporting.Services.Interfaces.Settings;
+using DFI.FaultReporting.Services.Interfaces.Emails;
+using DFI.FaultReporting.Services.Interfaces.Tokens;
 
 namespace DFI.FaultReporting.Public.Pages.Account
 {
@@ -28,8 +30,11 @@ namespace DFI.FaultReporting.Public.Pages.Account
         private readonly ILogger<LoginModel> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ISettingsService _settingsService;
+        private readonly IEmailService _emailService;
+        private readonly IVerificationTokenService _verificationTokenService;
 
-        public LoginModel(IUserService userService, IUserRoleService userRoleService, IRoleService roleService, ILogger<LoginModel> logger, IHttpContextAccessor httpContextAccessor, ISettingsService settingsService)
+        public LoginModel(IUserService userService, IUserRoleService userRoleService, IRoleService roleService, ILogger<LoginModel> logger, IHttpContextAccessor httpContextAccessor, 
+            ISettingsService settingsService, IEmailService emailService, IVerificationTokenService verificationTokenService)
         {
             _userService = userService;
             _userRoleService = userRoleService;
@@ -37,6 +42,8 @@ namespace DFI.FaultReporting.Public.Pages.Account
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _settingsService = settingsService;
+            _emailService = emailService;
+            _verificationTokenService = verificationTokenService;
         }
 
         [BindProperty]
@@ -102,60 +109,48 @@ namespace DFI.FaultReporting.Public.Pages.Account
                         }
                     }
 
-
-
                     ClaimsPrincipal currentUser = new ClaimsPrincipal();
                     currentUser.AddIdentity(claimsIdentity);
 
                     HttpContext.User = currentUser;
 
-                    var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, currentUser);
 
-                    var apiKey = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.EMAILKEY);
-                    var client = new SendGridClient(apiKey);
-                    var from = new EmailAddress("");
-                    var subject = "Sending with SendGrid is Fun";
-                    var to = new EmailAddress(loginRequest.Email);
-                    var plainTextContent = "and easy to do anywhere, even with C#";
-                    var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-                    var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                    var response = await client.SendEmailAsync(msg);
+                    Response emailResponse = await SendEmail(loginRequest.Email);
 
-                    //var apiKey = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.EMAILKEY);
-                    //var client = new SendGridClient(apiKey);
-                    //var from = new EmailAddress(await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.EMAILFROM));
-                    //var subject = "Sending with SendGrid is Fun";
-                    //var to = new EmailAddress(loginRequest.Email);
-                    //var plainTextContent = "and easy to do anywhere, even with C#";
-                    //var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-                    //var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
-                    //var response = await client.SendEmailAsync(msg);
+                    if (emailResponse.IsSuccessStatusCode)
+                    {
 
-                    TempData["isAuth"] = true;
-                    TempData["UserName"] = authResponse.UserName;
-                    TempData.Keep();
-                    ViewData["isAuth"] = true;
-                    ViewData["UserName"] = authResponse.UserName;
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "There was a problem sending the verification code");
+                        return Page();
+                    }
 
                     _logger.LogInformation("User logged in.");
                     return Redirect("/Index");
                 }
                 else
                 {
-                    TempData["isAuth"] = null;
-                    TempData["UserName"] = null;
-                    TempData.Keep();
-                    ViewData["isAuth"] = false;
-                    ViewData["UserName"] = null;
-
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt");
                     return Page();
                 }
             }
-
             return Page();
+        }
+
+        public async Task<Response> SendEmail(string emailAddress)
+        {
+            int verficationToken = await _verificationTokenService.GenerateToken();
+
+            string subject = "DFI Fault Reporting: Verification Code";
+            EmailAddress to = new EmailAddress(emailAddress);
+            string textContent = string.Empty;
+            string htmlContent = "<p>Hello, below is your verification code, do not share this code with anyone.</p><br /><p>Verification Code:</p><br /><strong>" + verficationToken.ToString() + "</strong>";
+            Attachment? attachment = null;
+
+            return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
         }
     }
 }

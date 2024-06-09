@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SendGrid;
+using SendGrid.Helpers.Mail;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,6 @@ namespace DFI.FaultReporting.Services.Interfaces.Emails
 {
     public interface IEmailService
     {
+        Task<Response> SendEmail(string subject, EmailAddress to, string textContent, string htmlContent, Attachment? attachment);
     }
 }

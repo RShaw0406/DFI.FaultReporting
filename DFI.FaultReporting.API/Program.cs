@@ -18,8 +18,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Settings;
-using DFI.FaultReporting.Services.Interfaces.Token;
-using DFI.FaultReporting.Services.Token;
+using DFI.FaultReporting.Services.Interfaces.Tokens;
+using DFI.FaultReporting.Services.Tokens;
 using Microsoft.Data.SqlClient;
 using DFI.FaultReporting.JWT.Requests;
 using DFI.FaultReporting.JWT.Response;
@@ -51,7 +51,7 @@ builder.Services.AddScoped<IUserRoleSQLRepository, UserRoleSQLRepository>();
 builder.Services.AddScoped<DFI.FaultReporting.JWT.Requests.LoginRequest, DFI.FaultReporting.JWT.Requests.LoginRequest>();
 builder.Services.AddScoped<RegistrationRequest, RegistrationRequest>();
 builder.Services.AddScoped<AuthResponse, AuthResponse>();
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 

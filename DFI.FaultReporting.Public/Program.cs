@@ -7,14 +7,18 @@ using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Interfaces.Files;
 using DFI.FaultReporting.Services.Admin;
+using DFI.FaultReporting.Services.Emails;
 using DFI.FaultReporting.Services.FaultReports;
 using DFI.FaultReporting.Services.Files;
 using DFI.FaultReporting.Services.Interfaces.Admin;
+using DFI.FaultReporting.Services.Interfaces.Emails;
 using DFI.FaultReporting.Services.Interfaces.Roles;
 using DFI.FaultReporting.Services.Interfaces.Settings;
+using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.Services.Interfaces.Users;
 using DFI.FaultReporting.Services.Roles;
 using DFI.FaultReporting.Services.Settings;
+using DFI.FaultReporting.Services.Tokens;
 using DFI.FaultReporting.Services.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -61,6 +65,8 @@ builder.Services.AddScoped<UserHttp, UserHttp>();
 builder.Services.AddScoped<UserRoleHttp, UserRoleHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IVerificationTokenService, VerificationTokenService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

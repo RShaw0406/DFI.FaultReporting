@@ -2,7 +2,7 @@
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Settings;
-using DFI.FaultReporting.Services.Interfaces.Token;
+using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
@@ -15,17 +15,17 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DFI.FaultReporting.Services.Token
+namespace DFI.FaultReporting.Services.Tokens
 {
-    public class TokenService : ITokenService
+    public class JWTTokenService : IJWTTokenService
     {
-        public ISettingsService _settings { get; }
+        public ISettingsService _settingsService;
         private IUserRoleSQLRepository _userRoleSQLRepository;
         private IRoleSQLRepository _roleSQLRepository;
 
-        public TokenService(ISettingsService settings, IUserRoleSQLRepository userRoleSQLRepository, IRoleSQLRepository roleSQLRepository)
+        public JWTTokenService(ISettingsService settingsService, IUserRoleSQLRepository userRoleSQLRepository, IRoleSQLRepository roleSQLRepository)
         {
-            _settings = settings;
+            _settingsService = settingsService;
             _userRoleSQLRepository = userRoleSQLRepository;
             _roleSQLRepository = roleSQLRepository;
         }
@@ -63,9 +63,9 @@ namespace DFI.FaultReporting.Services.Token
             }
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(await _settings.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTKEY));
-            var issuer = await _settings.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTISSUER);
-            var audience = await _settings.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTAUDIENCE);
+            var key = Encoding.ASCII.GetBytes(await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTKEY));
+            var issuer = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTISSUER);
+            var audience = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTAUDIENCE);
             var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
