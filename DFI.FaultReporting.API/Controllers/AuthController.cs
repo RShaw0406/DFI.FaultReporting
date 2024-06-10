@@ -1,7 +1,9 @@
 ﻿using DFI.FaultReporting.JWT.Requests;
 using DFI.FaultReporting.JWT.Response;
+using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Users;
@@ -10,9 +12,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Newtonsoft.Json;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -25,14 +33,16 @@ namespace DFI.FaultReporting.API.Controllers
         private IUserRoleSQLRepository _userRoleSQLRepository;
         private IJWTTokenService _tokenService;
         public ILogger<AuthController> _logger;
+        public ISettingsService _settingsService;
 
-        public AuthController(IUserSQLRepository userSQLRepository, IRoleSQLRepository roleSQLRepository, IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, IJWTTokenService tokenService)
+        public AuthController(IUserSQLRepository userSQLRepository, IRoleSQLRepository roleSQLRepository, IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, IJWTTokenService tokenService, ISettingsService settingsService)
         {
             _userSQLRepository = userSQLRepository;
             _roleSQLRepository = roleSQLRepository;
             _userRoleSQLRepository = userRoleSQLRepository;
             _logger = logger;
             _tokenService = tokenService;
+            _settingsService = settingsService;
         }
 
         public List<User>? Users { get; set; }
@@ -132,9 +142,13 @@ namespace DFI.FaultReporting.API.Controllers
             }
 
             // Generate token
-            var token = await _tokenService.GenerateToken(requestUser);
+            SecurityToken token = await _tokenService.GenerateToken(requestUser);
 
-            return Ok(new AuthResponse {  UserID = requestUser.ID, UserName = requestUser.Email, Token = token.ToString() });
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+            string tokenString = tokenHandler.WriteToken(token);
+
+            return Ok(new AuthResponse {  UserID = requestUser.ID, UserName = requestUser.Email, Token = tokenString });
         }
     }
 }

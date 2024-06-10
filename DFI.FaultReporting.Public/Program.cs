@@ -71,7 +71,7 @@ builder.Services.AddScoped<IVerificationTokenService, VerificationTokenService>(
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        //options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
         options.AccessDeniedPath = "/Error/";
     });
 

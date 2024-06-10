@@ -34,7 +34,7 @@ namespace DFI.FaultReporting.Services.Tokens
 
         public List<Role>? Roles { get; set; }
 
-        public async Task<string> GenerateToken(User user)
+        public async Task<SecurityToken> GenerateToken(User user)
         {
             UserRoles = await _userRoleSQLRepository.GetUserRoles();
 
@@ -62,22 +62,23 @@ namespace DFI.FaultReporting.Services.Tokens
                 }
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTKEY));
-            var issuer = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTISSUER);
-            var audience = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTAUDIENCE);
-            var signingCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            byte[] key = Encoding.ASCII.GetBytes(await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTKEY));
+            string issuer = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTISSUER);
+            string audience = await _settingsService.GetSettingString(DFI.FaultReporting.Common.Constants.Settings.JWTAUDIENCE);
+            DateTime expires = DateTime.Now.AddHours(1);
+            SigningCredentials signingCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
+            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
             {
                 Issuer = issuer,
                 Audience = audience,
                 SigningCredentials = signingCredentials,
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = expires,
                 Subject = claimsIdentity
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+            SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+            return token;
         }
     }
 }

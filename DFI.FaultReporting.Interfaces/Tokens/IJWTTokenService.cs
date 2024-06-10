@@ -1,4 +1,5 @@
 ﻿using DFI.FaultReporting.Models.Users;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace DFI.FaultReporting.Services.Interfaces.Tokens
 {
     public interface IJWTTokenService
     {
-        Task<string> GenerateToken(User user);
+        Task<SecurityToken> GenerateToken(User user);
     }
 }
