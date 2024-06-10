@@ -34,7 +34,8 @@
                     </div>
                 </form>
             }
-
+        </section>
+        <section>
             @if (Model.verificationCodeSent == true)
             {
                 <form id="verificationCode" method="post">
@@ -54,7 +55,7 @@
                         <button id="btnLogin" asp-page-handler="Login" type="submit" class="btn btn-lg btn-primary">Log in</button>
                     </div>
                 </form>
-            }            
-        </section>
+            }
+        </section>           
     </div>
 </div>

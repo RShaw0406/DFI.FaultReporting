@@ -1,0 +1,26 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Account.LogoutModel
+@{
+    ViewData["Title"] = "Log out";
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <section>
+            <form id="logout" method="post">
+                <h2>Are you sure you want to log out?</h2>
+                <hr />
+                <div class="alert alert-warning">
+                    <strong>Warning: </strong>By logging out all unsaved progress will be lost and you will need to log in and re-verify to use the application again.
+                </div>
+                <div class="btn-group">
+                    <button id="btnLogout" asp-page-handler="Logout" type="submit" class="btn btn-lg btn-outline-danger">Logout</button>
+                    &nbsp;
+                    <button id="btnCancel" asp-page-handler="Cancel" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
