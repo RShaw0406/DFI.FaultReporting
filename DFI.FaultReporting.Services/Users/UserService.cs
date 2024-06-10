@@ -38,9 +38,9 @@ namespace DFI.FaultReporting.Services.Users
             return Users;
         }
 
-        public async Task<User> GetUser(int ID)
+        public async Task<User> GetUser(int ID, string token)
         {
-            User user = await _userHttp.GetUser(ID);
+            User user = await _userHttp.GetUser(ID, token);
 
             return user;
         }
@@ -52,16 +52,16 @@ namespace DFI.FaultReporting.Services.Users
             return user;
         }
 
-        public async Task<User> UpdateUser(User user)
+        public async Task<User> UpdateUser(User user, string token)
         {
-            user = await _userHttp.UpdateUser(user);
+            user = await _userHttp.UpdateUser(user, token);
 
             return user;
         }
 
-        public async Task<int> DeleteUser(int ID)
+        public async Task<int> DeleteUser(int ID, string token)
         {
-            await _userHttp.DeleteUser(ID);
+            await _userHttp.DeleteUser(ID, token);
 
             return ID;
         }

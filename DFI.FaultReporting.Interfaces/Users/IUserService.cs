@@ -16,12 +16,12 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
 
         Task<List<User>> GetUsers(string token);
 
-        Task<User> GetUser(int ID);
+        Task<User> GetUser(int ID, string token);
 
         Task<User> CreateUser(User user);
 
-        Task<User> UpdateUser(User user);
+        Task<User> UpdateUser(User user, string token);
 
-        Task<int> DeleteUser(int ID);
+        Task<int> DeleteUser(int ID, string token);
     }
 }

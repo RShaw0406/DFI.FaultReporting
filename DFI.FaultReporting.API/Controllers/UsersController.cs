@@ -34,7 +34,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/Users
         [HttpGet]
-        [Authorize(Roles = "User")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<User>>> GetUser()
         {
             Users = await _userSQLRepository.GetUsers();
@@ -43,6 +43,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/Users/5
         [HttpGet("{ID}")]
+        [Authorize]
         public async Task<ActionResult<User>> GetUser(int ID)
         {
             User user = await _userSQLRepository.GetUser(ID);
@@ -52,7 +53,7 @@ namespace DFI.FaultReporting.API.Controllers
                 return NotFound();
             }
 
-            return user;
+            return Ok(user);
         }
 
         // POST: api/Users
@@ -66,19 +67,20 @@ namespace DFI.FaultReporting.API.Controllers
 
             user = await _userSQLRepository.CreateUser(user);
 
-            return CreatedAtAction("GetUser", new { user.ID }, user);
+            return Ok(CreatedAtAction("GetUser", new { user.ID }, user));
         }
 
         // PUT: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<User>> PutUser(User user)
         {
             try
             {
                 user = await _userSQLRepository.UpdateUser(user);
 
-                return user;
+                return Ok(user);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -90,13 +92,14 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    throw;
+                    return BadRequest();
                 }
             }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{ID}")]
+        [Authorize]
         public async Task<ActionResult<int>> DeleteUser(int ID)
         {
             User user = await _userSQLRepository.GetUser(ID);
@@ -108,7 +111,7 @@ namespace DFI.FaultReporting.API.Controllers
 
             await _userSQLRepository.DeleteUser(ID);
 
-            return ID;
+            return Ok(ID);
         }
     }
 }

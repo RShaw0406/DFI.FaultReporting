@@ -18,9 +18,34 @@
 
 <div class="row">
     <div class="col-md-3">
-
+        <ul class="nav nav-pills bg-light border-bottom box-shadow mb-3 flex-column">
+            <li class="nav-item">
+                <form id="showAccountDetails" action="post">
+                    <button class="nav-link text-dark" asp-asp-page-handler="GoToAccountDetails" type="submit">Account Details</button>
+                </form>
+            </li>
+            <li class="nav-item">
+                <form id="showPersonalDetails" action="post">
+                    <button class="nav-link text-dark" asp-asp-page-handler="GoToPersonalDetails" type="submit">Personal Details</button>
+                </form>
+            </li>
+            <li class="nav-item">
+                <form id="showContactDetails" action="post">
+                    <button class="nav-link text-dark" asp-asp-page-handler="GoToContactDetails" type="submit">Contact Details</button>
+                </form>
+            </li>
+            <li class="nav-item">
+                <form id="showAddressDetails" action="post">
+                    <button class="nav-link text-dark" asp-asp-page-handler="GoToAddressDetails" type="submit">Address Details</button>
+                </form>
+            </li>
+            <li class="nav-item">
+                <form id="showDeleteDetails" action="post">
+                    <button class="nav-link text-dark" asp-asp-page-handler="GoToDeleteDetails" type="submit">Delete Account</button>
+                </form>
+            </li>
+        </ul>
     </div>
     <div class="col-md-9">
-
     </div>
 </div>

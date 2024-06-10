@@ -30,7 +30,7 @@
                         <span asp-validation-for="loginInput.Password" class="text-danger"></span>
                     </div>
                     <div>
-                        <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-primary">Request Verification Code</button>
+                        <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-outline-primary">Request Verification Code</button>
                     </div>
                 </form>
             }
@@ -52,7 +52,7 @@
                         <span asp-validation-for="verificationCodeInput.VerificationCode" class="text-danger"></span>
                     </div>
                     <div>
-                        <button id="btnLogin" asp-page-handler="Login" type="submit" class="btn btn-lg btn-primary">Log in</button>
+                        <button id="btnLogin" asp-page-handler="Login" type="submit" class="btn btn-lg btn-outline-primary">Log in</button>
                     </div>
                 </form>
             }

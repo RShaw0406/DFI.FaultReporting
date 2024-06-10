@@ -8,6 +8,7 @@ using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,11 +120,13 @@ namespace DFI.FaultReporting.Http.Users
             }
         }
 
-        public async Task<User> GetUser(int ID)
+        public async Task<User> GetUser(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -190,11 +193,13 @@ namespace DFI.FaultReporting.Http.Users
             }
         }
 
-        public async Task<User> UpdateUser(User user)
+        public async Task<User> UpdateUser(User user, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var userJSON = JsonConvert.SerializeObject(user);
 
@@ -230,11 +235,13 @@ namespace DFI.FaultReporting.Http.Users
             }
         }
 
-        public async Task<int> DeleteUser(int ID)
+        public async Task<int> DeleteUser(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
