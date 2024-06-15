@@ -112,41 +112,53 @@ namespace DFI.FaultReporting.Public.Pages.Account
 
                     int verficationToken = await _verificationTokenService.GenerateToken();
 
-                    Response emailResponse = await SendVerificationCode(loginInput.Email, verficationToken);
+                    verificationCodeSent = true;
 
-                    if (emailResponse.IsSuccessStatusCode)
-                    {
-                        verificationCodeSent = true;
+                    TempData["VerificationToken"] = verficationToken;
+                    TempData["VerificationCodeSent"] = verificationCodeSent;
+                    TempData.Keep();
 
-                        TempData["VerificationToken"] = verficationToken;
-                        TempData["VerificationCodeSent"] = verificationCodeSent;
-                        TempData.Keep();
-                    }
-                    else
-                    {
-                        verificationCodeSent = false;
+                    //Response emailResponse = await SendVerificationCode(loginInput.Email, verficationToken);
 
-                        TempData.Keep();
+                    //if (emailResponse.IsSuccessStatusCode)
+                    //{
+                    //    verificationCodeSent = true;
 
-                        ModelState.AddModelError(string.Empty, "There was a problem sending the verification code");
-                        return Page();
-                    }
+                    //    TempData["VerificationToken"] = verficationToken;
+                    //    TempData["VerificationCodeSent"] = verificationCodeSent;
+                    //    TempData.Keep();
+                    //}
+                    //else
+                    //{
+                    //    verificationCodeSent = false;
+
+                    //    TempData.Keep();
+
+                    //    ModelState.AddModelError(string.Empty, "There was a problem sending the verification code");
+                    //    return Page();
+                    //}
                 }
                 else
                 {
+                    verificationCodeSent = false;
+
                     TempData.Clear();
 
                     ModelState.AddModelError(string.Empty, "Invalid login attempt");
                     return Page();
                 }
             }
+
             TempData.Keep();
+
             return Page();
         }
 
         public async Task<IActionResult> OnPostLogin()
         {
             verificationCodeSent = Boolean.Parse(TempData["VerificationCodeSent"].ToString());
+
+            verificationCodeInput.VerificationCode = TempData["VerificationToken"].ToString();
 
             if (verificationCodeInput.VerificationCode != null)
             {
@@ -194,19 +206,17 @@ namespace DFI.FaultReporting.Public.Pages.Account
                     return Page();
                 }
             }
+
             TempData.Keep();
+
             return Page();
         }
 
         public async Task<Response> SendVerificationCode(string emailAddress, int verficationToken)
         {         
-            string subject = "DFI Fault Reporting: Verification Code";
             EmailAddress to = new EmailAddress(emailAddress);
-            string textContent = string.Empty;
-            string htmlContent = "<p>Hello,</p><p>Below is your verification code, do not share this code with anyone.</p><br /><p>Verification Code:</p><br /><strong>" + verficationToken.ToString() + "</strong>";
-            Attachment? attachment = null;
 
-            return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
+            return await _emailService.SendVerificationCodeEmail(to, verficationToken);
         }
 
         public async Task<ClaimsPrincipal> ValidateJWTToken(string token)

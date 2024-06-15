@@ -50,11 +50,8 @@ namespace DFI.FaultReporting.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequest request)
         {
-            // Generate a 128-bit salt using a sequence of
-            // cryptographically strong random bytes.
-            byte[] salt = RandomNumberGenerator.GetBytes(128 / 8); // divide by 8 to convert bits to bytes
+            byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
 
-            // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
             string passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: request.Password!,
                 salt: salt,
@@ -67,7 +64,7 @@ namespace DFI.FaultReporting.API.Controllers
                 Email = request.Email,
                 EmailConfirmed = true,
                 Password = passwordHash,
-                PasswordSalt = salt,
+                PasswordSalt = Convert.ToBase64String(salt),
                 Prefix = request.Prefix,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
@@ -124,24 +121,27 @@ namespace DFI.FaultReporting.API.Controllers
                 return Unauthorized("Invalid email");
             }
 
-            byte[] salt = requestUser.PasswordSalt;
+            byte[] salt = Convert.FromBase64String(requestUser.PasswordSalt);
 
-            // derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
-            string passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            string requestPasswordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
                 password: request.Password!,
                 salt: salt,
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
 
-            //bool verified = BCrypt.Net.BCrypt.Compare(requestUser.Password, passwordHash);
+            //string currentPasswordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+            //    password: requestUser.Password!,
+            //    salt: salt,
+            //    prf: KeyDerivationPrf.HMACSHA256,
+            //    iterationCount: 100000,
+            //    numBytesRequested: 256 / 8));
 
-            if (passwordHash != requestUser.Password)
+            if (requestPasswordHash != requestUser.Password)
             {
                 return Unauthorized("Invalid password");
             }
 
-            // Generate token
             SecurityToken token = await _tokenService.GenerateToken(requestUser);
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();

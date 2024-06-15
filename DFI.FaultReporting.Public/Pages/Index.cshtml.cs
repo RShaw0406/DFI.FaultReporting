@@ -18,14 +18,11 @@ namespace DFI.FaultReporting.Public.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
-
-        private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public IndexModel(ILogger<IndexModel> logger, IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
-            _userService = userService;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -39,10 +36,5 @@ namespace DFI.FaultReporting.Public.Pages
 
             return Page();
         }
-
-        //public void OnGet()
-        //{
-            
-        //}
     }
 }

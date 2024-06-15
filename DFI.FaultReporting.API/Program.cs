@@ -23,6 +23,8 @@ using DFI.FaultReporting.Services.Tokens;
 using Microsoft.Data.SqlClient;
 using DFI.FaultReporting.JWT.Requests;
 using DFI.FaultReporting.JWT.Response;
+using DFI.FaultReporting.Services.Interfaces.Passwords;
+using DFI.FaultReporting.Services.Passwords;
 //using DFI.FaultReporting.Services.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -54,6 +56,7 @@ builder.Services.AddScoped<AuthResponse, AuthResponse>();
 builder.Services.AddScoped<IJWTTokenService, JWTTokenService>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

@@ -61,13 +61,11 @@ namespace DFI.FaultReporting.API.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-            string passwordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
 
-            user.Password = passwordHash;
 
             user = await _userSQLRepository.CreateUser(user);
 
-            return Ok(CreatedAtAction("GetUser", new { user.ID }, user));
+            return CreatedAtAction("GetUser", new { user.ID }, user);
         }
 
         // PUT: api/Users
@@ -80,7 +78,7 @@ namespace DFI.FaultReporting.API.Controllers
             {
                 user = await _userSQLRepository.UpdateUser(user);
 
-                return Ok(user);
+                return user;
             }
             catch (DbUpdateConcurrencyException)
             {

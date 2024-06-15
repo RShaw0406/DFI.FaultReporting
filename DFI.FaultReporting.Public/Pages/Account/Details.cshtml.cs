@@ -1,12 +1,656 @@
+using Azure.Core;
+using DFI.FaultReporting.Common.SessionStorage;
+using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.Interfaces.Emails;
+using DFI.FaultReporting.Services.Interfaces.Settings;
+using DFI.FaultReporting.Services.Interfaces.Tokens;
+using DFI.FaultReporting.Services.Interfaces.Users;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Security.Claims;
+using System.Security.Cryptography;
 
 namespace DFI.FaultReporting.Public.Pages.Account
 {
     public class DetailsModel : PageModel
     {
-        public void OnGet()
+        private readonly ILogger<DetailsModel> _logger;
+        private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ISettingsService _settingsService;
+        private readonly IEmailService _emailService;
+        private readonly IVerificationTokenService _verificationTokenService;
+
+        public DetailsModel(ILogger<DetailsModel> logger, IUserService userService, IHttpContextAccessor httpContextAccessor, ISettingsService settingsService, IEmailService emailService, 
+            IVerificationTokenService verificationTokenService)
         {
+            _logger = logger;
+            _userService = userService;
+            _httpContextAccessor = httpContextAccessor;
+            _settingsService = settingsService;
+            _emailService = emailService;
+            _verificationTokenService = verificationTokenService;
         }
+
+        public User CurrentUser { get; set; }
+
+        [BindProperty]
+        public AccountDetailsInputModel AccountDetailsInput { get; set; }
+
+        [BindProperty]
+        public VerificationCodeModel VerificationCodeInput { get; set; }
+
+        [BindProperty]
+        public PersonalDetailsInputModel PersonalDetailsInput { get; set; }
+
+        public bool ShowAccountDetails { get; set; }
+
+        public bool ShowPersonalDetails { get; set; }
+
+        public bool VerificationCodeSent { get; set; }
+
+        public bool UpdateSuccess { get; set; }
+
+        public bool ValidDOB { get; set; }
+
+        public bool InValidYearDOB { get; set; }
+
+        public string InValidYearDOBMessage = "";
+
+        [DisplayName("Day")]
+        public int DayDOB { get; set; }
+
+        [DisplayName("Month")]
+        public int MonthDOB { get; set; }
+
+        [DisplayName("Year")]
+        public int YearDOB { get; set; }
+
+        public class AccountDetailsInputModel
+        {
+            [DisplayName("New email address")]
+            [DataType(DataType.EmailAddress, ErrorMessage = "You must enter a valid email address")]
+            public string? NewEmail { get; set; }
+
+            [DisplayName("New password")]
+            // Password should contain the following:
+            // At least 1 number
+            // At least 1 special character
+            // At least 1 uppercase letter
+            // At least 1 lowercase letter
+            // At least 8 characters in total
+            [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,}$", ErrorMessage = "Password does not meet all requirements")]
+            [DataType(DataType.Password)]
+            public string? NewPassword { get; set; }
+
+            [Display(Name = "Confirm new password")]
+            [DataType(DataType.Password)]
+            [Compare("NewPassword", ErrorMessage = "The new password and confirmation password do not match")]
+            public string? ConfirmPassword { get; set; }
+        }
+
+        public class VerificationCodeModel
+        {
+            public string? EmailVerificationCode { get; set; }
+
+            [Required]
+            [DisplayName("Verification code")]
+            [Compare("EmailVerificationCode", ErrorMessage = "The verification codes do not match")]
+            public string? VerificationCode { get; set; }
+        }
+
+        public class PersonalDetailsInputModel 
+        {
+            [DisplayName("New title")]
+            [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "New title must not contain special characters or numbers")]
+            [StringLength(8, ErrorMessage = "Prefix name must not be more than 8 characters")]
+            public string? Prefix { get; set; }
+
+            [DisplayName("New first name")]
+            [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "New first name must not contain special characters or numbers")]
+            [StringLength(125, ErrorMessage = "First name must not be more than 125 characters")]
+            public string? FirstName { get; set; }
+
+            [DisplayName("New last name")]
+            [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "New last name must not contain special characters or numbers")]
+            [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
+            public string? LastName { get; set; }
+
+            [DisplayName("Day")]
+            [Range(1, 31, ErrorMessage = "New date of birth day must be between {1} and {2}")]
+            public int? DayDOB { get; set; }
+
+            [DisplayName("Month")]
+            [Range(1, 12, ErrorMessage = "New date of birth month must be between {1} and {2}")]
+            public int? MonthDOB { get; set; }
+
+            [DisplayName("Year")]
+            public int? YearDOB { get; set; }
+
+            [DisplayName("New date of birth")]
+            [DataType(DataType.Date)]
+            public DateTime? DOB { get; set; }
+        }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            HttpContext.Session.Clear();
+
+            TempData.Clear();
+
+            UpdateSuccess = false;
+
+            if (_httpContextAccessor.HttpContext.User != null)
+            {
+                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
+                {
+                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+                    string? jwtToken = jwtTokenClaim.Value;
+
+                    CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
+
+                    HttpContext.Session.SetInSession("User", CurrentUser);
+
+                    ShowAccountDetails = true;
+                }
+            }
+
+            return Page();
+        }
+
+        #region Account Details
+        //Method Summary:
+        //This method is excuted when the "Account details" link is clicked in the side navigation.
+        //When excuted the "Account details" section is displayed.
+        public void OnGetShowAccountDetails()
+        {
+            //Set the CurrentUser property by getting the "User" object stored in session.
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            //Set the ShowAccountDetails property to true.
+            ShowAccountDetails = true;
+
+            //Clear all TempData to ensure a fresh start.
+            TempData.Clear();
+        }
+
+        //Method Summary:
+        //This method is executed when the "Request verification code" button is clicked in the "Account details" section.
+        //When executed the AccountDetailsInput model is validated and if valid an email containing a generated 6 digit code is sent to the user.
+        public async Task<IActionResult> OnPostRequestVerificationCode()
+        {
+            //Set the ShowAccountDetails property to true so that the section remains visible after the post.
+            ShowAccountDetails = true;
+
+            //Set the CurrentUser property by getting the "User" object stored in session so that the property remains populated after the post.
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            //Set the AccountDetailsInput model in session so that it can be accessed again after the post.
+            HttpContext.Session.SetInSession("AccountDetailsInputModel", AccountDetailsInput);
+
+            //The "NewEmail" or the "NewPassword" and "ConfirmPassword" properties of the AccountDetailsInput model are not null.
+            //The user has changed at least 1 piece of information.
+            if (AccountDetailsInput.NewEmail != null || AccountDetailsInput.NewPassword != null && AccountDetailsInput.ConfirmPassword != null)
+            {
+                //Initialise a new ValidationContext to be used to validate the AccountDetailsInput model only.
+                ValidationContext validationContext = new ValidationContext(AccountDetailsInput);
+
+                //Create a collection to store the returned AccountDetailsInput model validation results.
+                ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+
+                //Carry out validation check on the AccountDetailsInput model.
+                bool isAccountDetailsValid = Validator.TryValidateObject(AccountDetailsInput, validationContext, validationResults, true);
+
+                //The AccountDetailsInput model is valid.
+                if (isAccountDetailsValid)
+                {
+                    //Generate a verification code by calling the GenerateToken() method from the _verificationTokenService.
+                    int verificationToken = await _verificationTokenService.GenerateToken();
+
+                    //Declare a new string to store the email address to be used for sending the verification code.
+                    string? emailAddress = string.Empty;
+
+                    //The user has changed their email address.
+                    if (AccountDetailsInput.NewEmail != null)
+                    {
+                        //Set the emailAddress string to the new email address.
+                        emailAddress = AccountDetailsInput.NewEmail;
+                    }
+                    //The user has not changed their email address.
+                    else
+                    {
+                        //Set the emailAddress string to the users current email address.
+                        emailAddress = CurrentUser.Email;
+                    }
+
+                    //Declare new Response to store the reponse from the email service and populate by calling the SendVerificationCode method.
+                    Response emailResponse = await SendVerificationCode(emailAddress, verificationToken);
+
+                    //The email has successfully been sent.
+                    if (emailResponse.IsSuccessStatusCode)
+                    {
+                        //Set the VerificationCodeSent property to true as this will be needed to show the textbox for the user to input the code they received.
+                        VerificationCodeSent = true;
+
+                        //Store the verificationToken in TempData as it will be needed to check against the code input by the user.
+                        TempData["VerificationToken"] = verificationToken;
+
+                        //Store the VerificationCodeSent property value in TempData as it will be needed to ensure the code input textboxe remains visible if an error occurs.
+                        TempData["VerificationCodeSent"] = VerificationCodeSent;
+
+                        //Keep all TempData
+                        TempData.Keep();
+                    }
+                    //The email has not been sent successfully.
+                    else
+                    {
+                        //Set the VerificationCodeSent property to false to ensure the "Account details" section remains visible.
+                        VerificationCodeSent = false;
+
+                        //Clear all TempData to ensure a fresh start.
+                        TempData.Clear();
+
+                        //Add an error to the ModelState to inform the user that the email was not sent.
+                        ModelState.AddModelError(string.Empty, "There was a problem sending the verification code");
+
+                        //Return the Page.
+                        return Page();
+                    }
+                }
+                //The AccountDetailsInput model is not valid.
+                else
+                {
+                    //Set the VerificationCodeSent property to false to ensure the "Account details" section remains visible.
+                    VerificationCodeSent = false;
+
+                    //Clear all TempData to ensure a fresh start.
+                    TempData.Clear();
+
+                    //Loop over each validationResult in the returned validationResults
+                    foreach (ValidationResult validationResult in validationResults)
+                    {
+                        //Add an error to the ModelState to inform the user of en validation errors.
+                        ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
+                    }
+
+                    //Return the Page.
+                    return Page();
+                }
+            }
+            //The user has not changed any information.
+            else
+            {
+                //Set the VerificationCodeSent property to false to ensure the "Account details" section remains visible.
+                VerificationCodeSent = false;
+
+                //Clear all TempData to ensure a fresh start.
+                TempData.Clear();
+
+                //Add an error to the ModelState to inform the user that they have not changed any information.
+                ModelState.AddModelError(string.Empty, "You have not changed any account details");
+
+                //Return the Page();
+                return Page();
+            }
+
+            //If the method get this far something has gone wrong.
+
+            //Keep all TempData so that it can be reused if needed.
+            TempData.Keep();
+
+            //Return the Page.
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostUpdateAccountDetails()
+        {
+            VerificationCodeSent = true;
+
+            ShowAccountDetails = true;
+
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            AccountDetailsInput = HttpContext.Session.GetFromSession<AccountDetailsInputModel>("AccountDetailsInputModel");
+
+            VerificationCodeInput.EmailVerificationCode = TempData["VerificationToken"].ToString();
+
+            ValidationContext validationContext = new ValidationContext(VerificationCodeInput);
+            ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+            bool isVerificationCodeValid = Validator.TryValidateObject(VerificationCodeInput, validationContext, validationResults, true);
+
+            if (isVerificationCodeValid)
+            {
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+                string? jwtToken = jwtTokenClaim.Value;
+
+                if (AccountDetailsInput.NewEmail != null)
+                {
+                    CurrentUser.Email = AccountDetailsInput.NewEmail;
+                }
+
+                if (AccountDetailsInput.NewPassword != null)
+                {
+                    byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
+
+                    string passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                        password: AccountDetailsInput.NewPassword!,
+                        salt: salt,
+                        prf: KeyDerivationPrf.HMACSHA256,
+                        iterationCount: 100000,
+                        numBytesRequested: 256 / 8));
+
+                    CurrentUser.Password = passwordHash;
+                    CurrentUser.PasswordSalt = Convert.ToBase64String(salt);
+                }
+
+                User updatedUser = await _userService.UpdateUser(CurrentUser, jwtToken);
+
+                HttpContext.Session.SetInSession("User", CurrentUser);
+
+                CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+                VerificationCodeSent = false;
+
+                AccountDetailsInput.NewEmail = string.Empty;
+
+                AccountDetailsInput.NewPassword = string.Empty;
+
+                AccountDetailsInput.ConfirmPassword = string.Empty;
+
+                TempData.Clear();
+
+                UpdateSuccess = true;
+
+                return Page();
+            }
+            else
+            {
+                TempData.Keep();
+
+                foreach (ValidationResult validationResult in validationResults)
+                {
+                    ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
+                }
+
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostCancelAccountDetailsUpdate()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ModelState.Clear();
+
+            ShowAccountDetails = true;
+
+            VerificationCodeSent = false;
+
+            AccountDetailsInput.NewEmail = string.Empty;
+
+            AccountDetailsInput.NewPassword = string.Empty;
+
+            AccountDetailsInput.ConfirmPassword = string.Empty;
+
+            TempData.Clear();
+
+            UpdateSuccess = false;
+
+            return Page();
+        }
+
+        public async Task<Response> SendVerificationCode(string emailAddress, int verficationToken)
+        {
+            EmailAddress to = new EmailAddress(emailAddress);
+
+            return await _emailService.SendVerificationCodeEmail(to, verficationToken);
+        }
+        #endregion Account Details
+
+        #region Personal Details
+        public void OnGetShowPersonalDetails()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowPersonalDetails = true;
+
+            DateTime dob = Convert.ToDateTime(CurrentUser.DOB);
+
+            DayDOB = (int)dob.Day;
+
+            MonthDOB = (int)dob.Month;
+
+            YearDOB = (int)dob.Year;
+
+            ValidDOB = true;
+
+            InValidYearDOB = false;
+
+            TempData.Clear();
+        }
+
+        public async Task<IActionResult> OnPostUpdatePersonalDetails()
+        {
+            ShowPersonalDetails = true;
+
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            DateTime dob = Convert.ToDateTime(CurrentUser.DOB);
+
+            DayDOB = (int)dob.Day;
+
+            MonthDOB = (int)dob.Month;
+
+            YearDOB = (int)dob.Year;
+
+            ValidDOB = true;
+
+            //Initialise a new ValidationContext to be used to validate the PersonalDetailsInput model only.
+            ValidationContext validationContext = new ValidationContext(PersonalDetailsInput);
+
+            //Create a collection to store the returned AccountDetailsInput model validation results.
+            ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+
+            //Carry out validation check on the PersonalDetailsInput model.
+            bool isPersonalDetailsValid = Validator.TryValidateObject(PersonalDetailsInput, validationContext, validationResults, true);
+
+            if (PersonalDetailsInput.Prefix != null || PersonalDetailsInput.FirstName != null || PersonalDetailsInput.LastName != null || PersonalDetailsInput.DayDOB != null || PersonalDetailsInput.MonthDOB != null || PersonalDetailsInput.YearDOB != null)
+            {
+                if (PersonalDetailsInput.DayDOB != null || PersonalDetailsInput.MonthDOB != null || PersonalDetailsInput.YearDOB != null)
+                {
+                    if (PersonalDetailsInput.YearDOB > DateTime.Now.Year)
+                    {
+                        InValidYearDOB = true;
+
+                        InValidYearDOBMessage = "New date of birth year cannot be in the future";
+
+                        validationResults.Add(new ValidationResult(InValidYearDOBMessage));
+                    }
+                    else if (PersonalDetailsInput.YearDOB < 1900)
+                    {
+                        InValidYearDOB = true;
+
+                        InValidYearDOBMessage = "New date of birth year must be at least after 1900";
+
+                        validationResults.Add(new ValidationResult(InValidYearDOBMessage));
+                    }
+
+                    string inputDOB = PersonalDetailsInput.YearDOB.ToString() + "-" + PersonalDetailsInput.MonthDOB.ToString() + "-" + PersonalDetailsInput.DayDOB.ToString();
+
+                    DateTime newDOB;
+
+                    ValidDOB = DateTime.TryParse(inputDOB, out newDOB);
+
+                    if (ValidDOB)
+                    {
+                        PersonalDetailsInput.DOB = newDOB;
+                    }
+                    else
+                    {
+                        validationResults.Add(new ValidationResult("New date of birth must contain a valid day, month, and year"));
+                    }
+                }
+
+                if (isPersonalDetailsValid)
+                {
+                    if (InValidYearDOB)
+                    {
+                        //Add an error to the ModelState to inform the user that they have entered a year that is in the future.
+                        ModelState.AddModelError(string.Empty, InValidYearDOBMessage);
+                    }
+
+                    if (!ValidDOB)
+                    {
+                        PersonalDetailsInput.DOB = null;
+
+                        //Add an error to the ModelState to inform the user that they have not entered a valid date.
+                        ModelState.AddModelError(string.Empty, "New date of birth must contain day, month, and year");
+                    }
+
+                    if (!ValidDOB || InValidYearDOB)
+                    {
+                        //Return the Page();
+                        return Page();
+                    }
+
+                    if (PersonalDetailsInput.DOB != null ) 
+                    {
+                        CurrentUser.DOB = PersonalDetailsInput.DOB;
+                    }
+
+                    if (PersonalDetailsInput.Prefix != null)
+                    {
+                        CurrentUser.Prefix = PersonalDetailsInput.Prefix;
+                    }
+
+                    if (PersonalDetailsInput.FirstName != null)
+                    {
+                        CurrentUser.FirstName = PersonalDetailsInput.FirstName;
+                    }
+
+                    if (PersonalDetailsInput.LastName != null)
+                    {
+                        CurrentUser.LastName = PersonalDetailsInput.LastName;
+                    }
+
+                    //ValidDOB = true;
+
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+                    string? jwtToken = jwtTokenClaim.Value;
+
+                    User updatedUser = await _userService.UpdateUser(CurrentUser, jwtToken);
+
+                    HttpContext.Session.Clear();
+
+                    HttpContext.Session.SetInSession("User", CurrentUser);
+
+                    CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+                    dob = Convert.ToDateTime(CurrentUser.DOB);
+
+                    DayDOB = (int)dob.Day;
+
+                    MonthDOB = (int)dob.Month;
+
+                    YearDOB = (int)dob.Year;
+
+                    ModelState.Clear();
+
+                    PersonalDetailsInput.Prefix = string.Empty;
+
+                    PersonalDetailsInput.FirstName = string.Empty;
+
+                    PersonalDetailsInput.LastName = string.Empty;
+
+                    PersonalDetailsInput.DayDOB = null;
+
+                    PersonalDetailsInput.MonthDOB = null;
+
+                    PersonalDetailsInput.YearDOB = null;
+
+                    PersonalDetailsInput.DOB = null;
+
+                    UpdateSuccess = true;
+
+                    return Page();
+                }
+                //The PersonalDetailsInput model is not valid.
+                else
+                {
+                    //ValidDOB = true;
+
+                    //Loop over each validationResult in the returned validationResults
+                    foreach (ValidationResult validationResult in validationResults)
+                    {
+                        //Add an error to the ModelState to inform the user of en validation errors.
+                        ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
+                    }
+
+                    //Return the Page.
+                    return Page();
+                }
+            }
+            else
+            {
+                //ValidDOB = true;
+
+                //Add an error to the ModelState to inform the user that they have not changed any information.
+                ModelState.AddModelError(string.Empty, "You have not changed any account details");
+
+                //Return the Page();
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostCancelPersonalDetailsUpdate()
+        {
+            UpdateSuccess = false;
+
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            DateTime dob = Convert.ToDateTime(CurrentUser.DOB);
+
+            DayDOB = (int)dob.Day;
+
+            MonthDOB = (int)dob.Month;
+
+            YearDOB = (int)dob.Year;
+
+            ValidDOB = true;
+
+            ShowPersonalDetails = true;
+
+            ModelState.Clear();
+
+            PersonalDetailsInput.Prefix = string.Empty;
+
+            PersonalDetailsInput.FirstName = string.Empty;
+
+            PersonalDetailsInput.LastName = string.Empty;
+
+            PersonalDetailsInput.DayDOB = null;
+
+            PersonalDetailsInput.MonthDOB = null;
+
+            PersonalDetailsInput.YearDOB = null;
+
+            PersonalDetailsInput.DOB = null;
+
+            return Page();
+        }
+        #endregion Personal Details
     }
 }

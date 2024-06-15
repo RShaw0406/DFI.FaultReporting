@@ -1,7 +1,7 @@
 ﻿@page
 @model DFI.FaultReporting.Public.Pages.Account.DetailsModel
 @{
-    ViewData["Title"] = "My Details";
+    ViewData["Title"] = "My details";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -10,42 +10,238 @@
 <div class="row">
     <div class="col-md-12">
         <section>
-            <h2>Manage your account details/settings</h2>
+            <h2>Manage your details/settings</h2>
             <hr />
         </section>
     </div>
 </div>
-
 <div class="row">
     <div class="col-md-3">
         <ul class="nav nav-pills bg-light border-bottom box-shadow mb-3 flex-column">
             <li class="nav-item">
-                <form id="showAccountDetails" action="post">
-                    <button class="nav-link text-dark" asp-asp-page-handler="GoToAccountDetails" type="submit">Account Details</button>
-                </form>
+                <a id="linkShowAccountDetails" class="nav-link text-dark" asp-page-handler="ShowAccountDetails">Account details</a>
             </li>
             <li class="nav-item">
-                <form id="showPersonalDetails" action="post">
-                    <button class="nav-link text-dark" asp-asp-page-handler="GoToPersonalDetails" type="submit">Personal Details</button>
-                </form>
+                <a id="linkShowPersonalDetails" class="nav-link text-dark" asp-page-handler="ShowPersonalDetails">Personal details</a>
             </li>
             <li class="nav-item">
                 <form id="showContactDetails" action="post">
-                    <button class="nav-link text-dark" asp-asp-page-handler="GoToContactDetails" type="submit">Contact Details</button>
+                    <button class="nav-link text-dark" asp-page-handler="GoToContactDetails" type="submit">Contact details</button>
                 </form>
             </li>
             <li class="nav-item">
                 <form id="showAddressDetails" action="post">
-                    <button class="nav-link text-dark" asp-asp-page-handler="GoToAddressDetails" type="submit">Address Details</button>
+                    <button class="nav-link text-dark" asp-page-handler="GoToAddressDetails" type="submit">Address details</button>
                 </form>
             </li>
             <li class="nav-item">
                 <form id="showDeleteDetails" action="post">
-                    <button class="nav-link text-dark" asp-asp-page-handler="GoToDeleteDetails" type="submit">Delete Account</button>
+                    <button class="nav-link text-dark" asp-page-handler="GoToDeleteDetails" type="submit">Delete account</button>
                 </form>
             </li>
         </ul>
     </div>
     <div class="col-md-9">
+        @if (Model.ShowAccountDetails)
+        {
+            <div class="row">
+                <div class="col-md-6">
+                    <section>
+                        <h3>Account details</h3>
+                        <form id="showAccountDetailsForm" method="get">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.Email" class="form-control" disabled />
+                                <label asp-for="CurrentUser.Email" class="form-label"></label>
+                            </div>
+                        </form>
+                        <br />
+                        @if (!Model.VerificationCodeSent)
+                        {
+                            <form id="editAccountDetailsForm" method="post">
+                                <h3>Update account details</h3>
+                                <div class="alert alert-info">
+                                    <strong>Info: </strong>
+                                    <p>When updating any of your account details Two-Factor Authentication (2FA) is implemented.</p>
+                                    <p>Update your account details and click the "Request verification code" button to recieve an email containing your code.</p>
+                                </div>
+                                @if (Model.UpdateSuccess)
+                                {
+                                    <div class="alert alert-success alert-dismissible">
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        <strong>Success: </strong>
+                                        <p>Account details have been successfully updated.</p>
+                                    </div>
+                                }
+                                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                                    <span><strong>Please review and correct the following errors:</strong></span>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input asp-for="AccountDetailsInput.NewEmail" class="form-control" autocomplete="email" placeholder="Enter new email" />
+                                    <label asp-for="AccountDetailsInput.NewEmail" class="form-label"></label>
+                                    <span asp-validation-for="AccountDetailsInput.NewEmail" class="text-danger"></span>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input asp-for="AccountDetailsInput.NewPassword" class="form-control" autocomplete="newPassword" placeholder="Enter your new password" />
+                                    <label asp-for="AccountDetailsInput.NewPassword" class="form-label"></label>
+                                    <span asp-validation-for="AccountDetailsInput.NewPassword" class="text-danger"></span>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input asp-for="AccountDetailsInput.ConfirmPassword" class="form-control" autocomplete="newPassword" placeholder="Confirm your new password" />
+                                    <label asp-for="AccountDetailsInput.ConfirmPassword" class="form-label"></label>
+                                    <span asp-validation-for="AccountDetailsInput.ConfirmPassword" class="text-danger"></span>
+                                </div>
+                                <div class="btn-group">
+                                    <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-outline-primary">Request verification code</button>
+                                    &nbsp;
+                                    <button id="btnCancelRequestVerificationCode" asp-page-handler="CancelAccountDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                </div>
+                            </form>
+                        }
+                        @if (Model.VerificationCodeSent)
+                        {
+                            <form id="verificationCodeForm" method="post">
+                                <h3>Enter your verification code below</h3>
+                                <div class="alert alert-info">
+                                    <strong>Info: </strong>
+                                    <p>You should receive an email containing your verification code within the next few minutes. Please check your spam/junk folder.</p>
+                                    <p>If you have updated your email address please check your new email address inbox and spam/junk folder.</p>
+                                    <p>Enter the code below to and click the "Update" button to save your changes.</p>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                                    <span><strong>Please review and correct the following errors:</strong></span>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <input asp-for="VerificationCodeInput.VerificationCode" class="form-control" autocomplete="off" aria-required="true" placeholder="verification code" />
+                                    <label asp-for="VerificationCodeInput.VerificationCode" class="form-label">Verification Code</label>
+                                    <span asp-validation-for="VerificationCodeInput.VerificationCode" class="text-danger"></span>
+                                </div>
+                                <div class="btn-group">
+                                    <button id="btnUpdateAccountDetails" asp-page-handler="UpdateAccountDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                    &nbsp;
+                                    <button id="btnCancelAccountDetailsUpdate" asp-page-handler="CancelAccountDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                </div>
+                            </form>
+                        }
+                    </section>
+                    <br />
+                </div>
+            </div>
+        }
+        @if (Model.ShowPersonalDetails)
+        {
+            <div class="row">
+                <div class="col-md-6">
+                    <section>
+                        <h3>Personal details</h3>
+                        <form id="showPersonalDetailsForm" method="get">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.Prefix" class="form-control" disabled />
+                                <label asp-for="CurrentUser.Prefix" class="form-label"></label>
+                            </div>
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.FirstName" class="form-control" disabled />
+                                <label asp-for="CurrentUser.FirstName" class="form-label"></label>
+                            </div>
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.LastName" class="form-control" disabled />
+                                <label asp-for="CurrentUser.LastName" class="form-label"></label>
+                            </div>
+                            <span class="form-label">Date of birth</span>
+                            <div class="form-floating mb-3 input-group">
+                                <div class="col-2">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="DayDOB" class="form-control" disabled />
+                                        <label asp-for="DayDOB" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-2">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="MonthDOB" class="form-control" disabled />
+                                        <label asp-for="MonthDOB" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-4">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="YearDOB" class="form-control" disabled />
+                                        <label asp-for="YearDOB" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <br />
+                        <form id="editPersonalDetailsForm" method="post">
+                            <h3>Update personal details</h3>
+                            @if (Model.UpdateSuccess)
+                            {
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    <strong>Success: </strong>
+                                    <p>Personal details have been successfully updated.</p>
+                                </div>
+                            }
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                                <span><strong>Please review and correct the following errors:</strong></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="PersonalDetailsInput.Prefix" class="form-control" autocomplete="title" placeholder="Enter new title" />
+                                <label asp-for="PersonalDetailsInput.Prefix" class="form-label"></label>
+                                <span asp-validation-for="PersonalDetailsInput.Prefix" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="PersonalDetailsInput.FirstName" class="form-control" autocomplete="firstName" placeholder="Enter new first name" />
+                                <label asp-for="PersonalDetailsInput.FirstName" class="form-label"></label>
+                                <span asp-validation-for="PersonalDetailsInput.FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="PersonalDetailsInput.LastName" class="form-control" autocomplete="lastName" placeholder="Enter new last name" />
+                                <label asp-for="PersonalDetailsInput.LastName" class="form-label"></label>
+                                <span asp-validation-for="PersonalDetailsInput.LastName" class="text-danger"></span>
+                            </div>
+                            <span class="form-label">New date of birth</span>
+                            <div class="form-floating mb-3 input-group">
+                                <div class="col-2">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="PersonalDetailsInput.DayDOB" class="form-control" autocomplete="day" placeholder="Enter new day" type="text" />
+                                        <label asp-for="PersonalDetailsInput.DayDOB" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-2">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="PersonalDetailsInput.MonthDOB" class="form-control" autocomplete="month" placeholder="Enter new month" type="text" />
+                                        <label asp-for="PersonalDetailsInput.MonthDOB" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-4">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="PersonalDetailsInput.YearDOB" class="form-control" autocomplete="month" placeholder="Enter new month" type="text" />
+                                        <label asp-for="PersonalDetailsInput.YearDOB" class="form-label"></label>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="PersonalDetailsInput.DayDOB" class="text-danger"></span>
+                                <span asp-validation-for="PersonalDetailsInput.MonthDOB" class="text-danger"></span>
+                                @if (Model.InValidYearDOB)
+                                {
+                                    <span asp-validation-for="PersonalDetailsInput.YearDOB" class="text-danger">@Model.InValidYearDOBMessage</span>
+                                }
+                                @if (!Model.ValidDOB)
+                                {
+                                    <span class="text-danger">New date of birth must contain day, month, and year</span>
+                                }
+                            </div>
+                            <div class="btn-group">
+                                <button id="btnUpdatePersonalDetails" asp-page-handler="UpdatePersonalDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                &nbsp;
+                                <button id="btnCancelPersonalDetailsUpdate" asp-page-handler="CancelPersonalDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </section>
+                    <br />
+                </div>
+            </div>            
+        }
     </div>
 </div>

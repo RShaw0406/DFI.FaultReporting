@@ -9,9 +9,9 @@
 <div class="row">
     <div class="col-md-12">
         <section>
-            @if (Model.verificationCodeSent == null || Model.verificationCodeSent == false)
+            @if (Model.verificationCodeSent == false)
             {
-                <form id="login" method="post">
+                <form id="loginForm" method="post">
                     <h2>Enter your log in details below</h2>
                     <hr />
                     <div class="alert alert-info">
@@ -38,7 +38,7 @@
         <section>
             @if (Model.verificationCodeSent == true)
             {
-                <form id="verificationCode" method="post">
+                <form id="verificationCodeForm" method="post">
                     <h2>Enter your verification code below</h2>
                     <hr />
                     <div class="alert alert-info">

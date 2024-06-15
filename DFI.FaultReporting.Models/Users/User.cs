@@ -33,27 +33,30 @@ namespace DFI.FaultReporting.Models.Users
         // At least 1 lowercase letter
         // At least 8 characters in total
         // At most 127 characters
-        [RegularExpression(@"^(?=.*\d)(?=(.*\W){1})(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{8,127}$", ErrorMessage = "Password does not meet all requirements")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,}$", ErrorMessage = "Password does not meet all requirements")]
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 
-        public byte[] PasswordSalt { get; set; }
+        public string? PasswordSalt { get; set; }
 
+        [DisplayName("Title")]
         [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "Prefix must not contain special characters or numbers")]
         [StringLength(8, ErrorMessage = "Prefix name must not be more than 8 characters")]
         public string? Prefix { get; set; }
 
+        [DisplayName("First name")]
         [Required(ErrorMessage = "You must enter a first name")]
         [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "First name must not contain special characters or numbers")]
         [StringLength(125, ErrorMessage = "First name must not be more than 125 characters")]
         public string? FirstName { get; set; }
 
+        [DisplayName("Last name")]
         [Required(ErrorMessage = "You must enter a last name")]
         [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "Last name must not contain special characters or numbers")]
         [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
         public string? LastName { get; set; }
 
-        [DisplayName("Date of Birth")]
+        [DisplayName("Date of birth")]
         [DataType(DataType.Date)]
         public DateTime? DOB { get; set; }
 

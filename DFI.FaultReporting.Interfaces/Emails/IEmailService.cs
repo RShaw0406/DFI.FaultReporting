@@ -11,5 +11,7 @@ namespace DFI.FaultReporting.Services.Interfaces.Emails
     public interface IEmailService
     {
         Task<Response> SendEmail(string subject, EmailAddress to, string textContent, string htmlContent, Attachment? attachment);
+
+        Task<Response> SendVerificationCodeEmail(EmailAddress to, int verficationToken);
     }
 }
