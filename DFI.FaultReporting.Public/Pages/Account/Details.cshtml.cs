@@ -51,9 +51,14 @@ namespace DFI.FaultReporting.Public.Pages.Account
         [BindProperty]
         public PersonalDetailsInputModel PersonalDetailsInput { get; set; }
 
+        [BindProperty]
+        public ContactDetailsInputModel ContactDetailsInput { get; set; }
+
         public bool ShowAccountDetails { get; set; }
 
         public bool ShowPersonalDetails { get; set; }
+
+        public bool ShowContactDetails { get; set; }
 
         public bool VerificationCodeSent { get; set; }
 
@@ -138,6 +143,14 @@ namespace DFI.FaultReporting.Public.Pages.Account
             [DisplayName("New date of birth")]
             [DataType(DataType.Date)]
             public DateTime? DOB { get; set; }
+        }
+
+        public class ContactDetailsInputModel 
+        {
+            [DisplayName("New contact number")]
+            [RegularExpression(@"^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$", ErrorMessage = "You must enter a valid new contact number")]
+            [DataType(DataType.PhoneNumber, ErrorMessage = "You must enter a valid new contact number")]
+            public string? ContactNumber { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -460,7 +473,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
             //Initialise a new ValidationContext to be used to validate the PersonalDetailsInput model only.
             ValidationContext validationContext = new ValidationContext(PersonalDetailsInput);
 
-            //Create a collection to store the returned AccountDetailsInput model validation results.
+            //Create a collection to store the returned PersonalDetailsInput model validation results.
             ICollection<ValidationResult> validationResults = new List<ValidationResult>();
 
             //Carry out validation check on the PersonalDetailsInput model.
@@ -545,8 +558,6 @@ namespace DFI.FaultReporting.Public.Pages.Account
                         CurrentUser.LastName = PersonalDetailsInput.LastName;
                     }
 
-                    //ValidDOB = true;
-
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
 
                     string? jwtToken = jwtTokenClaim.Value;
@@ -590,8 +601,6 @@ namespace DFI.FaultReporting.Public.Pages.Account
                 //The PersonalDetailsInput model is not valid.
                 else
                 {
-                    //ValidDOB = true;
-
                     //Loop over each validationResult in the returned validationResults
                     foreach (ValidationResult validationResult in validationResults)
                     {
@@ -605,8 +614,6 @@ namespace DFI.FaultReporting.Public.Pages.Account
             }
             else
             {
-                //ValidDOB = true;
-
                 //Add an error to the ModelState to inform the user that they have not changed any information.
                 ModelState.AddModelError(string.Empty, "You have not changed any account details");
 
@@ -652,5 +659,97 @@ namespace DFI.FaultReporting.Public.Pages.Account
             return Page();
         }
         #endregion Personal Details
+
+        #region Contact Details
+        public void OnGetShowContactDetails()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowContactDetails = true;
+
+            TempData.Clear();
+        }
+
+        public async Task<IActionResult> OnPostUpdateContactDetails()
+        {
+            ShowContactDetails = true;
+
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            //Initialise a new ValidationContext to be used to validate the ContactDetailsInput model only.
+            ValidationContext validationContext = new ValidationContext(ContactDetailsInput);
+
+            //Create a collection to store the returned ContactDetailsInput model validation results.
+            ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+
+            //Carry out validation check on the ContactDetailsInput model.
+            bool isContactDetailsValid = Validator.TryValidateObject(ContactDetailsInput, validationContext, validationResults, true);
+
+            if (ContactDetailsInput.ContactNumber != null)
+            {
+                if (isContactDetailsValid)
+                {
+                    CurrentUser.ContactNumber = ContactDetailsInput.ContactNumber;
+
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+                    string? jwtToken = jwtTokenClaim.Value;
+
+                    User updatedUser = await _userService.UpdateUser(CurrentUser, jwtToken);
+
+                    HttpContext.Session.Clear();
+
+                    HttpContext.Session.SetInSession("User", CurrentUser);
+
+                    CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+                    ModelState.Clear();
+
+                    ContactDetailsInput.ContactNumber = string.Empty;
+
+                    UpdateSuccess = true;
+
+                    return Page();
+
+                }
+                //The PersonalDetailsInput model is not valid.
+                else
+                {
+                    //Loop over each validationResult in the returned validationResults
+                    foreach (ValidationResult validationResult in validationResults)
+                    {
+                        //Add an error to the ModelState to inform the user of en validation errors.
+                        ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
+                    }
+
+                    //Return the Page.
+                    return Page();
+                }
+            }
+            else
+            {
+                //Add an error to the ModelState to inform the user that they have not changed any information.
+                ModelState.AddModelError(string.Empty, "You have not changed any contact details");
+
+                //Return the Page();
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostCancelContactDetailsUpdate()
+        {
+            UpdateSuccess = false;
+
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowContactDetails = true;
+
+            ModelState.Clear();
+
+            ContactDetailsInput.ContactNumber = string.Empty;
+
+            return Page();
+        }
+        #endregion Contact Details
     }
 }

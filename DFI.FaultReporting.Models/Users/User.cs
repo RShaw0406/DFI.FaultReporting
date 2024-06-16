@@ -60,17 +60,17 @@ namespace DFI.FaultReporting.Models.Users
         [DataType(DataType.Date)]
         public DateTime? DOB { get; set; }
 
-        [DisplayName("Address Line 1")]
+        [DisplayName("Address line 1")]
         [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "Address line 1 must not contain special characters")]
         [StringLength(100, ErrorMessage = "Address line 1 must not be more than 100 characters")]
         public string? AddressLine1 { get; set; }
 
-        [DisplayName("Address Line 2")]
+        [DisplayName("Address line 2")]
         [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "Address line 2 must not contain special characters")]
         [StringLength(100, ErrorMessage = "Address line 2 must not be more than 100 characters")]
         public string? AddressLine2 { get; set; }
 
-        [DisplayName("Address Line 3")]
+        [DisplayName("Address line 3")]
         [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "Address line 3 must not contain special characters")]
         [StringLength(100, ErrorMessage = "Address line 3 must not be more than 100 characters")]
         public string? AddressLine3 { get; set; }
@@ -79,26 +79,26 @@ namespace DFI.FaultReporting.Models.Users
         [RegularExpression(@"^(([Bb][Tt][0-9]{1,2})\s?[0-9][A-Za-z]{2})$", ErrorMessage = "You must enter a valid Northern Ireland postcode")]
         public string? Postcode { get; set; }
 
-        [DisplayName("Contact Number")]
-        [RegularExpression(@"^[\d +]{11,15}$", ErrorMessage = "You must enter a valid telephone number")]
+        [DisplayName("Contact number")]
+        [RegularExpression(@"^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$", ErrorMessage = "You must enter a valid telephone number")]
         [DataType(DataType.PhoneNumber, ErrorMessage = "You must enter a valid contact number")]
         public string? ContactNumber { get; set; }
 
-        [DisplayName("Account Locked")]
+        [DisplayName("Account locked")]
         public bool? AccountLocked { get; set; }
 
-        [DisplayName("Account Locked End")]
+        [DisplayName("Account locked end")]
         [DataType(DataType.Date)]
         public DateTime? AccountLockedEnd { get; set; }
 
-        [DisplayName("Incorrect Attempts")]
+        [DisplayName("Incorrect attempts")]
         public int? IncorrectAttempts { get; set; }
 
-        [DisplayName("Input By")]
+        [DisplayName("Input by")]
         [Required(ErrorMessage = "You must provide an input by")]
         public string? InputBy { get; set; }
 
-        [DisplayName("Input On")]
+        [DisplayName("Input on")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
         public DateTime InputOn { get; set; }

@@ -25,9 +25,7 @@
                 <a id="linkShowPersonalDetails" class="nav-link text-dark" asp-page-handler="ShowPersonalDetails">Personal details</a>
             </li>
             <li class="nav-item">
-                <form id="showContactDetails" action="post">
-                    <button class="nav-link text-dark" asp-page-handler="GoToContactDetails" type="submit">Contact details</button>
-                </form>
+                <a id="linkShowPersonalDetails" class="nav-link text-dark" asp-page-handler="ShowContactDetails" type="submit">Contact details</a>
             </li>
             <li class="nav-item">
                 <form id="showAddressDetails" action="post">
@@ -242,6 +240,48 @@
                     <br />
                 </div>
             </div>            
+        }
+        @if (Model.ShowContactDetails)
+        {
+            <div class="row">
+                <div class="col-md-6">
+                    <section>
+                        <h3>Contact details</h3>
+                        <form id="showContactDetailsForm" method="get">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.ContactNumber" class="form-control" disabled />
+                                <label asp-for="CurrentUser.ContactNumber" class="form-label"></label>
+                            </div>
+                        </form>
+                        <br />
+                        <form id="editContactDetailsForm" method="post">
+                            <h3>Update contact details</h3>
+                            @if (Model.UpdateSuccess)
+                            {
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    <strong>Success: </strong>
+                                    <p>Contact details have been successfully updated.</p>
+                                </div>
+                            }
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                                <span><strong>Please review and correct the following errors:</strong></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="ContactDetailsInput.ContactNumber" class="form-control" autocomplete="title" placeholder="Enter new contact number" />
+                                <label asp-for="ContactDetailsInput.ContactNumber" class="form-label"></label>
+                                <span asp-validation-for="ContactDetailsInput.ContactNumber" class="text-danger"></span>
+                            </div>
+                            <div class="btn-group">
+                                <button id="btnUpdateContactDetails" asp-page-handler="UpdateContactDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                &nbsp;
+                                <button id="btnCancelContactDetailsUpdate" asp-page-handler="CancelContactDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </section>
+                    <br />
+                </div>
+            </div>
         }
     </div>
 </div>
