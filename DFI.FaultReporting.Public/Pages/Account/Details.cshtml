@@ -28,9 +28,7 @@
                 <a id="linkShowPersonalDetails" class="nav-link text-dark" asp-page-handler="ShowContactDetails" type="submit">Contact details</a>
             </li>
             <li class="nav-item">
-                <form id="showAddressDetails" action="post">
-                    <button class="nav-link text-dark" asp-page-handler="GoToAddressDetails" type="submit">Address details</button>
-                </form>
+                <a id="linkShowAddressDetails" class="nav-link text-dark" asp-page-handler="ShowAddressDetails" type="submit">Address details</a>
             </li>
             <li class="nav-item">
                 <form id="showDeleteDetails" action="post">
@@ -268,7 +266,7 @@
                                 <span><strong>Please review and correct the following errors:</strong></span>
                             </div>
                             <div class="form-floating mb-3">
-                                <input asp-for="ContactDetailsInput.ContactNumber" class="form-control" autocomplete="title" placeholder="Enter new contact number" />
+                                <input asp-for="ContactDetailsInput.ContactNumber" class="form-control" autocomplete="phone" placeholder="Enter new contact number" />
                                 <label asp-for="ContactDetailsInput.ContactNumber" class="form-label"></label>
                                 <span asp-validation-for="ContactDetailsInput.ContactNumber" class="text-danger"></span>
                             </div>
@@ -276,6 +274,79 @@
                                 <button id="btnUpdateContactDetails" asp-page-handler="UpdateContactDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
                                 &nbsp;
                                 <button id="btnCancelContactDetailsUpdate" asp-page-handler="CancelContactDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </section>
+                    <br />
+                </div>
+            </div>
+        }
+        @if (Model.ShowAddressDetails)
+        {
+            <div class="row">
+                <div class="col-md-6">
+                    <section>
+                        <h3>Address details</h3>
+                        <form id="showAddressDetailsForm" method="get">
+                            <div class="col-4">
+                                <div class="form-floating mb-3 input-group">
+                                    <input asp-for="CurrentUser.Postcode" class="form-control" disabled />
+                                    <label asp-for="CurrentUser.Postcode" class="form-label"></label>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.AddressLine1" class="form-control" disabled />
+                                <label asp-for="CurrentUser.AddressLine1" class="form-label"></label>
+                            </div>
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.AddressLine2" class="form-control" disabled />
+                                <label asp-for="CurrentUser.AddressLine2" class="form-label"></label>
+                            </div>
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="CurrentUser.AddressLine3" class="form-control" disabled />
+                                <label asp-for="CurrentUser.AddressLine3" class="form-label"></label>
+                            </div>
+                        </form>
+                        <br />
+                        <form id="editAddressDetailsForm" method="post">
+                            <h3>Update address details</h3>
+                            @if (Model.UpdateSuccess)
+                            {
+                                <div class="alert alert-success alert-dismissible">
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    <strong>Success: </strong>
+                                    <p>Address details have been successfully updated.</p>
+                                </div>
+                            }
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                                <span><strong>Please review and correct the following errors:</strong></span>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="AddressDetailsInput.Postcode" class="form-control" autocomplete="postcode" placeholder="Enter new postcode" />
+                                    <label asp-for="AddressDetailsInput.Postcode" class="form-label"></label>
+                                </div>
+                            </div>
+                            <span asp-validation-for="AddressDetailsInput.Postcode" class="text-danger"></span>
+                            <div class="form-floating mb-3">
+                                <input asp-for="AddressDetailsInput.AddressLine1" class="form-control" autocomplete="address1" placeholder="Enter new address line 1" />
+                                <label asp-for="AddressDetailsInput.AddressLine1" class="form-label"></label>
+                                <span asp-validation-for="AddressDetailsInput.AddressLine1" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="AddressDetailsInput.AddressLine2" class="form-control" autocomplete="address2" placeholder="Enter new address line 2" />
+                                <label asp-for="AddressDetailsInput.AddressLine2" class="form-label"></label>
+                                <span asp-validation-for="AddressDetailsInput.AddressLine2" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="AddressDetailsInput.AddressLine3" class="form-control" autocomplete="address3" placeholder="Enter new address line 3" />
+                                <label asp-for="AddressDetailsInput.AddressLine3" class="form-label"></label>
+                                <span asp-validation-for="AddressDetailsInput.AddressLine3" class="text-danger"></span>
+                            </div>
+                            <div class="btn-group">
+                                <button id="btnUpdateAddressDetails" asp-page-handler="UpdateAddressDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                &nbsp;
+                                <button id="btnCancelAddressDetailsUpdate" asp-page-handler="CancelAddressDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
                             </div>
                         </form>
                     </section>

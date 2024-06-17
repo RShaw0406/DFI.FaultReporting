@@ -75,7 +75,6 @@ namespace DFI.FaultReporting.Models.Users
         [StringLength(100, ErrorMessage = "Address line 3 must not be more than 100 characters")]
         public string? AddressLine3 { get; set; }
 
-        [Required(ErrorMessage = "You must enter a postcode")]
         [RegularExpression(@"^(([Bb][Tt][0-9]{1,2})\s?[0-9][A-Za-z]{2})$", ErrorMessage = "You must enter a valid Northern Ireland postcode")]
         public string? Postcode { get; set; }
 

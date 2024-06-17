@@ -54,11 +54,16 @@ namespace DFI.FaultReporting.Public.Pages.Account
         [BindProperty]
         public ContactDetailsInputModel ContactDetailsInput { get; set; }
 
+        [BindProperty]
+        public AddressDetailsInputModel AddressDetailsInput { get; set; }
+
         public bool ShowAccountDetails { get; set; }
 
         public bool ShowPersonalDetails { get; set; }
 
         public bool ShowContactDetails { get; set; }
+
+        public bool ShowAddressDetails { get; set; }
 
         public bool VerificationCodeSent { get; set; }
 
@@ -151,6 +156,28 @@ namespace DFI.FaultReporting.Public.Pages.Account
             [RegularExpression(@"^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$", ErrorMessage = "You must enter a valid new contact number")]
             [DataType(DataType.PhoneNumber, ErrorMessage = "You must enter a valid new contact number")]
             public string? ContactNumber { get; set; }
+        }
+
+        public class AddressDetailsInputModel
+        {
+            [DisplayName("New address line 1")]
+            [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "new address line 1 must not contain special characters")]
+            [StringLength(100, ErrorMessage = "new address line 1 must not be more than 100 characters")]
+            public string? AddressLine1 { get; set; }
+
+            [DisplayName("New address line 2")]
+            [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "New address line 2 must not contain special characters")]
+            [StringLength(100, ErrorMessage = "New address line 2 must not be more than 100 characters")]
+            public string? AddressLine2 { get; set; }
+
+            [DisplayName("New address line 3")]
+            [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "New address line 3 must not contain special characters")]
+            [StringLength(100, ErrorMessage = "New address line 3 must not be more than 100 characters")]
+            public string? AddressLine3 { get; set; }
+
+            [DisplayName("New postcode")]
+            [RegularExpression(@"^(([Bb][Tt][0-9]{1,2})\s?[0-9][A-Za-z]{2})$", ErrorMessage = "You must enter a valid Northern Ireland postcode")]
+            public string? Postcode { get; set; }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -712,7 +739,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
                     return Page();
 
                 }
-                //The PersonalDetailsInput model is not valid.
+                //The ContactDetailsInput model is not valid.
                 else
                 {
                     //Loop over each validationResult in the returned validationResults
@@ -751,5 +778,126 @@ namespace DFI.FaultReporting.Public.Pages.Account
             return Page();
         }
         #endregion Contact Details
+
+        #region Address Details
+        public void OnGetShowAddressDetails()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowAddressDetails = true;
+
+            TempData.Clear();
+        }
+
+        public async Task<IActionResult> OnPostUpdateAddressDetails()
+        {
+            ShowAddressDetails = true;
+
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            //Initialise a new ValidationContext to be used to validate the AddressDetailsInput model only.
+            ValidationContext validationContext = new ValidationContext(AddressDetailsInput);
+
+            //Create a collection to store the returned AddressDetailsInput model validation results.
+            ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+
+            //Carry out validation check on the AddressDetailsInput model.
+            bool isAddressDetailsValid = Validator.TryValidateObject(AddressDetailsInput, validationContext, validationResults, true);
+
+            if (AddressDetailsInput.Postcode != null || AddressDetailsInput.AddressLine1 != null || AddressDetailsInput.AddressLine2 != null || AddressDetailsInput.AddressLine3 != null)
+            {
+                if (isAddressDetailsValid)
+                {
+                    if (AddressDetailsInput.Postcode != null)
+                    {
+                        CurrentUser.Postcode = AddressDetailsInput.Postcode;
+                    }
+
+                    if (AddressDetailsInput.AddressLine1 != null)
+                    {
+                        CurrentUser.AddressLine1 = AddressDetailsInput.AddressLine1;
+                    }
+
+                    if (AddressDetailsInput.AddressLine2 != null)
+                    {
+                        CurrentUser.AddressLine2 = AddressDetailsInput.AddressLine2;
+                    }
+
+                    if (AddressDetailsInput.AddressLine3 != null)
+                    {
+                        CurrentUser.AddressLine3 = AddressDetailsInput.AddressLine3;
+                    }
+
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+                    string? jwtToken = jwtTokenClaim.Value;
+
+                    User updatedUser = await _userService.UpdateUser(CurrentUser, jwtToken);
+
+                    HttpContext.Session.Clear();
+
+                    HttpContext.Session.SetInSession("User", CurrentUser);
+
+                    CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+                    ModelState.Clear();
+
+                    AddressDetailsInput.Postcode = string.Empty;
+
+                    AddressDetailsInput.AddressLine1 = string.Empty;
+
+                    AddressDetailsInput.AddressLine2 = string.Empty;
+
+                    AddressDetailsInput.AddressLine3 = null;
+
+                    UpdateSuccess = true;
+
+                    return Page();
+                }
+                //The AddressDetailsInput model is not valid.
+                else
+                {
+                    //Loop over each validationResult in the returned validationResults
+                    foreach (ValidationResult validationResult in validationResults)
+                    {
+                        //Add an error to the ModelState to inform the user of en validation errors.
+                        ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
+                    }
+
+                    //Return the Page.
+                    return Page();
+                }
+            }
+            else
+            {
+                //Add an error to the ModelState to inform the user that they have not changed any information.
+                ModelState.AddModelError(string.Empty, "You have not changed any address details");
+
+                //Return the Page();
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostCancelAddressDetailsUpdate()
+        {
+            UpdateSuccess = false;
+
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowAddressDetails = true;
+
+            ModelState.Clear();
+
+            AddressDetailsInput.Postcode = string.Empty;
+
+            AddressDetailsInput.AddressLine1 = string.Empty;
+
+            AddressDetailsInput.AddressLine2 = string.Empty;
+
+            AddressDetailsInput.AddressLine3 = null;
+
+            return Page();
+        }
+        #endregion Address Details
     }
 }
