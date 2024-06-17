@@ -24,6 +24,8 @@ namespace DFI.FaultReporting.Public.Pages.Account
 {
     public class DetailsModel : PageModel
     {
+        #region Dependency Injection
+        //Declare dependencies.
         private readonly ILogger<DetailsModel> _logger;
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -31,6 +33,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
         private readonly IEmailService _emailService;
         private readonly IVerificationTokenService _verificationTokenService;
 
+        //Inject dependencies in constructor.
         public DetailsModel(ILogger<DetailsModel> logger, IUserService userService, IHttpContextAccessor httpContextAccessor, ISettingsService settingsService, IEmailService emailService, 
             IVerificationTokenService verificationTokenService)
         {
@@ -41,55 +44,78 @@ namespace DFI.FaultReporting.Public.Pages.Account
             _emailService = emailService;
             _verificationTokenService = verificationTokenService;
         }
+        #endregion Dependency Injection
 
+        #region Properties
+        //Declare CurrentUser property, this is needed when calling the _userService.
         public User CurrentUser { get; set; }
 
+        //Declare AccountDetailsInput property, this is needed when updating account details.
         [BindProperty]
         public AccountDetailsInputModel AccountDetailsInput { get; set; }
 
+        //Declare VerificationCodeInput property, this is needed when inputting sent verification code when updating account details.
         [BindProperty]
         public VerificationCodeModel VerificationCodeInput { get; set; }
 
+        //Declare PersonalDetailsInput property, this is needed when updating personal details.
         [BindProperty]
         public PersonalDetailsInputModel PersonalDetailsInput { get; set; }
 
+        //Declare ContactDetailsInput property, this is needed when updating contact details.
         [BindProperty]
         public ContactDetailsInputModel ContactDetailsInput { get; set; }
 
+        //Declare AddressDetailsInput property, this is needed when updating address details.
         [BindProperty]
         public AddressDetailsInputModel AddressDetailsInput { get; set; }
 
+        //Declare ShowAccountDetails property, this is needed for displaying account details section. 
         public bool ShowAccountDetails { get; set; }
 
+        //Declare ShowPersonalDetails property, this is needed for displaying personal details section.
         public bool ShowPersonalDetails { get; set; }
 
+        //Declare ShowContactDetails property, this is needed for displaying contact details section.
         public bool ShowContactDetails { get; set; }
 
+        //Declare ShowAddressDetails property, this is needed for displaying address details section.
         public bool ShowAddressDetails { get; set; }
 
+        //Declare ShowDeleteDetails property, this is needed for displaying delete account section.
         public bool ShowDeleteDetails { get; set; }
 
+        //Declare ShowDeleteDetailsSure property, this is needed for displaying the delete account check section.
         public bool ShowDeleteDetailsSure { get; set; }
 
+        //Declare VerificationCodeSent property, this is needed for displaying the section for inputting the verification code.
         public bool VerificationCodeSent { get; set; }
 
+        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
 
+        //Declare ValidDOB property, this is needed for validating the input DOB when updating personal details.
         public bool ValidDOB { get; set; }
 
+        //Declare InValidYearDOB property, this is needed for validating the input year when updating personal details.
         public bool InValidYearDOB { get; set; }
 
+        //Declare InValidYearDOBMessage property, this is needed for storing the specific error message when upating personal details year.
         public string InValidYearDOBMessage = "";
 
+        //Declare DayDOB property, this is needed for storing the day value from users DOB.
         [DisplayName("Day")]
         public int DayDOB { get; set; }
 
+        //Declare MonthDOB property, this is needed for storing the month value from users DOB.
         [DisplayName("Month")]
         public int MonthDOB { get; set; }
 
+        //Declare YearDOB property, this is needed for storing the year value from users DOB.
         [DisplayName("Year")]
         public int YearDOB { get; set; }
 
+        //Declare AccountDetailsInputModel class, this is needed for updating account details.
         public class AccountDetailsInputModel
         {
             [DisplayName("New email address")]
@@ -113,6 +139,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
             public string? ConfirmPassword { get; set; }
         }
 
+        //Declare VerificationCodeModel class, this is needed when inputting setn verification code when updating account details.
         public class VerificationCodeModel
         {
             public string? EmailVerificationCode { get; set; }
@@ -123,7 +150,8 @@ namespace DFI.FaultReporting.Public.Pages.Account
             public string? VerificationCode { get; set; }
         }
 
-        public class PersonalDetailsInputModel 
+        //Declare PersonalDetailsInputModel class, this is needed when updating personal details.
+        public class PersonalDetailsInputModel
         {
             [DisplayName("New title")]
             [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "New title must not contain special characters or numbers")]
@@ -156,7 +184,8 @@ namespace DFI.FaultReporting.Public.Pages.Account
             public DateTime? DOB { get; set; }
         }
 
-        public class ContactDetailsInputModel 
+        //Declare ContactDetailsInputModel class, this is needed when updating contact details.
+        public class ContactDetailsInputModel
         {
             [DisplayName("New contact number")]
             [RegularExpression(@"^(?:(?:\(?(?:0(?:0|11)\)?[\s-]?\(?|\+)44\)?[\s-]?(?:\(?0\)?[\s-]?)?)|(?:\(?0))(?:(?:\d{5}\)?[\s-]?\d{4,5})|(?:\d{4}\)?[\s-]?(?:\d{5}|\d{3}[\s-]?\d{3}))|(?:\d{3}\)?[\s-]?\d{3}[\s-]?\d{3,4})|(?:\d{2}\)?[\s-]?\d{4}[\s-]?\d{4}))(?:[\s-]?(?:x|ext\.?|\#)\d{3,4})?$", ErrorMessage = "You must enter a valid new contact number")]
@@ -164,6 +193,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
             public string? ContactNumber { get; set; }
         }
 
+        //Declare AddressDetailsInputModel class, this is needed when updating contact details.
         public class AddressDetailsInputModel
         {
             [DisplayName("New address line 1")]
@@ -185,35 +215,52 @@ namespace DFI.FaultReporting.Public.Pages.Account
             [RegularExpression(@"^(([Bb][Tt][0-9]{1,2})\s?[0-9][A-Za-z]{2})$", ErrorMessage = "You must enter a valid Northern Ireland postcode")]
             public string? Postcode { get; set; }
         }
+        #endregion Properties
 
+        #region Page Load
+        //Method Summary:
+        //This method is executed when the page loads and is used for setting the CurrentUser in session.
         public async Task<IActionResult> OnGetAsync()
         {
+            //Clear session to ensure fresh start.
             HttpContext.Session.Clear();
 
+            //Clear TempData to ensure fresh start.
             TempData.Clear();
 
+            //Ensure UpdateSuccess message is not showing.
             UpdateSuccess = false;
 
+            //The contexts current user exists.
             if (_httpContextAccessor.HttpContext.User != null)
             {
+                //The contexts current user has been authenticated
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
                 {
+                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
                     string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
+                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
 
+                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
                     string? jwtToken = jwtTokenClaim.Value;
 
+                    //Set the CurrentUser property by calling the GetUser method in the _userService.
                     CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
 
+                    //Set the CurrentUser in session, needed for displaying details.
                     HttpContext.Session.SetInSession("User", CurrentUser);
 
+                    //Set ShowAccountDetails, this is the default view a user has.
                     ShowAccountDetails = true;
                 }
             }
 
+            //Return the page.
             return Page();
         }
+        #endregion Page Load
 
         #region Account Details
         //Method Summary:
@@ -359,22 +406,36 @@ namespace DFI.FaultReporting.Public.Pages.Account
             return Page();
         }
 
+        //Method Summary:
+        //This method executes when the "Update" button is clicked in the "Account details" section.
+        //When executed the VerificationCodeInput model is validated and if valid the CurrentUser is updated.
         public async Task<IActionResult> OnPostUpdateAccountDetails()
         {
+            //Set VerificationCodeSent to true, this is needed to ensure verification code input remains displayed if an error occurs.
             VerificationCodeSent = true;
 
+            //Set ShowAccountDetails to true, this is needed to ensure the "Account details" section remains displayed.
             ShowAccountDetails = true;
 
+            //Set the CurrentUser property to the "User" session object.
             CurrentUser = HttpContext.Session.GetFromSession<User>("User");
 
+            //Set the AccountDetailsInput to the "AccountDetailsInputModel" session object.
             AccountDetailsInput = HttpContext.Session.GetFromSession<AccountDetailsInputModel>("AccountDetailsInputModel");
 
+            //Get the sent verification code from TempData, needed for validating whether codes match. 
             VerificationCodeInput.EmailVerificationCode = TempData["VerificationToken"].ToString();
 
+            //Initialise a new ValidationContext to be used to validate the VerificationCodeInput model only.
             ValidationContext validationContext = new ValidationContext(VerificationCodeInput);
+
+            //Create a collection to store the returned VerificationCodeInput model validation results.
             ICollection<ValidationResult> validationResults = new List<ValidationResult>();
+
+            //Carry out validation check on the VerificationCodeInput model.
             bool isVerificationCodeValid = Validator.TryValidateObject(VerificationCodeInput, validationContext, validationResults, true);
 
+            //The VerificationCodeInput model is valid.
             if (isVerificationCodeValid)
             {
                 Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
