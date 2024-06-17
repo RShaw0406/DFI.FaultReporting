@@ -31,9 +31,7 @@
                 <a id="linkShowAddressDetails" class="nav-link text-dark" asp-page-handler="ShowAddressDetails" type="submit">Address details</a>
             </li>
             <li class="nav-item">
-                <form id="showDeleteDetails" action="post">
-                    <button class="nav-link text-dark" asp-page-handler="GoToDeleteDetails" type="submit">Delete account</button>
-                </form>
+                <a id="linkShowDeleteDetails" class="nav-link text-dark" asp-page-handler="ShowDeleteDetails" type="submit">Delete account</a>
             </li>
         </ul>
     </div>
@@ -349,6 +347,53 @@
                                 <button id="btnCancelAddressDetailsUpdate" asp-page-handler="CancelAddressDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
                             </div>
                         </form>
+                    </section>
+                    <br />
+                </div>
+            </div>
+        }
+        @if (Model.ShowDeleteDetails)
+        {
+            <div class="row">
+                <div class="col-md-6">
+                    <section>
+                        <h3>Delete account</h3>
+                        @if (!Model.ShowDeleteDetailsSure)
+                        {
+                            <form id="deleteAccount" method="post">
+                                <div class="alert alert-warning">
+                                    <strong>Warning: </strong>
+                                    <p>By deleting your account you will no longer be able to log in to the application.</p>
+                                </div>
+                                <div class="btn-group">
+                                    <button id="btnDeleteAccount" asp-page-handler="DeleteAccount" type="submit" class="btn btn-lg btn-outline-danger">Delete account</button>
+                                </div>
+                            </form>
+                        }
+                        @if (Model.ShowDeleteDetailsSure)
+                        {
+                            <form id="deleteAccountSure" method="post">
+                                <div class="alert alert-info">
+                                    <strong>Info:</strong>
+                                    <p>The following details will be deleted from the database:</p>
+                                    <ul>
+                                        <li>Account details</li>
+                                        <li>Personal details</li>
+                                        <li>Contact details</li>
+                                        <li>Address details</li>
+                                    </ul>
+                                </div>
+                                <div class="alert alert-danger">
+                                    <strong>Are you sure you want to delete your account?</strong>
+                                    <p>You will not be able to undo this action.</p>
+                                </div>
+                                <div class="btn-group">
+                                    <button id="btnDeleteAccountSure" asp-page-handler="DeleteAccountSure" type="submit" class="btn btn-lg btn-outline-danger">Delete account</button>
+                                    &nbsp;
+                                    <button id="btnCancelDeleteAccount" asp-page-handler="CancelDeleteAccount" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                </div>
+                            </form>
+                        }
                     </section>
                     <br />
                 </div>

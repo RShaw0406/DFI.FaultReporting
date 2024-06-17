@@ -84,9 +84,34 @@ namespace DFI.FaultReporting.SQL.Repository.Users
         public async Task<int> DeleteUser(int ID)
         {
             User user = await _context.User.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
-            _context.User.Remove(user);
+
+            user.Email = null;
+            user.EmailConfirmed = null;
+            user.Password = null;
+            user.PasswordSalt = null;
+            user.Prefix = null;
+            user.FirstName = null;
+            user.LastName = null;
+            user.DOB = null;
+            user.AddressLine1 = null;
+            user.AddressLine2 = null;
+            user.AddressLine3 = null;
+            user.Postcode = null;
+            user.ContactNumber = null;
+            user.AccountLocked = null;
+            user.AccountLockedEnd = null;
+            user.IncorrectAttempts = null;
+            user.InputBy = "Deleted User";
+            user.Active = false;
+
+            _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return ID;
+
+            //User user = await _context.User.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
+            //_context.User.Remove(user);
+            //await _context.SaveChangesAsync();
+            //return ID;
         }
     }
 }

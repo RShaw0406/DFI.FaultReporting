@@ -114,7 +114,7 @@ namespace DFI.FaultReporting.API.Controllers
         {
             Users = await _userSQLRepository.GetUsers();
 
-            User? requestUser = Users.Where(u => u.Email == request.Email).FirstOrDefault();
+            User? requestUser = Users.Where(u => u.Email == request.Email && u.Email != null).FirstOrDefault();
 
             if (requestUser == null)
             {
@@ -129,13 +129,6 @@ namespace DFI.FaultReporting.API.Controllers
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
-
-            //string currentPasswordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            //    password: requestUser.Password!,
-            //    salt: salt,
-            //    prf: KeyDerivationPrf.HMACSHA256,
-            //    iterationCount: 100000,
-            //    numBytesRequested: 256 / 8));
 
             if (requestPasswordHash != requestUser.Password)
             {

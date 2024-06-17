@@ -12,20 +12,13 @@ namespace DFI.FaultReporting.Models.Users
     {
         public int ID { get; set; }
 
-        //[Required(ErrorMessage = "You must enter a username")]
-        //[RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,8}$", ErrorMessage = "Username must not contain special characters")]
-        //[StringLength(8, ErrorMessage = "Username must not be more than 8 characters")]
-        //public string? Username { get; set; }
-
         [DisplayName("Email Address")]
-        [Required(ErrorMessage = "You must enter an email address")]
         [DataType(DataType.EmailAddress, ErrorMessage = "You must enter a valid email address")]
         public string? Email { get; set; }
 
         [DisplayName("Email Confirmed")]
-        public bool EmailConfirmed { get; set; }
+        public bool? EmailConfirmed { get; set; }
 
-        [Required(ErrorMessage = "You must enter a password")]
         // Password should contain the following:
         // At least 1 number
         // At least 1 special character
@@ -45,13 +38,11 @@ namespace DFI.FaultReporting.Models.Users
         public string? Prefix { get; set; }
 
         [DisplayName("First name")]
-        [Required(ErrorMessage = "You must enter a first name")]
         [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "First name must not contain special characters or numbers")]
         [StringLength(125, ErrorMessage = "First name must not be more than 125 characters")]
         public string? FirstName { get; set; }
 
         [DisplayName("Last name")]
-        [Required(ErrorMessage = "You must enter a last name")]
         [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "Last name must not contain special characters or numbers")]
         [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
         public string? LastName { get; set; }

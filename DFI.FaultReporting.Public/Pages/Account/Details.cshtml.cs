@@ -5,6 +5,8 @@ using DFI.FaultReporting.Services.Interfaces.Emails;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.Services.Interfaces.Users;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -64,6 +66,10 @@ namespace DFI.FaultReporting.Public.Pages.Account
         public bool ShowContactDetails { get; set; }
 
         public bool ShowAddressDetails { get; set; }
+
+        public bool ShowDeleteDetails { get; set; }
+
+        public bool ShowDeleteDetailsSure { get; set; }
 
         public bool VerificationCodeSent { get; set; }
 
@@ -397,23 +403,64 @@ namespace DFI.FaultReporting.Public.Pages.Account
 
                 User updatedUser = await _userService.UpdateUser(CurrentUser, jwtToken);
 
-                HttpContext.Session.SetInSession("User", CurrentUser);
+                if (updatedUser != null)
+                {
+                    HttpContext.Session.SetInSession("User", CurrentUser);
 
-                CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+                    CurrentUser = HttpContext.Session.GetFromSession<User>("User");
 
-                VerificationCodeSent = false;
+                    ClaimsIdentity claimsIdentity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, CurrentUser.Email));
 
-                AccountDetailsInput.NewEmail = string.Empty;
+                    foreach (Claim claim in HttpContext.User.Claims)
+                    {
+                        if (claim.Type != ClaimTypes.Name)
+                        {
+                            claimsIdentity.AddClaim(claim);
+                        }                  
+                    }
 
-                AccountDetailsInput.NewPassword = string.Empty;
+                    ClaimsPrincipal currentUser = new ClaimsPrincipal();
+                    currentUser.AddIdentity(claimsIdentity);
 
-                AccountDetailsInput.ConfirmPassword = string.Empty;
+                    Claim expiresClaim = currentUser.FindFirst("exp");
 
-                TempData.Clear();
+                    long ticks = long.Parse(expiresClaim.Value);
 
-                UpdateSuccess = true;
+                    DateTime? Expires = DateTimeOffset.FromUnixTimeSeconds(ticks).LocalDateTime;
 
-                return Page();
+                    AuthenticationProperties authenticationProperties = new AuthenticationProperties();
+
+                    authenticationProperties.ExpiresUtc = Expires;
+
+                    await HttpContext.SignOutAsync();
+
+                    HttpContext.User = currentUser;
+
+                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, currentUser, authenticationProperties);
+
+                    VerificationCodeSent = false;
+
+                    AccountDetailsInput.NewEmail = string.Empty;
+
+                    AccountDetailsInput.NewPassword = string.Empty;
+
+                    AccountDetailsInput.ConfirmPassword = string.Empty;
+
+                    TempData.Clear();
+
+                    UpdateSuccess = true;
+
+                    return Page();
+                }
+                else
+                {
+                    TempData.Keep();
+
+                    ModelState.AddModelError(string.Empty, "There was a problem updating your account details.");
+
+                    return Page();
+                }
             }
             else
             {
@@ -899,5 +946,85 @@ namespace DFI.FaultReporting.Public.Pages.Account
             return Page();
         }
         #endregion Address Details
+
+        #region Delete Account
+        public void OnGetShowDeleteDetails()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowDeleteDetails = true;
+
+            ShowDeleteDetailsSure = false;
+
+            TempData.Clear();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAccount()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowDeleteDetails = true;
+
+            ShowDeleteDetailsSure = true;
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostDeleteAccountSure()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+            string? jwtToken = jwtTokenClaim.Value;
+
+            int? deletedUserID = await _userService.DeleteUser(CurrentUser.ID, jwtToken);
+
+            if (deletedUserID != null)
+            {
+                Response emailResponse = await SendAccountDeletionEmail(CurrentUser.Email);
+
+                await HttpContext.SignOutAsync();
+
+                _logger.LogInformation("User deleted account and signed out.");
+
+                HttpContext.Session.Clear();
+
+                TempData.Clear();
+
+                return Redirect("/Index");
+            }
+            else
+            {
+                //Add an error to the ModelState to inform the user that their account cannot be deleted.
+                ModelState.AddModelError(string.Empty, "There was a problem deleting your account.");
+
+                //Return the Page();
+                return Page();
+            }
+        }
+
+        public async Task<IActionResult> OnPostCancelDeleteAccount()
+        {
+            CurrentUser = HttpContext.Session.GetFromSession<User>("User");
+
+            ShowDeleteDetails = true;
+
+            ShowDeleteDetailsSure = false;
+
+            return Page();
+        }
+
+        public async Task<Response> SendAccountDeletionEmail(string emailAddress)
+        {
+            string subject = "DFI Fault Reporting: Account Deleted";
+            EmailAddress to = new EmailAddress(emailAddress);
+            string textContent = string.Empty;
+            string htmlContent = "<p>Hello,</p><p>Your account has been successfully deleted.</p><p>Thank you for using the service.</p>";
+            Attachment? attachment = null;
+
+            return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
+        }
+        #endregion Delete Account
     }
 }
