@@ -19,17 +19,11 @@ namespace DFI.FaultReporting.Models.Users
         [DisplayName("Email Confirmed")]
         public bool? EmailConfirmed { get; set; }
 
-        // Password should contain the following:
-        // At least 1 number
-        // At least 1 special character
-        // At least 1 uppercase letter
-        // At least 1 lowercase letter
-        // At least 8 characters in total
-        // At most 127 characters
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[#$^+=!*()@%&]).{8,}$", ErrorMessage = "Password does not meet all requirements")]
+        //At this point password will be hashed.
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 
+        //At this point salt will be in base64.
         public string? PasswordSalt { get; set; }
 
         [DisplayName("Title")]

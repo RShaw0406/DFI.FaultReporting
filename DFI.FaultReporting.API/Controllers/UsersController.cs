@@ -14,6 +14,7 @@ using DFI.FaultReporting.SQL.Repository.Roles;
 using System.Data;
 using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -80,7 +81,7 @@ namespace DFI.FaultReporting.API.Controllers
 
                 return user;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 Users = await _userSQLRepository.GetUsers();
 
@@ -90,7 +91,7 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    return BadRequest();
+                    return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
         }

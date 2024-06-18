@@ -61,21 +61,6 @@ namespace DFI.FaultReporting.SQL.Repository.Users
 
         public async Task<User> UpdateUser(User user)
         {
-            //// Generate a 128-bit salt using a sequence of
-            //// cryptographically strong random bytes.
-            //byte[] salt = RandomNumberGenerator.GetBytes(128 / 8); // divide by 8 to convert bits to bytes
-
-            //// derive a 256-bit subkey (use HMACSHA256 with 100,000 iterations)
-            //string passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-            //    password: user.Password!,
-            //    salt: salt,
-            //    prf: KeyDerivationPrf.HMACSHA256,
-            //    iterationCount: 100000,
-            //    numBytesRequested: 256 / 8));
-
-            //user.Password = passwordHash;
-            //user.PasswordSalt = Convert.ToBase64String(salt);
-
             _context.Entry(user).State = EntityState.Modified;
             await _context.SaveChangesAsync();
             return user;
