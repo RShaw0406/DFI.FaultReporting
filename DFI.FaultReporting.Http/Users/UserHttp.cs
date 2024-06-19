@@ -60,20 +60,22 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    return null;
-                }
-                else
-                {
+                return null;
 
-                    throw new CustomHttpException("Error when attempting to Post login to API")
-                    {
-                        ResponseStatus = result.StatusCode,
-                        ExceptionClass = "UserHttp",
-                        ExceptionFunction = "Login",
-                    };
-                }
+                //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                //{
+                //    return null;
+                //}
+                //else
+                //{
+
+                //    throw new CustomHttpException("Error when attempting to Post login to API")
+                //    {
+                //        ResponseStatus = result.StatusCode,
+                //        ExceptionClass = "UserHttp",
+                //        ExceptionFunction = "Login",
+                //    };
+                //}
             }
         }
 
@@ -110,12 +112,14 @@ namespace DFI.FaultReporting.Http.Users
                 else
                 {
 
-                    throw new CustomHttpException("Error when attempting to GET Users data from API")
-                    {
-                        ResponseStatus = result.StatusCode,
-                        ExceptionClass = "UserHttp",
-                        ExceptionFunction = "GetUsers",
-                    };
+                    //throw new CustomHttpException("Error when attempting to GET Users data from API")
+                    //{
+                    //    ResponseStatus = result.StatusCode,
+                    //    ExceptionClass = "UserHttp",
+                    //    ExceptionFunction = "GetUsers",
+                    //};
+
+                    return null;
                 }
             }
         }
@@ -146,12 +150,14 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET User data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserHttp",
-                    ExceptionFunction = "GetUser",
-                };
+                //throw new CustomHttpException("Error when attempting to GET User data from API")
+                //{
+                //    ResponseStatus = result.StatusCode,
+                //    ExceptionClass = "UserHttp",
+                //    ExceptionFunction = "GetUser",
+                //};
+
+                return null;
             }
         }
 
@@ -184,12 +190,14 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST User data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserHttp",
-                    ExceptionFunction = "CreateUser",
-                };
+                //throw new CustomHttpException("Error when attempting to POST User data to API")
+                //{
+                //    ResponseStatus = result.StatusCode,
+                //    ExceptionClass = "UserHttp",
+                //    ExceptionFunction = "CreateUser",
+                //};
+
+                return null;
             }
         }
 
@@ -226,12 +234,14 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT User data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserHttp",
-                    ExceptionFunction = "UpdateUser",
-                };
+                //throw new CustomHttpException("Error when attempting to PUT User data to API")
+                //{
+                //    ResponseStatus = result.StatusCode,
+                //    ExceptionClass = "UserHttp",
+                //    ExceptionFunction = "UpdateUser",
+                //};
+
+                return null;
             }
         }
 
@@ -257,12 +267,13 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to DELETE User data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserHttp",
-                    ExceptionFunction = "DeleteUser",
-                };
+                //throw new CustomHttpException("Error when attempting to DELETE User data from API")
+                //{
+                //    ResponseStatus = result.StatusCode,
+                //    ExceptionClass = "UserHttp",
+                //    ExceptionFunction = "DeleteUser",
+                //};
+                return 0;
             }
         }
     }

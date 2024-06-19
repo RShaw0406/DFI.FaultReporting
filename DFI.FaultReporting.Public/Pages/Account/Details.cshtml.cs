@@ -139,7 +139,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
             public string? ConfirmPassword { get; set; }
         }
 
-        //Declare VerificationCodeModel class, this is needed when inputting setn verification code when updating account details.
+        //Declare VerificationCodeModel class, this is needed when inputting sent verification code when updating account details.
         public class VerificationCodeModel
         {
             public string? EmailVerificationCode { get; set; }
@@ -520,7 +520,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
                     //Convert the expires claims long value to a datetime.
                     DateTime? Expires = DateTimeOffset.FromUnixTimeSeconds(ticks).LocalDateTime;
 
-                    //Initialise a new AuthenticationProperties instancem, this is needed when re-logging the user into the application.
+                    //Initialise a new AuthenticationProperties instance, this is needed when re-logging the user into the application.
                     AuthenticationProperties authenticationProperties = new AuthenticationProperties();
 
                     //Set the expires of the AuthenticationProperties to the expires value from the expires claim of the claimsIdentity.
@@ -1297,10 +1297,10 @@ namespace DFI.FaultReporting.Public.Pages.Account
             string? jwtToken = jwtTokenClaim.Value;
 
             //Attempt to delete the users identity details by calling the DeleteUser method in the _userService.
-            int? deletedUserID = await _userService.DeleteUser(CurrentUser.ID, jwtToken);
+            int deletedUserID = await _userService.DeleteUser(CurrentUser.ID, jwtToken);
 
             //The users identity details have been successfully deleted.
-            if (deletedUserID != null)
+            if (deletedUserID != 0)
             {
                 //Declare new Response to store the reponse from the email service and populate by calling the SendAccountDeletionEmail method.
                 Response emailResponse = await SendAccountDeletionEmail(CurrentUser.Email);

@@ -62,8 +62,6 @@ namespace DFI.FaultReporting.API.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-
-
             user = await _userSQLRepository.CreateUser(user);
 
             return CreatedAtAction("GetUser", new { user.ID }, user);
