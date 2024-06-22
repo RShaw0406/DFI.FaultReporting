@@ -39,6 +39,13 @@ namespace DFI.FaultReporting.Services.Users
             return authResponse;
         }
 
+        public async Task<AuthResponse> Lock(string emailAddress)
+        {
+            AuthResponse authResponse = await _userHttp.Lock(emailAddress);
+
+            return authResponse;
+        }
+
         public async Task<List<User>> GetUsers(string token)
         {
             Users = await _userHttp.GetUsers(token);

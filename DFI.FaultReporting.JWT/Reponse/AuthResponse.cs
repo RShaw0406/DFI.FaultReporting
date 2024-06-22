@@ -13,7 +13,6 @@ namespace DFI.FaultReporting.JWT.Response
         public int UserID { get; set; }
         public string? UserName { get; set; }
         public string? Token { get; set; }
-
-        StatusCodeResult? StatusCodeResult { get; set; }
+        public string? ReturnStatusCodeMessage { get; set; }
     }
 }

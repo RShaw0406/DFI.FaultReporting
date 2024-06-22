@@ -99,33 +99,93 @@ namespace DFI.FaultReporting.Http.Users
 
             var result = await client.SendAsync(request);
 
-            if (result.IsSuccessStatusCode)
+            var response = await result.Content.ReadAsStringAsync();
+
+            AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
+
+            return authResponse;
+
+            //if (result.IsSuccessStatusCode)
+            //{
+            //    var response = await result.Content.ReadAsStringAsync();
+
+            //    AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
+
+            //    return authResponse;
+            //}
+            //else
+            //{
+            //    return null;
+
+            //    //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            //    //{
+            //    //    return null;
+            //    //}
+            //    //else
+            //    //{
+
+            //    //    throw new CustomHttpException("Error when attempting to Post login to API")
+            //    //    {
+            //    //        ResponseStatus = result.StatusCode,
+            //    //        ExceptionClass = "UserHttp",
+            //    //        ExceptionFunction = "Login",
+            //    //    };
+            //    //}
+            //}
+        }
+
+        public async Task<AuthResponse> Lock(string emailAddress)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            var lockJSON = JsonConvert.SerializeObject(emailAddress);
+
+            var content = new StringContent(lockJSON, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage
             {
-                var response = await result.Content.ReadAsStringAsync();
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(baseURL + APIEndPoints.AuthLock),
+                Content = content
+            };
 
-                AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
+            var result = await client.SendAsync(request);
 
-                return authResponse;
-            }
-            else
-            {
-                return null;
+            var response = await result.Content.ReadAsStringAsync();
 
-                //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                //{
-                //    return null;
-                //}
-                //else
-                //{
+            AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
 
-                //    throw new CustomHttpException("Error when attempting to Post login to API")
-                //    {
-                //        ResponseStatus = result.StatusCode,
-                //        ExceptionClass = "UserHttp",
-                //        ExceptionFunction = "Login",
-                //    };
-                //}
-            }
+            return authResponse;
+
+            //if (result.IsSuccessStatusCode)
+            //{
+            //    var response = await result.Content.ReadAsStringAsync();
+
+            //    AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
+
+            //    return authResponse;
+            //}
+            //else
+            //{
+            //    return null;
+
+            //    //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            //    //{
+            //    //    return null;
+            //    //}
+            //    //else
+            //    //{
+
+            //    //    throw new CustomHttpException("Error when attempting to Post login to API")
+            //    //    {
+            //    //        ResponseStatus = result.StatusCode,
+            //    //        ExceptionClass = "UserHttp",
+            //    //        ExceptionFunction = "Login",
+            //    //    };
+            //    //}
+            //}
         }
 
         public async Task<List<User>> GetUsers(string token)

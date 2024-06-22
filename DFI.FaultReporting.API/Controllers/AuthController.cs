@@ -1,4 +1,5 @@
-﻿using DFI.FaultReporting.JWT.Requests;
+﻿using Azure.Core;
+using DFI.FaultReporting.JWT.Requests;
 using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.Roles;
@@ -12,12 +13,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using Newtonsoft.Json;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -56,7 +59,8 @@ namespace DFI.FaultReporting.API.Controllers
 
             if (currentUser != null)
             {
-                return BadRequest("Email address already used");
+                //return BadRequest("Email address already used");
+                return BadRequest(new AuthResponse { ReturnStatusCodeMessage = "Email address already used" });
             }
 
             byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
@@ -77,7 +81,6 @@ namespace DFI.FaultReporting.API.Controllers
             User requestUser = new User
             {
                 Email = request.Email,
-                EmailConfirmed = true,
                 Password = passwordHash,
                 PasswordSalt = Convert.ToBase64String(salt),
                 Prefix = request.Prefix,
@@ -91,7 +94,6 @@ namespace DFI.FaultReporting.API.Controllers
                 ContactNumber = request.ContactNumber,
                 AccountLocked = false,
                 AccountLockedEnd = null,
-                IncorrectAttempts = 0,
                 InputBy = request.Email,
                 InputOn = DateTime.Now,
                 Active = true
@@ -103,7 +105,8 @@ namespace DFI.FaultReporting.API.Controllers
 
             if (role == null)
             {
-                return NotFound("Role not found: User");
+                //return NotFound("Role not found: User");
+                return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Role not found: User" });
             }
 
             User createdUser = await _userSQLRepository.CreateUser(requestUser);
@@ -135,19 +138,16 @@ namespace DFI.FaultReporting.API.Controllers
 
             User? requestUser = Users.Where(u => u.Email == request.Email && u.Email != null).FirstOrDefault();
 
-            if (requestUser.EmailConfirmed != true)
-            {
-                return Unauthorized("Email not confirmed");
-            }
-
             if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd > DateTime.Now)
             {
-                return Unauthorized("Account locked");
+                //return Unauthorized("Account locked");
+                return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
             }
 
             if (requestUser == null)
             {
-                return Unauthorized("Invalid email");
+                //return Unauthorized("Invalid email");
+                return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid email" });
             }
 
             byte[] salt = Convert.FromBase64String(requestUser.PasswordSalt);
@@ -161,7 +161,8 @@ namespace DFI.FaultReporting.API.Controllers
 
             if (requestPasswordHash != requestUser.Password)
             {
-                return Unauthorized("Invalid password");
+                //return Unauthorized("Invalid password");
+                return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid password" });
             }
 
             SecurityToken token = await _tokenService.GenerateToken(requestUser);
@@ -171,6 +172,21 @@ namespace DFI.FaultReporting.API.Controllers
             string tokenString = tokenHandler.WriteToken(token);
 
             return Ok(new AuthResponse {  UserID = requestUser.ID, UserName = requestUser.Email, Token = tokenString });
+        }
+
+        [HttpPut("lock")]
+        public async Task<IActionResult> LockAccount([FromBody]string emailAddress)
+        {
+            Users = await _userSQLRepository.GetUsers();
+
+            User? lockedUser = Users.Where(u => u.Email == emailAddress && u.Email != null).FirstOrDefault();
+
+            lockedUser.AccountLocked = true;
+            lockedUser.AccountLockedEnd = DateTime.Now.AddMinutes(30);
+
+            await _userSQLRepository.UpdateUser(lockedUser);
+
+            return Ok(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
         }
     }
 }

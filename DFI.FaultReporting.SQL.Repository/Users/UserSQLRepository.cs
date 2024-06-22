@@ -56,7 +56,6 @@ namespace DFI.FaultReporting.SQL.Repository.Users
             User user = await _context.User.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
 
             user.Email = null;
-            user.EmailConfirmed = null;
             user.Password = null;
             user.PasswordSalt = null;
             user.Prefix = null;
@@ -70,7 +69,6 @@ namespace DFI.FaultReporting.SQL.Repository.Users
             user.ContactNumber = null;
             user.AccountLocked = null;
             user.AccountLockedEnd = null;
-            user.IncorrectAttempts = null;
             user.InputBy = "Deleted User";
             user.Active = false;
 

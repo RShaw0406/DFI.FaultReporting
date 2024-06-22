@@ -16,9 +16,6 @@ namespace DFI.FaultReporting.Models.Users
         [DataType(DataType.EmailAddress, ErrorMessage = "You must enter a valid email address")]
         public string? Email { get; set; }
 
-        [DisplayName("Email Confirmed")]
-        public bool? EmailConfirmed { get; set; }
-
         //At this point password will be hashed.
         [DataType(DataType.Password)]
         public string? Password { get; set; }
@@ -74,9 +71,6 @@ namespace DFI.FaultReporting.Models.Users
         [DisplayName("Account locked end")]
         [DataType(DataType.Date)]
         public DateTime? AccountLockedEnd { get; set; }
-
-        [DisplayName("Incorrect attempts")]
-        public int? IncorrectAttempts { get; set; }
 
         [DisplayName("Input by")]
         [Required(ErrorMessage = "You must provide an input by")]

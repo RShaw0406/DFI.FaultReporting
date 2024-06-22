@@ -70,6 +70,9 @@ namespace DFI.FaultReporting.Public.Pages.Account
         [BindProperty]
         public bool verificationCodeSent { get; set; }
 
+        //Declare IncorrectAttempts property, this is needed for counting invalid login attempts by users.
+        public int? IncorrectAttempts { get; set; }
+
         //Declare LoginInputModel class, this is needed when requesting login to API.
         public class LoginInputModel
         {
@@ -135,7 +138,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
                 AuthResponse authResponse = await _userService.Login(loginRequest);
 
                 //User has been successfully authenticated.
-                if (authResponse != null)
+                if (authResponse.ReturnStatusCodeMessage == null)
                 {
                     //Store TempData information to be used later in the login process after valid verification code has been input.
                     TempData["LoginEmail"] = loginInput.Email;
@@ -185,11 +188,57 @@ namespace DFI.FaultReporting.Public.Pages.Account
                     //Set verificationCodeSent property to false to ensure verification code input is not shown.
                     verificationCodeSent = false;
 
-                    //Clear TempData to ensure fresh start.
-                    TempData.Clear();
+                    //AuthResponse has returned stating that the users account is locked.
+                    if (authResponse.ReturnStatusCodeMessage == "Account locked")
+                    {
+                        //Add an error to the ModelState to inform the user that their account is locked.
+                        ModelState.AddModelError(string.Empty, "Your account is currently locked try again later");
+                    }
+                    //AuthResponse has returned stating that the user has input an invalid email address.
+                    else if (authResponse.ReturnStatusCodeMessage == "Invalid email")
+                    {
+                        //Add an error to the ModelState to inform the user that their login attempt did not work.
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                    }
+                    //AuthResponse has returned stating that the user has input an invalid password.
+                    else
+                    {
 
-                    //Add an error to the ModelState to inform the user that their login attempt did not work.
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt");
+                        //Add an error to the ModelState to inform the user that their login attempt did not work.
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt");
+
+                        //TempData has IncorrectAttempts value.
+                        if (TempData["IncorrectAttempts"] != null)
+                        {
+                            //Set IncorrectAttempts property to TempData value.
+                            IncorrectAttempts = (int)TempData["IncorrectAttempts"];
+                            //Increment IncorrectAttempts.
+                            IncorrectAttempts++;
+                        }
+                        //TempData does not have IncorrectAttempts value.
+                        else
+                        {
+                            //Set IncorrectAttempts property to 1.
+                            IncorrectAttempts = 1;
+                        }
+
+
+                        //User has input invalid login details 5 times.
+                        if (IncorrectAttempts == 5)
+                        {
+                            //Lock the users account by calling the Lock method in the _userService
+                            authResponse = await _userService.Lock(loginInput.Email);
+
+                            //Redirect user to the AccountLocked page.
+                            return Redirect("/Account/AccountLocked");
+                        }
+
+                        //Set IncorrectAttempts in TempData.
+                        TempData["IncorrectAttempts"] = IncorrectAttempts;
+
+                        //Keep TempData to ensure that IncorrectAttempts is stored.
+                        TempData.Keep();
+                    }
 
                     //Return the Page.
                     return Page();
