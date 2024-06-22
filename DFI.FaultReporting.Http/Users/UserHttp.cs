@@ -7,6 +7,7 @@ using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -31,7 +32,55 @@ namespace DFI.FaultReporting.Http.Users
 
         public List<User>? Users { get; set; }
 
-        public async Task<AuthResponse> Login(LoginRequest loginRequest)
+        public async Task<AuthResponse> Register(RegistrationRequest registrationRequest)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            var registrationRequestJSON = JsonConvert.SerializeObject(registrationRequest);
+
+            var content = new StringContent(registrationRequestJSON, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(baseURL + APIEndPoints.AuthRegister),
+                Content = content
+            };
+
+            var result = await client.SendAsync(request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+
+                AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
+
+                return authResponse;
+            }
+            else
+            {
+                return null;
+
+                //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                //{
+                //    return null;
+                //}
+                //else
+                //{
+
+                //    throw new CustomHttpException("Error when attempting to Post login to API")
+                //    {
+                //        ResponseStatus = result.StatusCode,
+                //        ExceptionClass = "UserHttp",
+                //        ExceptionFunction = "Login",
+                //    };
+                //}
+            }
+        }
+
+        public async Task<AuthResponse> Login(JWT.Requests.LoginRequest loginRequest)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 

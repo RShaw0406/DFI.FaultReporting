@@ -5,6 +5,7 @@ using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Users;
+using Microsoft.AspNetCore.Identity.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,14 @@ namespace DFI.FaultReporting.Services.Users
             _userHttp = userHttp;
         }
 
-        public async Task<AuthResponse> Login(LoginRequest loginRequest)
+        public async Task<AuthResponse> Register(RegistrationRequest registrationRequest)
+        {
+            AuthResponse authResponse = await _userHttp.Register(registrationRequest);
+
+            return authResponse;
+        }
+
+        public async Task<AuthResponse> Login(JWT.Requests.LoginRequest loginRequest)
         {
             AuthResponse authResponse = await _userHttp.Login(loginRequest);
 

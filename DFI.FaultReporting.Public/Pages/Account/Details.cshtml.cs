@@ -155,17 +155,17 @@ namespace DFI.FaultReporting.Public.Pages.Account
         {
             [DisplayName("New title")]
             [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "New title must not contain special characters or numbers")]
-            [StringLength(8, ErrorMessage = "Prefix name must not be more than 8 characters")]
+            [StringLength(8, ErrorMessage = "New title must not be more than 8 characters")]
             public string? Prefix { get; set; }
 
             [DisplayName("New first name")]
             [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "New first name must not contain special characters or numbers")]
-            [StringLength(125, ErrorMessage = "First name must not be more than 125 characters")]
+            [StringLength(125, ErrorMessage = "New first name must not be more than 125 characters")]
             public string? FirstName { get; set; }
 
             [DisplayName("New last name")]
             [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "New last name must not contain special characters or numbers")]
-            [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
+            [StringLength(125, ErrorMessage = "New last name must not be more than 125 characters")]
             public string? LastName { get; set; }
 
             [DisplayName("Day")]
@@ -197,8 +197,8 @@ namespace DFI.FaultReporting.Public.Pages.Account
         public class AddressDetailsInputModel
         {
             [DisplayName("New address line 1")]
-            [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "new address line 1 must not contain special characters")]
-            [StringLength(100, ErrorMessage = "new address line 1 must not be more than 100 characters")]
+            [RegularExpression(@"^[a-zA-Z0-9''-'\s]{1,100}$", ErrorMessage = "New address line 1 must not contain special characters")]
+            [StringLength(100, ErrorMessage = "New address line 1 must not be more than 100 characters")]
             public string? AddressLine1 { get; set; }
 
             [DisplayName("New address line 2")]
@@ -916,6 +916,9 @@ namespace DFI.FaultReporting.Public.Pages.Account
 
             //Set the ValidDOB property to true, this is needed for validation.
             ValidDOB = true;
+
+            //Set the InValidYearDOB property to false, this is needed for validation.
+            InValidYearDOB = false;
 
             //Clear the PersonalDetailsInput model to ensure fresh start.
             ModelState.Clear();

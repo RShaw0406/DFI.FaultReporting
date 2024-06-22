@@ -50,6 +50,15 @@ namespace DFI.FaultReporting.API.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequest request)
         {
+            Users = await _userSQLRepository.GetUsers();
+
+            User? currentUser = Users.Where(u => u.Email == request.Email && u.Email != null).FirstOrDefault();
+
+            if (currentUser != null)
+            {
+                return BadRequest("Email address already used");
+            }
+
             byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
 
             string passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
@@ -58,6 +67,12 @@ namespace DFI.FaultReporting.API.Controllers
                 prf: KeyDerivationPrf.HMACSHA256,
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
+
+            //Create a string DOB by combining all the input DOB values.
+            string inputDOB = request.YearDOB.ToString() + "-" + request.MonthDOB.ToString() + "-" + request.DayDOB.ToString();
+
+            //Declare a DOB datetime.
+            DateTime DOB = DateTime.Parse(inputDOB);
 
             User requestUser = new User
             {
@@ -68,7 +83,7 @@ namespace DFI.FaultReporting.API.Controllers
                 Prefix = request.Prefix,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                DOB = request.DOB,
+                DOB = DOB,
                 AddressLine1 = request.AddressLine1,
                 AddressLine2 = request.AddressLine2,
                 AddressLine3 = request.AddressLine3,
@@ -104,9 +119,13 @@ namespace DFI.FaultReporting.API.Controllers
 
             await _userRoleSQLRepository.CreateUserRole(userRole);
 
-            var token = await _tokenService.GenerateToken(requestUser);
+            SecurityToken token = await _tokenService.GenerateToken(createdUser);
 
-            return Ok(new AuthResponse { Token = token.ToString() });
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+            string tokenString = tokenHandler.WriteToken(token);
+
+            return Ok(new AuthResponse { UserID = createdUser.ID, UserName = createdUser.Email, Token = tokenString });
         }
 
         [HttpPost("login")]
@@ -115,6 +134,16 @@ namespace DFI.FaultReporting.API.Controllers
             Users = await _userSQLRepository.GetUsers();
 
             User? requestUser = Users.Where(u => u.Email == request.Email && u.Email != null).FirstOrDefault();
+
+            if (requestUser.EmailConfirmed != true)
+            {
+                return Unauthorized("Email not confirmed");
+            }
+
+            if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd > DateTime.Now)
+            {
+                return Unauthorized("Account locked");
+            }
 
             if (requestUser == null)
             {

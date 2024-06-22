@@ -11,8 +11,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
 {
     public interface IUserService
     {
-
-        Task<AuthResponse> Login(LoginRequest loginRequest);
+        Task<AuthResponse> Register(RegistrationRequest registrationRequest);
+        Task<AuthResponse> Login(JWT.Requests.LoginRequest loginRequest);
 
         Task<List<User>> GetUsers(string token);
 

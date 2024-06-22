@@ -20,7 +20,9 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=DFI.FaultReporting;Trusted_Connection=True;MultipleActiveResultSets=true");
+            optionsBuilder.UseSqlServer("Server=tcp:dfifaultreportingsqlserver.database.windows.net,1433;Initial Catalog=DFIFaultReportingSQLDB;" +
+                "Persist Security Info=False;User ID=DFIFaultReportingUser;Password=!!!Reporting!!!;" +
+                "MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
         }
 
         public DbSet<ClaimStatus> ClaimStatus { get; set; } = null!;
