@@ -165,6 +165,14 @@ namespace DFI.FaultReporting.API.Controllers
                 return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid password" });
             }
 
+            if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd < DateTime.Now)
+            {
+                requestUser.AccountLocked = false;
+                requestUser.AccountLockedEnd = null;
+
+                await _userSQLRepository.UpdateUser(requestUser);
+            }
+
             SecurityToken token = await _tokenService.GenerateToken(requestUser);
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
