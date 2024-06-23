@@ -1,0 +1,51 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step1Model
+@{
+    ViewData["Title"] = "Report a fault";
+}
+
+<body onload="initMap()">
+    <div class="container-fluid">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:25%">Step 1</div>
+        </div>
+        <br />
+        <h2>Select type and location of fault</h2>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="autocomplete">
+                    <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-center">
+                    <div id="map" style="height: 1000px; width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <br />
+        <label id="LatLabel" style="font-weight: bold;">Lat:</label>
+        <br />
+        <label id="LabelLat"></label>
+        <br />
+        <label id="LongLabel" style="font-weight: bold;">Long:</label>
+        <br />
+        <label id="LabelLong"></label>
+        <br />
+        <label id="PlaceLabel" style="font-weight: bold;">PlaceID:</label>
+        <br />
+        <label id="LabelPlace"></label>
+        <br />
+        <label id="RoadLabel" style="font-weight: bold;">Road:</label>
+        <br />
+        <label id="LabelRoad"></label>
+    </div>
+    <script src="~/js/mapping/ReportFault.js"></script>
+</body>

@@ -62,21 +62,6 @@ namespace DFI.FaultReporting.Http.Users
             else
             {
                 return null;
-
-                //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                //{
-                //    return null;
-                //}
-                //else
-                //{
-
-                //    throw new CustomHttpException("Error when attempting to Post login to API")
-                //    {
-                //        ResponseStatus = result.StatusCode,
-                //        ExceptionClass = "UserHttp",
-                //        ExceptionFunction = "Login",
-                //    };
-                //}
             }
         }
 
@@ -104,34 +89,6 @@ namespace DFI.FaultReporting.Http.Users
             AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
 
             return authResponse;
-
-            //if (result.IsSuccessStatusCode)
-            //{
-            //    var response = await result.Content.ReadAsStringAsync();
-
-            //    AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
-
-            //    return authResponse;
-            //}
-            //else
-            //{
-            //    return null;
-
-            //    //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            //    //{
-            //    //    return null;
-            //    //}
-            //    //else
-            //    //{
-
-            //    //    throw new CustomHttpException("Error when attempting to Post login to API")
-            //    //    {
-            //    //        ResponseStatus = result.StatusCode,
-            //    //        ExceptionClass = "UserHttp",
-            //    //        ExceptionFunction = "Login",
-            //    //    };
-            //    //}
-            //}
         }
 
         public async Task<AuthResponse> Lock(string emailAddress)
@@ -158,34 +115,6 @@ namespace DFI.FaultReporting.Http.Users
             AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
 
             return authResponse;
-
-            //if (result.IsSuccessStatusCode)
-            //{
-            //    var response = await result.Content.ReadAsStringAsync();
-
-            //    AuthResponse authResponse = JsonConvert.DeserializeObject<AuthResponse>(response);
-
-            //    return authResponse;
-            //}
-            //else
-            //{
-            //    return null;
-
-            //    //if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            //    //{
-            //    //    return null;
-            //    //}
-            //    //else
-            //    //{
-
-            //    //    throw new CustomHttpException("Error when attempting to Post login to API")
-            //    //    {
-            //    //        ResponseStatus = result.StatusCode,
-            //    //        ExceptionClass = "UserHttp",
-            //    //        ExceptionFunction = "Login",
-            //    //    };
-            //    //}
-            //}
         }
 
         public async Task<List<User>> GetUsers(string token)
@@ -214,22 +143,7 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-                {
-                    return null;
-                }
-                else
-                {
-
-                    //throw new CustomHttpException("Error when attempting to GET Users data from API")
-                    //{
-                    //    ResponseStatus = result.StatusCode,
-                    //    ExceptionClass = "UserHttp",
-                    //    ExceptionFunction = "GetUsers",
-                    //};
-
-                    return null;
-                }
+                return null;
             }
         }
 
@@ -259,13 +173,6 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                //throw new CustomHttpException("Error when attempting to GET User data from API")
-                //{
-                //    ResponseStatus = result.StatusCode,
-                //    ExceptionClass = "UserHttp",
-                //    ExceptionFunction = "GetUser",
-                //};
-
                 return null;
             }
         }
@@ -299,13 +206,6 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                //throw new CustomHttpException("Error when attempting to POST User data to API")
-                //{
-                //    ResponseStatus = result.StatusCode,
-                //    ExceptionClass = "UserHttp",
-                //    ExceptionFunction = "CreateUser",
-                //};
-
                 return null;
             }
         }
@@ -329,8 +229,6 @@ namespace DFI.FaultReporting.Http.Users
                 Content = content
             };
 
-            //request.Headers.Add("Accept", "application/json");
-
             var result = await client.SendAsync(request);
 
             if (result.IsSuccessStatusCode)
@@ -343,13 +241,6 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                //throw new CustomHttpException("Error when attempting to PUT User data to API")
-                //{
-                //    ResponseStatus = result.StatusCode,
-                //    ExceptionClass = "UserHttp",
-                //    ExceptionFunction = "UpdateUser",
-                //};
-
                 return null;
             }
         }
@@ -376,12 +267,6 @@ namespace DFI.FaultReporting.Http.Users
             }
             else
             {
-                //throw new CustomHttpException("Error when attempting to DELETE User data from API")
-                //{
-                //    ResponseStatus = result.StatusCode,
-                //    ExceptionClass = "UserHttp",
-                //    ExceptionFunction = "DeleteUser",
-                //};
                 return 0;
             }
         }

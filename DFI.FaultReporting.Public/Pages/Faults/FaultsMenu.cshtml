@@ -1,0 +1,35 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Faults.FaultsMenuModel
+@{
+    ViewData["Title"] = "Faults menu";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Select from one of the options below</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="View faults link" title="View faults" asp-page="/Faults/Faults">View faults</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Report a fault link" title="Report faults" asp-page="/Faults/ReportFault/Step1">Report a fault</a>
+            </div>
+        </div>
+    </div>
+    @if (User.Identity.IsAuthenticated == true)
+    {
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="small-tile">
+                    <a class="nav-link" aria-label="My reports link" title="My reports" asp-page="/Faults/MyReports">My reports</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

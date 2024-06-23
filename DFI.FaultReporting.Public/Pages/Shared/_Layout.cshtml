@@ -14,15 +14,15 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3 fixed-top">
             <div class="container">
                 <div class="d-none d-xl-block">
-                    <a class="navbar-brand" asp-area="" asp-page="/Index">
+                    <a class="navbar-brand" asp-page="/Index">
                         <img src="~/images/infrastructure-full_0.png" alt="Department for Infrastructure Logo" width="650" height="75" />
                     </a>
                 </div>
                 <div class="d-block d-xl-none d-xxl-none">
-                    <a class="navbar-brand" asp-area="" asp-page="/Index">
+                    <a class="navbar-brand" asp-page="/Index">
                         <img src="~/images/dfi-logo-sm.png" alt="Department for Infrastructure Logo" />
                     </a>
                 </div>
@@ -33,28 +33,55 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link" asp-page="/Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Faults</a>
+                            <ul class="dropdown-menu bg-light">
+                                <li><a class="dropdown-item" asp-page="/Faults/Faults">View faults</a></li>
+                                <li><a class="dropdown-item" asp-page="/Faults/ReportFault/Step1">Report a fault</a></li>
+                                @if (User.Identity.IsAuthenticated == true)
+                                {
+                                    <li><a class="dropdown-item" asp-page="/Faults/MyReports">My reports</a></li>
+                                }
+                            </ul>
                         </li>
+                        @if (User.Identity.IsAuthenticated == false || User.Identity.IsAuthenticated == true && User.IsInRole("User"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Claims</a>
+                                <ul class="dropdown-menu bg-light">
+                                    <li><a class="dropdown-item" asp-page="/Faults/Faults">Submit a claim</a></li>
+                                    @if (User.Identity.IsAuthenticated == true && User.IsInRole("User"))
+                                    {
+                                        <li><a class="dropdown-item" asp-page="/Faults/ReportFault/Step1">My claims</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (User.Identity.IsAuthenticated == true && User.IsInRole("Contractor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Index">Jobs</a>
+                            </li>
+                        }
                         @{
                             if (User.Identity.IsAuthenticated == true)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Account/Details" title="Account Details">Hello @User.Identity?.Name</a>
+                                    <a class="nav-link" asp-page="/Account/Details" title="Account Details">Account</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Account/Logout" title="Logout">Logout</a>
+                                    <a class="nav-link" asp-page="/Account/Logout" title="Logout">Logout</a>
                                 </li>
                             }
                             else
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Account/Login" title="Login">Login</a>
+                                    <a class="nav-link" asp-page="/Account/Login" title="Login">Login</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Account/Register" title="Register">Register</a>
+                                    <a class="nav-link" asp-page="/Account/Register" title="Register">Register</a>
                                 </li>
                             }
                         }
@@ -63,7 +90,11 @@
             </div>
         </nav>
     </header>
+    <br />
+    <br />
+    <br />
     <div class="container">
+        <br />
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

@@ -1,49 +1,77 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
-
-<body onload="initMap()">
-    <div class="text-center">
-        <h1 class="display-4">Welcome</h1>
-        <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Welcome to the fault reporting and compensation claims application</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Faults menu link" title="Faults" asp-page="/Faults/FaultsMenu">Faults</a>
+            </div>
+        </div>
     </div>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-center">
-                    <div class="autocomplete">
-                        <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+    @{
+        if (User.Identity.IsAuthenticated == false || User.Identity.IsAuthenticated == true && User.IsInRole("User"))
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Claims link" title="Claims" asp-page="">Claims</a>
                     </div>
                 </div>
             </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-center">
-                    <div id="map" style="height: 1000px; width: 100%;"></div>
+        }
+
+        if (User.Identity.IsAuthenticated == true && User.IsInRole("Contractor"))
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Jobs link" title="Jobs" asp-page="">Jobs</a>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <br />
-        <label id="LatLabel" style="font-weight: bold;">Lat:</label>
-        <br />
-        <label id="LabelLat"></label>
-        <br />
-        <label id="LongLabel" style="font-weight: bold;">Long:</label>
-        <br />
-        <label id="LabelLong"></label>
-        <br />
-        <label id="PlaceLabel" style="font-weight: bold;">PlaceID:</label>
-        <br />
-        <label id="LabelPlace"></label>
-        <br />
-        <label id="RoadLabel" style="font-weight: bold;">Road:</label>
-        <br />
-        <label id="LabelRoad"></label>
-    </div>
-    <script src="~/js/mapping/ReportFault.js"></script>
-</body>
+        }
+    }
+    @{
+        if (User.Identity.IsAuthenticated == true)
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="My account link" title="Account details" asp-page="/Account/Details">Account</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Logout link" title="Logout" asp-page="/Account/Logout">Logout</a>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Login link" title="Login" asp-page="/Account/Login">Login</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Register link" title="Register" asp-page="/Account/Register">Register</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

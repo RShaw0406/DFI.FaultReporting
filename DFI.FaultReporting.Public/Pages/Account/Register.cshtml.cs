@@ -263,7 +263,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
                     AuthResponse authResponse = await _userService.Register(RegistrationRequest);
 
                     //User has been successfully registered.
-                    if (authResponse != null)
+                    if (authResponse.ReturnStatusCodeMessage == null)
                     {
                         //Create a ClaimsPrinicpal and populated with claims contained in the JWTToken generated earlier.
                         ClaimsPrincipal jwtClaimsPrincipal = await ValidateJWTToken(authResponse.Token);
@@ -322,11 +322,21 @@ namespace DFI.FaultReporting.Public.Pages.Account
                         //Set VerificationCodeSent property to true to ensure verification code input is shown.
                         VerificationCodeSent = true;
 
+                        //AuthResponse has returned stating that the email address is already in use.
+                        if (authResponse.ReturnStatusCodeMessage == "Email address already used")
+                        {
+                            //Add an error to the ModelState to inform the user that email address is already in use.
+                            ModelState.AddModelError(string.Empty, "An account with this email address already exists");
+                        }
+                        //AuthReponse has returned a different message.
+                        else
+                        {
+                            //Add an error to the ModelState to inform the user that their registration attempt did not work.
+                            ModelState.AddModelError(string.Empty, "There was a problem registering your account");
+                        }
+
                         //Keep TempData incase its needed again.
                         TempData.Keep();
-
-                        //Add an error to the ModelState to inform the user that their registration attempt did not work.
-                        ModelState.AddModelError(string.Empty, "Invalid registration attempt");
 
                         //Return the Page.
                         return Page();
