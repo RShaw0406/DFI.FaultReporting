@@ -84,15 +84,22 @@ body {
 
 /*AutoComplete Search Box Styles*/
 .autocomplete {
+    z-index: 100;
     width: 50%;
     position: relative;
     display: inline-block;
+    margin: 0.25rem;
 }
+
+/*.autocomplete input:focus {
+    box-shadow: none!important;
+    border: none!important;
+}*/
 
 @media only screen and (max-width: 768px) {
     /* For mobile phones: */
     .autocomplete {
-        width: 100%;
+        width: 98%;
         position: relative;
         display: inline-block;
     }
@@ -103,7 +110,7 @@ body {
     border: 1px solid #d4d4d4;
     border-bottom: none;
     border-top: none;
-    z-index: 99;
+    z-index: 200;
     top: 100%;
     left: 0;
     right: 0;

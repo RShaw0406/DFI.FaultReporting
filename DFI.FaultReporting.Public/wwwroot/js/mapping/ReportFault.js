@@ -312,13 +312,12 @@ function snapMarkerToRoad(position) {
 
                 console.log("Marker Location Details:")
                 console.log(cp);
+                console.log(lines[i]);
 
                 //Capture the distance and closest coordinate.
                 minDistance = cp.properties.distance;
                 closestCoord = cp.geometry.coordinates;
-                document.getElementById('LabelLat').innerHTML = closestCoord[1];
-                document.getElementById('LabelLong').innerHTML = closestCoord[0];
-                document.getElementById('LabelPlace').innerHTML = closestCoord;
+
 
                 reverseAddressSearch(closestCoord);
             }
@@ -342,7 +341,7 @@ function reverseAddressSearch(position) {
 
     searchURL.searchAddressReverse(atlas.service.Aborter.timeout(3000), position, {
         view: 'Auto',
-        radius: 6
+        radius: 7
     }).then(results => {
 
         console.log(results);
@@ -358,10 +357,23 @@ function reverseAddressSearch(position) {
             placeMarker(position);
 
             if (result.features.length > 0 && result.features[0].properties && result.features[0].properties.address) {
-                var road1 = (result.features[0].properties.address.streetName);
-                var road2 = (result.features[0].properties.address.localName);
-                var road3 = (result.features[0].properties.address.countrySecondarySubdivision);
-                document.getElementById('LabelRoad').innerHTML = road1 + ", " + road2 + ", " + road3;
+                var roadNum = (result.features[0].properties.address.routeNumbers[0]);
+                var roadName = (result.features[0].properties.address.streetName);
+                var roadTown = (result.features[0].properties.address.localName);
+                var roadCounty = (result.features[0].properties.address.countrySecondarySubdivision);
+                document.getElementById('lat').value = position[1];
+                document.getElementById('long').value = position[0];
+                document.getElementById('roadNumber').value = roadNum;
+                document.getElementById('roadName').value = roadName;
+                //if (roadName == "undefined") {
+                //    document.getElementById('roadName').value = roadNum;
+                //}
+                //else
+                //{
+
+                //}
+                document.getElementById('roadTown').value = roadTown;
+                document.getElementById('roadCounty').value = roadCounty;
                 console.log(result.features[0].properties.address.freeformAddress);
             } else {
                 console.log("No address for that location!");

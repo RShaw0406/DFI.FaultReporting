@@ -15,52 +15,54 @@ namespace DFI.FaultReporting.Models.FaultReports
 
         [DisplayName("Lat")]
         [Required(ErrorMessage = "You must enter a latitude")]
-        [StringLength(12, ErrorMessage = "Latitude must not be more than 12 characters")]
-        public required string Latitude { get; set; }
+        public string? Latitude { get; set; }
 
         [DisplayName("Long")]
         [Required(ErrorMessage = "You must enter a longitude")]
-        [StringLength(13, ErrorMessage = "Longitude must not be more than 13 characters")]
-        public required string Longitude { get; set; }
+        public string? Longitude { get; set; }
 
         [DisplayName("Road")]
         [Required(ErrorMessage = "You must enter a road")]
         [StringLength(250, ErrorMessage = "Road must not be more than 250 characters")]
-        public required string RoadName { get; set; }
+        public string? RoadName { get; set; }
 
         [DisplayName("Priority")]
         [Required(ErrorMessage = "You must enter a fault priority")]
-        public required int FaultPriorityID { get; set; }
+        public int FaultPriorityID { get; set; }
 
         [DisplayName("Type")]
         [Required(ErrorMessage = "You must enter a fault type")]
-        public required int FaultTypeID { get; set; }
+        public int FaultTypeID { get; set; }
 
         [DisplayName("Status")]
         [Required(ErrorMessage = "You must enter a fault status")]
-        public required int FaultStatusID { get; set; }
+        public int FaultStatusID { get; set; }
 
-        [DisplayName("Assigned Staff")]
+        [DisplayName("Assigned staff")]
         public int StaffID { get; set; }
 
-        [DisplayName("Input By")]
+        [DisplayName("Input by")]
         [Required(ErrorMessage = "You must provide an input by")]
-        public required string InputBy { get; set; }
+        public string? InputBy { get; set; }
 
-        [DisplayName("Input On")]
+        [DisplayName("Input on")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
-        public required DateTime InputOn { get; set; }
+        public DateTime InputOn { get; set; }
 
         [Required(ErrorMessage = "You must provide an active")]
-        public required bool Active { get; set; }
+        public bool Active { get; set; }
 
-        //public virtual FaultPriority? FaultPriority { get; set; }
+        [DisplayName("Road number")]
+        [StringLength(10, ErrorMessage = "Road number must not be more than 10 characters")]
+        public string? RoadNumber { get; set; }
 
-        //public virtual FaultType? FaultType { get; set; }
+        [DisplayName("Road town")]
+        [StringLength(100, ErrorMessage = "Road town must not be more than 100 characters")]
+        public string? RoadTown { get; set; }
 
-        //public virtual FaultStatus? FaultStatus { get; set; }
-
-        //public virtual Staff? Staff { get; set; }
+        [DisplayName("Road county")]
+        [StringLength(50, ErrorMessage = "Road county must not be more than 50 characters")]
+        public string? RoadCounty { get; set; }
     }
 }

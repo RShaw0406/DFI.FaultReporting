@@ -14,38 +14,98 @@
         <br />
         <h2>Select type and location of fault</h2>
         <hr />
-        <div class="row">
-            <div class="col-md-12">
-                <div class="autocomplete">
-                    <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+        <form id="step1Form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                <span><strong>Please review and correct the following errors:</strong></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <select asp-for="Step1Input.FaultTypeID" class="form-select" asp-items="Model.FaultTypesList">
+                            <option value="">
+                                Please select...
+                            </option>
+                        </select>
+                        <label asp-for="Step1Input.FaultTypeID" class="form-label"></label>
+                        <span asp-validation-for="Step1Input.FaultTypeID" class="text-danger"></span>
+                    </div>
                 </div>
             </div>
-        </div>
-        <br />
-        <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-center">
-                    <div id="map" style="height: 1000px; width: 100%;"></div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-center">
+                        <div id="map" style="height: 1000px; width: 100%;">
+                            <div class="autocomplete">
+                                <label for="searchBox" class="form-label" hidden></label>
+                                <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+                            </div>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Step1Input.Latitude" class="text-danger"></span>
                 </div>
             </div>
-        </div>
+            <br />
+            <div class="row" hidden>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step1Input.Latitude" id="lat" class="form-control" />
+                        <label asp-for="Step1Input.Latitude" class="form-label"></label>
 
-        <br />
-        <label id="LatLabel" style="font-weight: bold;">Lat:</label>
-        <br />
-        <label id="LabelLat"></label>
-        <br />
-        <label id="LongLabel" style="font-weight: bold;">Long:</label>
-        <br />
-        <label id="LabelLong"></label>
-        <br />
-        <label id="PlaceLabel" style="font-weight: bold;">PlaceID:</label>
-        <br />
-        <label id="LabelPlace"></label>
-        <br />
-        <label id="RoadLabel" style="font-weight: bold;">Road:</label>
-        <br />
-        <label id="LabelRoad"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="row" hidden>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step1Input.Longitude" id="long" class="form-control" />
+                        <label asp-for="Step1Input.Longitude" class="form-label"></label>
+@*                         <span asp-validation-for="Step1Input.Longitude" class="text-danger"></span> *@
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step1Input.RoadNumber" id="roadNumber" class="form-control" autocomplete="roadNumber" placeholder="Enter road number" />
+                        <label asp-for="Step1Input.RoadNumber" class="form-label"></label>
+                        <span asp-validation-for="Step1Input.RoadNumber" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step1Input.RoadName" id="roadName" class="form-control" autocomplete="roadName" placeholder="Enter road name" />
+                        <label asp-for="Step1Input.RoadName" class="form-label"></label>
+                        <span asp-validation-for="Step1Input.RoadName" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step1Input.RoadTown" id="roadTown" class="form-control" autocomplete="roadTown" placeholder="Enter road town" />
+                        <label asp-for="Step1Input.RoadTown" class="form-label"></label>
+                        <span asp-validation-for="Step1Input.RoadTown" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step1Input.RoadCounty" id="roadCounty" class="form-control" autocomplete="roadCounty" placeholder="Enter road county" />
+                        <label asp-for="Step1Input.RoadCounty" class="form-label"></label>
+                        <span asp-validation-for="Step1Input.RoadCounty" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button id="btnCancel" asp-page-handler="Cancel" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                &nbsp;
+                <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next</button>
+            </div>
+        </form>
     </div>
+    <br />
     <script src="~/js/mapping/ReportFault.js"></script>
 </body>

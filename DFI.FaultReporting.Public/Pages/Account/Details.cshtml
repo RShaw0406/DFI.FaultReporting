@@ -286,7 +286,7 @@
                     <section>
                         <h3>Address details</h3>
                         <form id="showAddressDetailsForm" method="get">
-                            <div class="col-4">
+                            <div class="col-sm-4">
                                 <div class="form-floating mb-3 input-group">
                                     <input asp-for="CurrentUser.Postcode" class="form-control" disabled />
                                     <label asp-for="CurrentUser.Postcode" class="form-label"></label>
@@ -319,7 +319,7 @@
                             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
                                 <span><strong>Please review and correct the following errors:</strong></span>
                             </div>
-                            <div class="col-4">
+                            <div class="col-sm-4">
                                 <div class="form-floating mb-3">
                                     <input asp-for="AddressDetailsInput.Postcode" class="form-control" autocomplete="postcode" placeholder="Enter new postcode" />
                                     <label asp-for="AddressDetailsInput.Postcode" class="form-label"></label>
