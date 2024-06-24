@@ -59,11 +59,13 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
         }
 
-        public async Task<Fault> GetFault(int ID)
+        public async Task<Fault> GetFault(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -92,11 +94,13 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
         }
 
-        public async Task<Fault> CreateFault(Fault fault)
+        public async Task<Fault> CreateFault(Fault fault, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultJSON = JsonConvert.SerializeObject(fault);
 
@@ -130,11 +134,13 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
         }
 
-        public async Task<Fault> UpdateFault(Fault fault)
+        public async Task<Fault> UpdateFault(Fault fault, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultJSON = JsonConvert.SerializeObject(fault);
 
@@ -170,11 +176,13 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
         }
 
-        public async Task<int> DeleteFault(int ID)
+        public async Task<int> DeleteFault(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {

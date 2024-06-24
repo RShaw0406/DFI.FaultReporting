@@ -11,12 +11,12 @@ namespace DFI.FaultReporting.Interfaces.FaultReports
     {
         Task<List<Report>> GetReports();
 
-        Task<Report> GetReport(int ID);
+        Task<Report> GetReport(int ID, string token);
 
-        Task<Report> CreateReport(Report report);
+        Task<Report> CreateReport(Report report, string token);
 
-        Task<Report> UpdateReport(Report report);
+        Task<Report> UpdateReport(Report report, string token);
 
-        Task<int> DeleteReport(int ID);
+        Task<int> DeleteReport(int ID, string token);
     }
 }

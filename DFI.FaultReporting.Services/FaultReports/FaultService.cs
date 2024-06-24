@@ -29,30 +29,30 @@ namespace DFI.FaultReporting.Services.FaultReports
             return Faults;
         }
 
-        public async Task<Fault> GetFault(int ID)
+        public async Task<Fault> GetFault(int ID, string token)
         {
-            Fault fault = await _faultHttp.GetFault(ID);
+            Fault fault = await _faultHttp.GetFault(ID, token);
 
             return fault;
         }
 
-        public async Task<Fault> CreateFault(Fault fault)
+        public async Task<Fault> CreateFault(Fault fault, string token)
         {
-            fault = await _faultHttp.CreateFault(fault);
+            fault = await _faultHttp.CreateFault(fault, token);
 
             return fault;
         }
 
-        public async Task<Fault> UpdateFault(Fault fault)
+        public async Task<Fault> UpdateFault(Fault fault, string token)
         {
-            fault = await _faultHttp.UpdateFault(fault);
+            fault = await _faultHttp.UpdateFault(fault, token);
 
             return fault;
         }
 
-        public async Task<int> DeleteFault(int ID)
+        public async Task<int> DeleteFault(int ID, string token)
         {
-            await _faultHttp.DeleteFault(ID);
+            await _faultHttp.DeleteFault(ID, token);
 
             return ID;
         }

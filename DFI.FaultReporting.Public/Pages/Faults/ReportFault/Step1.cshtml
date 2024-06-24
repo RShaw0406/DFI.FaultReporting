@@ -1,7 +1,7 @@
 ﻿@page
 @model DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step1Model
 @{
-    ViewData["Title"] = "Report a fault";
+    ViewData["Title"] = "Step 1";
 }
 
 <body onload="initMap()">
@@ -9,7 +9,7 @@
         <h1>@ViewData["Title"]</h1>
         <br />
         <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:25%">Step 1</div>
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:33%">Step 1</div>
         </div>
         <br />
         <h2>Select type and location of fault</h2>
@@ -59,7 +59,6 @@
                     <div class="form-floating mb-3">
                         <input asp-for="Step1Input.Longitude" id="long" class="form-control" />
                         <label asp-for="Step1Input.Longitude" class="form-label"></label>
-@*                         <span asp-validation-for="Step1Input.Longitude" class="text-danger"></span> *@
                     </div>
                 </div>
             </div>

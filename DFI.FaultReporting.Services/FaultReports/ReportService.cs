@@ -27,30 +27,30 @@ namespace DFI.FaultReporting.Services.FaultReports
             return Reports;
         }
 
-        public async Task<Report> GetReport(int ID)
+        public async Task<Report> GetReport(int ID, string token)
         {
-            Report report = await _reportHttp.GetReport(ID);
+            Report report = await _reportHttp.GetReport(ID, token);
 
             return report;
         }
 
-        public async Task<Report> CreateReport(Report report)
+        public async Task<Report> CreateReport(Report report, string token)
         {
-            report = await _reportHttp.CreateReport(report);
+            report = await _reportHttp.CreateReport(report, token);
 
             return report;
         }
 
-        public async Task<Report> UpdateReport(Report report)
+        public async Task<Report> UpdateReport(Report report, string token)
         {
-            report = await _reportHttp.UpdateReport(report);
+            report = await _reportHttp.UpdateReport(report, token);
 
             return report;
         }
 
-        public async Task<int> DeleteReport(int ID)
+        public async Task<int> DeleteReport(int ID, string token)
         {
-            await _reportHttp.DeleteReport(ID);
+            await _reportHttp.DeleteReport(ID, token);
 
             return ID;
         }

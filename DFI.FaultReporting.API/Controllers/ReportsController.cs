@@ -10,6 +10,7 @@ using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.SQL.Repository.Interfaces.FaultReports;
 using DFI.FaultReporting.SQL.Repository.FaultReports;
 using NuGet.Protocol.Plugins;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -38,6 +39,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/Reports/5
         [HttpGet("{ID}")]
+        [Authorize]
         public async Task<ActionResult<Report>> GetReport(int ID)
         {
             Report report = await _reportSQLRepository.GetReport(ID);
@@ -53,6 +55,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/Reports
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Report>> PostReport(Report report)
         {
             report = await _reportSQLRepository.CreateReport(report);
@@ -63,6 +66,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/Reports/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<Report>> PutReport(Report report)
         {
             try
@@ -88,6 +92,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // DELETE: api/Reports/5
         [HttpDelete("{ID}")]
+        [Authorize]
         public async Task<ActionResult<int>> DeleteReport(int ID)
         {
             Report report = await _reportSQLRepository.GetReport(ID);

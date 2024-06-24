@@ -1,4 +1,34 @@
 ﻿@page
 @model DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step2Model
 @{
+    ViewData["Title"] = "Step 2";
 }
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:66%">Step 2</div>
+    </div>
+    <br />
+    <h2>Additional information/description of fault</h2>
+    <hr />
+    <form id="step2Form" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+            <span><strong>Please review and correct the following errors:</strong></span>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-floating mb-3">
+                    <textarea asp-for="Step2Input.AdditionalInfo" class="form-control" autocomplete="additionalInfo" placeholder="Enter additional info"></textarea>
+                    <label asp-for="Step2Input.AdditionalInfo" class="form-label"></label>
+                    <span asp-validation-for="Step2Input.AdditionalInfo" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group">
+            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary">Back</button>
+            &nbsp;
+            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next</button>
+        </div>
+    </form>
+</div>

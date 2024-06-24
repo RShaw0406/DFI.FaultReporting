@@ -101,22 +101,6 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         //This method is executed when the page loads and is used for populating the fault types dropdown list.
         public async Task<IActionResult> OnGetAsync()
         {
-            ////Get the fault from "Fault" object stored in session.
-            //Fault? sessionFault = HttpContext.Session.GetFromSession<Fault>("Fault");
-
-            ////User has previously input step1 details and has clicked the back button on step2.
-            //if (sessionFault != null)
-            //{
-            //    //Populate Step1Input model with session values.
-            //    Step1Input.Latitude = sessionFault.Latitude;
-            //    Step1Input.Longitude = sessionFault.Longitude;
-            //    Step1Input.RoadNumber = sessionFault.RoadNumber;
-            //    Step1Input.RoadName = sessionFault.RoadName;
-            //    Step1Input.RoadTown = sessionFault.RoadTown;
-            //    Step1Input.RoadCounty = sessionFault.RoadCounty;
-            //    Step1Input.FaultTypeID = sessionFault.FaultTypeID;
-            //}
-
             //The contexts current user exists.
             if (_httpContextAccessor.HttpContext.User != null)
             {
@@ -163,18 +147,6 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 //Redirect user to no permission
                 return Redirect("/NoPermission");
             }
-
-            ////Get fault types for dropdown
-            //FaultTypes = await GetFaultTypes();
-
-            ////Populate fault types dropdown.
-            //FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
-            //{
-            //    Text = ft.FaultTypeDescription,
-            //    Value = ft.ID.ToString()
-            //});
-
-            //return Page();
         }
         #endregion Page Load
 
@@ -184,7 +156,17 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         //When executed a new Fault object is created and stored in session, the user is then redirected to Step2 page.
         public async Task<IActionResult> OnPostNext()
         {
-            Debug.WriteLine(Step1Input.Latitude);
+            //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
+            string? jwtToken = jwtTokenClaim.Value;
+
+            //Set the CurrentUser property by calling the GetUser method in the _userService.
+            CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
 
             //Initialise a new ValidationContext to be used to validate the Step1Input model only.
             ValidationContext validationContext = new ValidationContext(Step1Input);
@@ -194,27 +176,6 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
 
             //Carry out validation check on the Step1Input model.
             bool isStep1InputValid = Validator.TryValidateObject(Step1Input, validationContext, validationResults, true);
-
-
-            //The contexts current user exists.
-            if (_httpContextAccessor.HttpContext.User != null)
-            {
-                //The contexts current user has been authenticated
-                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
-                {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentUser property by calling the GetUser method in the _userService.
-                    CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
-                }
-            }
 
             //The isStep1InputValid model is valid.
             if (isStep1InputValid)
@@ -251,7 +212,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 newFault.InputOn = DateTime.Now;
                 newFault.Active = true;
 
-                //Set the newFault in session, needed for displaying details.
+                //Set the newFault in session, needed for displaying details if user returns to this step.
                 HttpContext.Session.SetInSession("Fault", newFault);
 
                 //Redirect user to step2
@@ -281,15 +242,21 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 //Return the Page.
                 return Page();
             }
-
-
         }
         #endregion Step1
 
+        #region Fault Types
+        //Method Summary:
+        //This method is executed when the page loads and when an error occurs.
+        //When executed this method returns a list of fault types to populate the fault types dropdown list.
         public async Task<List<FaultType>> GetFaultTypes()
         {
+            //Get fault types by calling the GetFaultTypes method from the _faultTypeService.
             List<FaultType> faultTypes = await _faultTypeService.GetFaultTypes();
+
+            //Return fault types.
             return faultTypes;
         }
+        #endregion Fault Types
     }
 }

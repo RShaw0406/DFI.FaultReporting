@@ -15,31 +15,27 @@ namespace DFI.FaultReporting.Models.FaultReports
 
         [DisplayName("Fault")]
         [Required(ErrorMessage = "You must enter a fault")]
-        public required int FaultID { get; set; }
+        public int FaultID { get; set; }
 
-        [DisplayName("Additional Information")]
+        [DisplayName("Additional information")]
         [Required(ErrorMessage = "You must enter additional info")]
         [StringLength(1000, ErrorMessage = "Additional info must not be more than 1000 characters")]
         public string? AdditionalInfo { get; set; }
 
-        [DisplayName("Reporting User")]
+        [DisplayName("Reporting user")]
         [Required(ErrorMessage = "You must enter a user")]
-        public required int UserID { get; set; }
+        public int UserID { get; set; }
 
-        [DisplayName("Input By")]
+        [DisplayName("Input by")]
         [Required(ErrorMessage = "You must provide an input by")]
-        public required string InputBy { get; set; }
+        public string? InputBy { get; set; }
 
-        [DisplayName("Input On")]
+        [DisplayName("Input on")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
-        public required DateTime InputOn { get; set; }
+        public DateTime InputOn { get; set; }
 
         [Required(ErrorMessage = "You must provide an active")]
-        public required bool Active { get; set; }
-
-        //public virtual Fault? Fault { get; set; }
-
-        //public virtual PublicUser? User { get; set; }
+        public bool Active { get; set; }
     }
 }
