@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DFI.FaultReporting.Public.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome-free-6.5.2-web/css/all.min.css" />
     <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" type="text/css">
     <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
     <script src="https://atlas.microsoft.com/sdk/javascript/service/2/atlas-service.min.js"></script>
@@ -39,7 +40,7 @@
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Faults</a>
                             <ul class="dropdown-menu bg-light">
                                 <li><a class="dropdown-item" asp-page="/Faults/Faults">View faults</a></li>
-                                <li><a class="dropdown-item" asp-page="/Faults/ReportFault/Step1">Report a fault</a></li>
+                                <li><a class="dropdown-item" asp-page="/Faults/ReportFault/ReportFault">Report a fault</a></li>
                                 @if (User.Identity.IsAuthenticated == true)
                                 {
                                     <li><a class="dropdown-item" asp-page="/Faults/MyReports">My reports</a></li>
@@ -90,6 +91,7 @@
             </div>
         </nav>
     </header>
+    <br />
     <br />
     <br />
     <br />

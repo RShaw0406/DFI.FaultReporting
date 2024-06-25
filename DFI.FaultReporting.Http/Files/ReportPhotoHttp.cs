@@ -26,11 +26,13 @@ namespace DFI.FaultReporting.Http.Files
 
         public List<ReportPhoto>? ReportPhotos { get; set; }
 
-        public async Task<List<ReportPhoto>> GetReportPhotos()
+        public async Task<List<ReportPhoto>> GetReportPhotos(string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -59,11 +61,13 @@ namespace DFI.FaultReporting.Http.Files
             }
         }
 
-        public async Task<ReportPhoto> GetReportPhoto(int ID)
+        public async Task<ReportPhoto> GetReportPhoto(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -92,11 +96,13 @@ namespace DFI.FaultReporting.Http.Files
             }
         }
 
-        public async Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto)
+        public async Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var reportPhotoJSON = JsonConvert.SerializeObject(reportPhoto);
 
@@ -130,11 +136,13 @@ namespace DFI.FaultReporting.Http.Files
             }
         }
 
-        public async Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto)
+        public async Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var reportPhotoJSON = JsonConvert.SerializeObject(reportPhoto);
 
@@ -170,11 +178,13 @@ namespace DFI.FaultReporting.Http.Files
             }
         }
 
-        public async Task<int> DeleteReportPhoto(int ID)
+        public async Task<int> DeleteReportPhoto(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {

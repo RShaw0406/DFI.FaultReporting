@@ -12,6 +12,7 @@ using DFI.FaultReporting.Services.FaultReports;
 using DFI.FaultReporting.Services.Files;
 using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Emails;
+using DFI.FaultReporting.Services.Interfaces.Files;
 using DFI.FaultReporting.Services.Interfaces.Passwords;
 using DFI.FaultReporting.Services.Interfaces.Roles;
 using DFI.FaultReporting.Services.Interfaces.Settings;
@@ -70,6 +71,11 @@ builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IVerificationTokenService, VerificationTokenService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IMimeSnifferService, MimeSnifferService>();
+builder.Services.AddScoped<IFileDetectorService, ImageFileDetectorService>();
+builder.Services.AddScoped<IFileDetectorService, PDFFileDetectorService>();
+builder.Services.AddScoped<IFileDetectorService, WordFileDetectorService>();
+builder.Services.AddScoped<IFileValidationService, FileValidationService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

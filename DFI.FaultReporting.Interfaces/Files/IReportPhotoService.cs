@@ -9,14 +9,14 @@ namespace DFI.FaultReporting.Interfaces.Files
 {
     public interface IReportPhotoService
     {
-        Task<List<ReportPhoto>> GetReportPhotos();
+        Task<List<ReportPhoto>> GetReportPhotos(string token);
 
-        Task<ReportPhoto> GetReportPhoto(int ID);
+        Task<ReportPhoto> GetReportPhoto(int ID, string token);
 
-        Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto);
+        Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto, string token);
 
-        Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto);
+        Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto, string token);
 
-        Task<int> DeleteReportPhoto(int ID);
+        Task<int> DeleteReportPhoto(int ID, string token);
     }
 }

@@ -1,0 +1,173 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step4Model
+@{
+    ViewData["Title"] = "Step 3";
+}
+<body onload="initReviewMap()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div>
+        </div>
+        <br />
+        <h2>Review details and submit report</h2>
+        <hr />
+        <form id="reviewForm" method="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-center">
+                        <div id="reviewMap" style="height: 500px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="row" hidden>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.Latitude" id="lat" class="form-control" />
+                                <label asp-for="Fault.Latitude" class="form-label"></label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" hidden>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.Longitude" id="long" class="form-control" />
+                                <label asp-for="Fault.Longitude" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="FaultType.FaultTypeDescription" id="faultType" class="form-control" disabled />
+                                <label asp-for="FaultType.FaultTypeDescription" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.RoadNumber" id="roadNumber" class="form-control" disabled />
+                                <label asp-for="Fault.RoadNumber" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.RoadName" id="roadName" class="form-control" disabled />
+                                <label asp-for="Fault.RoadName" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.RoadTown" id="roadTown" class="form-control" disabled />
+                                <label asp-for="Fault.RoadTown" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.RoadCounty" id="roadCounty" class="form-control" disabled />
+                                <label asp-for="Fault.RoadCounty" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <textarea asp-for="Report.AdditionalInfo" style="height: auto!important" id="additionalInfo" class="form-control" rows="10" disabled></textarea>
+                                <label asp-for="Report.AdditionalInfo" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6">
+                    @{
+                        if (Model.ReportPhotos != null)
+                        {
+                            foreach (var photo in Model.ReportPhotos)
+                            {
+                                <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                                <br />
+                            }
+                        }
+                    }
+                </div>
+            </div>
+            <br />
+            <div class="btn-group">
+                <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                &nbsp;
+                <button id="btnSubmit" asp-page-handler="SubmitReport" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Submit</button>
+            </div>
+        </form>
+    </div>
+    <br />
+</body>
+<script type="text/javascript">
+    function initReviewMap() {
+
+        // Azure Maps Subscription Key - Needed to access the service
+        const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
+
+        // Global variables used throughout code
+        var map, marker, searchURL
+
+        // Define map boundaries - this will restrict how far a user can pan on the map control and also the search results returned in the autocomplete
+        const mapBounds = [-8.3, 53.9, -5.3, 55.4]
+
+        const position = [];
+        position[0] = document.getElementById('long').value;
+        position[1] = document.getElementById('lat').value;
+
+        // Create new map control
+        map = new atlas.Map('reviewMap', {
+            // Center map on marker
+            center: [Number(position[0]), Number(position[1])],
+            // Set zoom to 18 to get close to marker
+            zoom: 18,
+            // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
+            maxBounds: mapBounds,
+            // Set lanuage to GB for better localisation
+            language: 'en-GB',
+            // Set auth
+            authOptions: {
+                authType: 'subscriptionKey',
+                subscriptionKey: azureMapsSubscriptionKey
+            },
+            style: 'road'
+        });
+
+        // Add full screen control to the map
+        map.controls.add(new atlas.control.FullscreenControl(), {
+            position: 'bottom-right',
+            style: 'auto'
+        });
+
+        // Add zoom control to the map
+        map.controls.add(new atlas.control.ZoomControl(), {
+            position: 'bottom-right'
+        });
+
+        map.controls.add(new atlas.control.StyleControl(), {
+            position: 'bottom-right',
+            mapStyles: 'all'
+        });
+
+        marker = new atlas.HtmlMarker({
+            position: position
+        });
+
+        map.markers.add(marker);
+    }
+</script>

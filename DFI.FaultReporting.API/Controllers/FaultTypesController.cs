@@ -10,6 +10,7 @@ using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using DFI.FaultReporting.SQL.Repository.Admin;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -38,6 +39,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/FaultTypes/5
         [HttpGet("{ID}")]
+        [Authorize]
         public async Task<ActionResult<FaultType>> GetFaultType(int ID)
         {
             FaultType faultType = await _faultTypeSQLRepository.GetFaultType(ID);

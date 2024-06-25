@@ -11,7 +11,7 @@ namespace DFI.FaultReporting.Interfaces.Admin
     {
         Task<List<FaultType>> GetFaultTypes();
 
-        Task<FaultType> GetFaultType(int ID);
+        Task<FaultType> GetFaultType(int ID, string token);
 
         Task<FaultType> CreateFaultType(FaultType faultType);
 

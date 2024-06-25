@@ -150,37 +150,47 @@ namespace DFI.FaultReporting.Public.Pages.Account
                     //Get a new verification code by calling the GenerateToken method in the _verificationTokenService.
                     int verficationToken = await _verificationTokenService.GenerateToken();
 
-                    //Declare new Response to store the reponse from the email service and populate by calling the SendVerificationCode method.
-                    Response emailResponse = await SendVerificationCode(loginInput.Email, verficationToken);
+                    //Set the verificationCodeSent property to true as this will be needed to show the textbox for the user to input the code they received.
+                    verificationCodeSent = true;
 
-                    //The email has successfully been sent.
-                    if (emailResponse.IsSuccessStatusCode)
-                    {
-                        //Set the verificationCodeSent property to true as this will be needed to show the textbox for the user to input the code they received.
-                        verificationCodeSent = true;
+                    //Set the sent verification code in TempData to be user for matching later.
+                    TempData["VerificationToken"] = verficationToken;
+                    TempData["VerificationCodeSent"] = verificationCodeSent;
 
-                        //Set the sent verification code in TempData to be user for matching later.
-                        TempData["VerificationToken"] = verficationToken;
-                        TempData["VerificationCodeSent"] = verificationCodeSent;
+                    //Keep TempData incase it is needed again.
+                    TempData.Keep();
 
-                        //Keep TempData incase it is needed again.
-                        TempData.Keep();
-                    }
-                    //The email has not been sent successfully.
-                    else
-                    {
-                        //Set the verificationCodeSent property to false to ensure the enter login details section remains visible.
-                        verificationCodeSent = false;
+                    ////Declare new Response to store the reponse from the email service and populate by calling the SendVerificationCode method.
+                    //Response emailResponse = await SendVerificationCode(loginInput.Email, verficationToken);
 
-                        //Keep TempData incase it is needed again.
-                        TempData.Keep();
+                    ////The email has successfully been sent.
+                    //if (emailResponse.IsSuccessStatusCode)
+                    //{
+                    //    //Set the verificationCodeSent property to true as this will be needed to show the textbox for the user to input the code they received.
+                    //    verificationCodeSent = true;
 
-                        //Add an error to the ModelState to inform the user that the email was not sent.
-                        ModelState.AddModelError(string.Empty, "There was a problem sending the verification code");
+                    //    //Set the sent verification code in TempData to be user for matching later.
+                    //    TempData["VerificationToken"] = verficationToken;
+                    //    TempData["VerificationCodeSent"] = verificationCodeSent;
 
-                        //Return the Page.
-                        return Page();
-                    }
+                    //    //Keep TempData incase it is needed again.
+                    //    TempData.Keep();
+                    //}
+                    ////The email has not been sent successfully.
+                    //else
+                    //{
+                    //    //Set the verificationCodeSent property to false to ensure the enter login details section remains visible.
+                    //    verificationCodeSent = false;
+
+                    //    //Keep TempData incase it is needed again.
+                    //    TempData.Keep();
+
+                    //    //Add an error to the ModelState to inform the user that the email was not sent.
+                    //    ModelState.AddModelError(string.Empty, "There was a problem sending the verification code");
+
+                    //    //Return the Page.
+                    //    return Page();
+                    //}
                 }
                 //User has not been authenticated.
                 else
@@ -259,6 +269,8 @@ namespace DFI.FaultReporting.Public.Pages.Account
         {
             //Set the verificationCodeSent property value to the value stored in TempData.
             verificationCodeSent = Boolean.Parse(TempData["VerificationCodeSent"].ToString());
+
+            verificationCodeInput.VerificationCode = TempData["VerificationToken"].ToString();
 
             //User has entered a verification code.
             if (verificationCodeInput.VerificationCode != null)

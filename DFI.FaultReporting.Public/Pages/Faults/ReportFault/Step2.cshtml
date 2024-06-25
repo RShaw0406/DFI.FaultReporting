@@ -7,7 +7,7 @@
     <h1>@ViewData["Title"]</h1>
     <br />
     <div class="progress">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:66%">Step 2</div>
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:50%"></div>
     </div>
     <br />
     <h2>Additional information/description of fault</h2>
@@ -19,16 +19,17 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="form-floating mb-3">
-                    <textarea asp-for="Step2Input.AdditionalInfo" class="form-control" autocomplete="additionalInfo" placeholder="Enter additional info"></textarea>
+                    <textarea asp-for="Step2Input.AdditionalInfo" style="height: auto!important" class="form-control" autocomplete="additionalInfo" placeholder="Enter additional info" rows="10"></textarea>
                     <label asp-for="Step2Input.AdditionalInfo" class="form-label"></label>
                     <span asp-validation-for="Step2Input.AdditionalInfo" class="text-danger"></span>
                 </div>
             </div>
         </div>
         <div class="btn-group">
-            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary">Back</button>
+            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
             &nbsp;
-            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next</button>
+            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
         </div>
     </form>
 </div>
+<br />

@@ -9,7 +9,7 @@
         <h1>@ViewData["Title"]</h1>
         <br />
         <div class="progress">
-            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:33%">Step 1</div>
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:25%"></div>
         </div>
         <br />
         <h2>Select type and location of fault</h2>
@@ -99,9 +99,9 @@
                 </div>
             </div>
             <div class="btn-group">
-                <button id="btnCancel" asp-page-handler="Cancel" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
                 &nbsp;
-                <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next</button>
+                <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
             </div>
         </form>
     </div>

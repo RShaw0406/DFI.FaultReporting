@@ -102,6 +102,8 @@ function initMap() {
 
     // Create an instance of the SearchURL client
     searchURL = new atlas.service.SearchURL(pipeline);
+
+    CheckForSessionMarker();
 }
 
 // Initialise the map
@@ -326,8 +328,8 @@ function snapMarkerToRoad(position) {
 }
 
 // METHOD SUMMARY - This method is used for placing the marker for the fault on the map control
-function placeMarker(position) {
-
+function placeMarker(position)
+{
     map.markers.clear();
 
     marker = new atlas.HtmlMarker({
@@ -365,13 +367,6 @@ function reverseAddressSearch(position) {
                 document.getElementById('long').value = position[0];
                 document.getElementById('roadNumber').value = roadNum;
                 document.getElementById('roadName').value = roadName;
-                //if (roadName == "undefined") {
-                //    document.getElementById('roadName').value = roadNum;
-                //}
-                //else
-                //{
-
-                //}
                 document.getElementById('roadTown').value = roadTown;
                 document.getElementById('roadCounty').value = roadCounty;
                 console.log(result.features[0].properties.address.freeformAddress);
@@ -383,4 +378,29 @@ function reverseAddressSearch(position) {
             alert('Please select a road within Northern Ireland')
         }
     });
+}
+
+function CheckForSessionMarker()
+{
+    if (document.getElementById('lat').value != "" && document.getElementById('long').value != "")
+    {
+        const position = [];
+        position[0] = document.getElementById('long').value;
+        position[1] = document.getElementById('lat').value;
+
+        marker = new atlas.HtmlMarker({
+            position: position
+        });
+
+        map.markers.add(marker);
+
+        map.setCamera({
+            // Center map on marker
+            center: [Number(position[0]), Number(position[1])],
+            // Set zoom to 18 to get close to marker
+            zoom: 18,
+            // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
+            maxBounds: mapBounds,
+        });
+    }
 }

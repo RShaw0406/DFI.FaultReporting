@@ -28,12 +28,10 @@ namespace DFI.FaultReporting.Public.Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
-            if (HttpContext.User.Identity.IsAuthenticated == true) {
-                string? userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //Clear session to ensure fresh start.
+            HttpContext.Session.Clear();
 
-                Debug.WriteLine(userId);
-            }
-
+            //Return the page.
             return Page();
         }
     }

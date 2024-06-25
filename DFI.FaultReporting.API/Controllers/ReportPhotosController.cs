@@ -13,6 +13,7 @@ using DFI.FaultReporting.SQL.Repository.Interfaces.Files;
 using DFI.FaultReporting.SQL.Repository.FaultReports;
 using System.Composition;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -33,6 +34,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/ReportPhotos
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<ReportPhoto>>> GetReportPhoto()
         {
             ReportPhotos = await _reportPhotoSQLRepository.GetReportPhotos();
@@ -41,6 +43,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/ReportPhotos/5
         [HttpGet("{ID}")]
+        [Authorize]
         public async Task<ActionResult<ReportPhoto>> GetReportPhoto(int ID)
         {
             ReportPhoto reportPhoto = await _reportPhotoSQLRepository.GetReportPhoto(ID);
@@ -56,6 +59,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/ReportPhotos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<ReportPhoto>> PostReportPhoto(ReportPhoto reportPhoto)
         {
             reportPhoto = await _reportPhotoSQLRepository.CreateReportPhoto(reportPhoto);
@@ -65,6 +69,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/ReportPhotos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<ReportPhoto>> PutReportPhoto(ReportPhoto reportPhoto)
         {
             try
@@ -90,6 +95,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // DELETE: api/ReportPhotos/5
         [HttpDelete("{ID}")]
+        [Authorize]
         public async Task<ActionResult<int>> DeleteReportPhoto(int ID)
         {
             ReportPhoto reportPhoto = await _reportPhotoSQLRepository.GetReportPhoto(ID);

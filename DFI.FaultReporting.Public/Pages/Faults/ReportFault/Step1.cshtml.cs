@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using static DFI.FaultReporting.Public.Pages.Account.DetailsModel;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Users;
@@ -114,6 +113,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                     if (sessionFault != null)
                     {
                         //Populate Step1Input model with session values.
+                        Step1Input = new Step1InputModel();
                         Step1Input.Latitude = sessionFault.Latitude;
                         Step1Input.Longitude = sessionFault.Longitude;
                         Step1Input.RoadNumber = sessionFault.RoadNumber;
@@ -192,19 +192,19 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 if (Step1Input.RoadNumber != null) {
                     if (Step1Input.RoadNumber.Contains("M"))
                     {
-                        newFault.FaultPriorityID = 8;
+                        newFault.FaultPriorityID = 4;
                     }
                     else if (Step1Input.RoadNumber.Contains("A"))
                     {
-                        newFault.FaultPriorityID = 11;
+                        newFault.FaultPriorityID = 7;
                     }
                     else if (Step1Input.RoadNumber.Contains("B"))
                     {
-                        newFault.FaultPriorityID = 13;
+                        newFault.FaultPriorityID = 8;
                     }
                     else
                     {
-                        newFault.FaultPriorityID = 14;
+                        newFault.FaultPriorityID = 9;
                     }
                 }
                 newFault.FaultStatusID = 1;
@@ -242,6 +242,14 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 //Return the Page.
                 return Page();
             }
+        }
+
+        //Method Summary:
+        //This method is executed when the back button is clicked.
+        //When executed the user is redirected to ReportFault page.
+        public async Task<IActionResult> OnPostBack()
+        {
+            return Redirect("/Faults/ReportFault/ReportFault");
         }
         #endregion Step1
 

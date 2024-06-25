@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using static DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step1Model;
 using DFI.FaultReporting.Models.Admin;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DFI.FaultReporting.Services.Admin;
@@ -77,7 +76,17 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 //The contexts current user has been authenticated.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
                 {
-                    
+                    //Get the report from "Report" object stored in session.
+                    Report? sessionReport = HttpContext.Session.GetFromSession<Report>("Report");
+
+                    //User has previously input step2 details and has clicked the back button on step3.
+                    if (sessionReport != null) 
+                    {
+                        //Populate Step2Input model with session values.
+                        Step2Input = new Step2InputModel();
+                        Step2Input.AdditionalInfo = sessionReport.AdditionalInfo;
+                    }
+
                     //Return the page.
                     return Page();
                 }
@@ -162,6 +171,14 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 //Return the Page.
                 return Page();
             }
+        }
+
+        //Method Summary:
+        //This method is executed when the back button is clicked.
+        //When executed the user is redirected to Step1.
+        public async Task<IActionResult> OnPostBack()
+        {
+            return Redirect("/Faults/ReportFault/Step1");
         }
         #endregion
     }

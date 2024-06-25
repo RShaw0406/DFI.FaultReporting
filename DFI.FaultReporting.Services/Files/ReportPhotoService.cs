@@ -22,37 +22,37 @@ namespace DFI.FaultReporting.Services.Files
             _reportPhotoHttp = reportPhotoHttp;
         }
 
-        public async Task<List<ReportPhoto>> GetReportPhotos()
+        public async Task<List<ReportPhoto>> GetReportPhotos(string token)
         {
-            ReportPhotos = await _reportPhotoHttp.GetReportPhotos();
+            ReportPhotos = await _reportPhotoHttp.GetReportPhotos(token);
 
             return ReportPhotos;
         }
 
-        public async Task<ReportPhoto> GetReportPhoto(int ID)
+        public async Task<ReportPhoto> GetReportPhoto(int ID, string token)
         {
-            ReportPhoto reportPhoto = await _reportPhotoHttp.GetReportPhoto(ID);
+            ReportPhoto reportPhoto = await _reportPhotoHttp.GetReportPhoto(ID, token);
 
             return reportPhoto;
         }
 
-        public async Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto)
+        public async Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto, string token)
         {
-            reportPhoto = await _reportPhotoHttp.CreateReportPhoto(reportPhoto);
+            reportPhoto = await _reportPhotoHttp.CreateReportPhoto(reportPhoto, token);
 
             return reportPhoto;
         }
 
-        public async Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto)
+        public async Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto, string token)
         {
-            reportPhoto = await _reportPhotoHttp.UpdateReportPhoto(reportPhoto);
+            reportPhoto = await _reportPhotoHttp.UpdateReportPhoto(reportPhoto, token);
 
             return reportPhoto;
         }
 
-        public async Task<int> DeleteReportPhoto(int ID)
+        public async Task<int> DeleteReportPhoto(int ID, string token)
         {
-            await _reportPhotoHttp.DeleteReportPhoto(ID);
+            await _reportPhotoHttp.DeleteReportPhoto(ID, token);
 
             return ID;
         }

@@ -59,11 +59,13 @@ namespace DFI.FaultReporting.Http.Admin
             }
         }
 
-        public async Task<FaultType> GetFaultType(int ID)
+        public async Task<FaultType> GetFaultType(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {

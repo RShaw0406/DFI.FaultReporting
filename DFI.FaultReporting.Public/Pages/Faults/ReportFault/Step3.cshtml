@@ -7,9 +7,55 @@
     <h1>@ViewData["Title"]</h1>
     <br />
     <div class="progress">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%">Step 3</div>
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:75%"></div>
     </div>
     <br />
-    <h2>Photos of fault</h2>
+    <h2>Upload photos of fault</h2>
     <hr />
+    <div class="alert alert-info">
+        <strong>Info: </strong>
+        <p>You are not required to upload any photos, however doing so will help us identify and prioritise the fault.</p>
+    </div>
+    <form id="photoUploadForm" enctype="multipart/form-data" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+            <span><strong>Please review and correct the following errors:</strong></span>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-floating mb-3">
+                    <input id="fileUpload" name="SelectedFile" type="file" />
+                    <label asp-for="SelectedFile" for="fileUpload" class="form-label" hidden>Upload photo</label>
+                    <br />
+                    <br />
+                    <button id="uploadbutton" type="submit" class="btn btn-lg btn-outline-primary" asp-page-handler="Upload"><i class="fa-solid fa-upload"></i> Upload</button>
+                    <br />
+                    <span asp-validation-for="SelectedFile" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            @{
+                if (Model.ReportPhotos != null)
+                {
+                    foreach (var photo in Model.ReportPhotos)
+                    {
+                        <div class="col-md-2 text-center">
+                            <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                            <br />
+                            <br />
+                            <button id="btnRemovePhoto" name="removePhotoValue" value="@photo.Description" asp-page-handler="RemovePhoto" type="submit" class="btn btn-lg btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                            <br />
+                        </div>
+                    }
+                }
+            }
+        </div>
+        <br />
+        <div class="btn-group">
+            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+            &nbsp;
+            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+        </div>
+    </form>
 </div>
+<br />

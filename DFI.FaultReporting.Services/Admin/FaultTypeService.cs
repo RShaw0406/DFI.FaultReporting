@@ -28,9 +28,9 @@ namespace DFI.FaultReporting.Services.Admin
             return FaultTypes;
         }
 
-        public async Task<FaultType> GetFaultType(int ID)
+        public async Task<FaultType> GetFaultType(int ID, string token)
         {
-            FaultType faultType = await _faultTypeHttp.GetFaultType(ID);
+            FaultType faultType = await _faultTypeHttp.GetFaultType(ID, token);
 
             return faultType;
         }
