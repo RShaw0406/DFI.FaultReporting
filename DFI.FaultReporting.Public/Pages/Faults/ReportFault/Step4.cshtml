@@ -165,7 +165,9 @@
         });
 
         marker = new atlas.HtmlMarker({
-            position: position
+            htmlContent: "<div><div class='marker'></div><div class='pulse'></div></div>",
+            position: position,
+            pixelOffset: [5, -18]
         });
 
         map.markers.add(marker);

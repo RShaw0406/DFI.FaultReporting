@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\lib\azure-maps\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 

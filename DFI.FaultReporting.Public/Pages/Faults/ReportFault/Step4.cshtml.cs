@@ -173,12 +173,15 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
             //Get the report photos from "ReportPhotos" object stored in session.
             List<ReportPhoto>? sessionReportPhotos = HttpContext.Session.GetFromSession<List<ReportPhoto>>("ReportPhotos");
 
-            foreach (ReportPhoto reportPhoto in sessionReportPhotos)
+            if (sessionReportPhotos != null && sessionReportPhotos.Count > 0)
             {
-                reportPhoto.ReportID = insertedReport.ID;
+                foreach (ReportPhoto reportPhoto in sessionReportPhotos)
+                {
+                    reportPhoto.ReportID = insertedReport.ID;
 
-                //Insert session reportPhoto to DB.
-                ReportPhoto? insertedReportPhoto = await _reportPhotoService.CreateReportPhoto(reportPhoto, jwtToken);
+                    //Insert session reportPhoto to DB.
+                    ReportPhoto? insertedReportPhoto = await _reportPhotoService.CreateReportPhoto(reportPhoto, jwtToken);
+                }
             }
 
             return Redirect("/Faults/ReportFault/SubmittedReport");
