@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Add report";
 }
-<body onload="initFaultMap()">
+<body onload="initReviewMap()">
     <div class="container">
         <h1>@ViewData["Title"]</h1>
         <br />
@@ -96,7 +96,7 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="d-flex justify-content-center">
-                                        <div id="faultMap" style="height: 500px; width: 100%;">
+                                        <div id="reviewMap" style="height: 500px; width: 100%;">
                                         </div>
                                     </div>
                                 </div>
@@ -176,14 +176,14 @@
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <div class="small-tile">
-                            <a class="nav-link" aria-label="Login link" title="Login" asp-page="/Account/Login">Login</a>
+                            <a class="nav-link" aria-label="Register link" title="Register" asp-page="/Account/Register"><i class="fa-solid fa-user-plus"></i> Register</a>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12 text-center">
                         <div class="small-tile">
-                            <a class="nav-link" aria-label="Register link" title="Register" asp-page="/Account/Register">Register</a>
+                            <a class="nav-link" aria-label="Login link" title="Login" asp-page="/Account/Login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
                         </div>
                     </div>
                 </div>
@@ -192,62 +192,4 @@
     </div>
     <br />
 </body>
-<script type="text/javascript">
-    function initFaultMap() {
-
-        // Azure Maps Subscription Key - Needed to access the service
-        const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
-
-        // Global variables used throughout code
-        var map, marker, searchURL
-
-        // Define map boundaries - this will restrict how far a user can pan on the map control and also the search results returned in the autocomplete
-        const mapBounds = [-8.3, 53.9, -5.3, 55.4]
-
-        const position = [];
-        position[0] = document.getElementById('long').value;
-        position[1] = document.getElementById('lat').value;
-
-        // Create new map control
-        map = new atlas.Map('faultMap', {
-            // Center map on marker
-            center: [Number(position[0]), Number(position[1])],
-            // Set zoom to 18 to get close to marker
-            zoom: 18,
-            // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
-            maxBounds: mapBounds,
-            // Set lanuage to GB for better localisation
-            language: 'en-GB',
-            // Set auth
-            authOptions: {
-                authType: 'subscriptionKey',
-                subscriptionKey: azureMapsSubscriptionKey
-            },
-            style: 'road'
-        });
-
-        // Add full screen control to the map
-        map.controls.add(new atlas.control.FullscreenControl(), {
-            position: 'bottom-right',
-            style: 'auto'
-        });
-
-        // Add zoom control to the map
-        map.controls.add(new atlas.control.ZoomControl(), {
-            position: 'bottom-right'
-        });
-
-        map.controls.add(new atlas.control.StyleControl(), {
-            position: 'bottom-right',
-            mapStyles: 'all'
-        });
-
-        marker = new atlas.HtmlMarker({
-            htmlContent: "<div><div class='marker'></div><div class='pulse'></div></div>",
-            position: position,
-            pixelOffset: [5, -18]
-        });
-
-        map.markers.add(marker);
-    }
-</script>
+<script src="~/js/mapping/ReviewMap.js"></script>

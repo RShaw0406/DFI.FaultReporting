@@ -85,9 +85,9 @@
                                     <span asp-validation-for="AccountDetailsInput.ConfirmPassword" class="text-danger"></span>
                                 </div>
                                 <div class="btn-group">
-                                    <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-outline-primary">Request verification code</button>
+                                    <button id="btnCancelRequestVerificationCode" asp-page-handler="CancelAccountDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-ban"></i> Cancel</button>
                                     &nbsp;
-                                    <button id="btnCancelRequestVerificationCode" asp-page-handler="CancelAccountDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                    <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-outline-primary"><i class="fa-regular fa-envelope"></i> Request verification code</button>
                                 </div>
                             </form>
                         }
@@ -110,9 +110,9 @@
                                     <span asp-validation-for="VerificationCodeInput.VerificationCode" class="text-danger"></span>
                                 </div>
                                 <div class="btn-group">
-                                    <button id="btnUpdateAccountDetails" asp-page-handler="UpdateAccountDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                    <button id="btnCancelAccountDetailsUpdate" asp-page-handler="CancelAccountDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-ban"></i> Cancel</button>
                                     &nbsp;
-                                    <button id="btnCancelAccountDetailsUpdate" asp-page-handler="CancelAccountDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                    <button id="btnUpdateAccountDetails" asp-page-handler="UpdateAccountDetails" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
                                 </div>
                             </form>
                         }
@@ -227,9 +227,9 @@
                                 }
                             </div>
                             <div class="btn-group">
-                                <button id="btnUpdatePersonalDetails" asp-page-handler="UpdatePersonalDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                <button id="btnCancelPersonalDetailsUpdate" asp-page-handler="CancelPersonalDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-ban"></i> Cancel</button>
                                 &nbsp;
-                                <button id="btnCancelPersonalDetailsUpdate" asp-page-handler="CancelPersonalDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                <button id="btnUpdatePersonalDetails" asp-page-handler="UpdatePersonalDetails" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
                             </div>
                         </form>
                     </section>
@@ -269,9 +269,9 @@
                                 <span asp-validation-for="ContactDetailsInput.ContactNumber" class="text-danger"></span>
                             </div>
                             <div class="btn-group">
-                                <button id="btnUpdateContactDetails" asp-page-handler="UpdateContactDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                <button id="btnCancelContactDetailsUpdate" asp-page-handler="CancelContactDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-ban"></i> Cancel</button>
                                 &nbsp;
-                                <button id="btnCancelContactDetailsUpdate" asp-page-handler="CancelContactDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                <button id="btnUpdateContactDetails" asp-page-handler="UpdateContactDetails" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
                             </div>
                         </form>
                     </section>
@@ -342,9 +342,9 @@
                                 <span asp-validation-for="AddressDetailsInput.AddressLine3" class="text-danger"></span>
                             </div>
                             <div class="btn-group">
-                                <button id="btnUpdateAddressDetails" asp-page-handler="UpdateAddressDetails" type="submit" class="btn btn-lg btn-outline-success">Update</button>
+                                <button id="btnCancelAddressDetailsUpdate" asp-page-handler="CancelAddressDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-ban"></i> Cancel</button>
                                 &nbsp;
-                                <button id="btnCancelAddressDetailsUpdate" asp-page-handler="CancelAddressDetailsUpdate" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                <button id="btnUpdateAddressDetails" asp-page-handler="UpdateAddressDetails" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
                             </div>
                         </form>
                     </section>
@@ -366,7 +366,7 @@
                                     <p>By deleting your account you will no longer be able to log in to the application.</p>
                                 </div>
                                 <div class="btn-group">
-                                    <button id="btnDeleteAccount" asp-page-handler="DeleteAccount" type="submit" class="btn btn-lg btn-outline-danger">Delete account</button>
+                                    <button id="btnDeleteAccount" asp-page-handler="DeleteAccount" type="submit" class="btn btn-lg btn-outline-danger"><i class="fa-regular fa-trash-can"></i> Delete account</button>
                                 </div>
                             </form>
                         }
@@ -389,9 +389,9 @@
                                     <p>You will not be able to undo this action.</p>
                                 </div>
                                 <div class="btn-group">
-                                    <button id="btnDeleteAccountSure" asp-page-handler="DeleteAccountSure" type="submit" class="btn btn-lg btn-outline-danger">Delete account</button>
+                                    <button id="btnCancelDeleteAccount" asp-page-handler="CancelDeleteAccount" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-ban"></i> Cancel</button>
                                     &nbsp;
-                                    <button id="btnCancelDeleteAccount" asp-page-handler="CancelDeleteAccount" type="submit" class="btn btn-lg btn-outline-secondary">Cancel</button>
+                                    <button id="btnDeleteAccountSure" asp-page-handler="DeleteAccountSure" type="submit" class="btn btn-lg btn-outline-danger"><i class="fa-regular fa-trash-can"></i> Delete account</button>
                                 </div>
                             </form>
                         }
