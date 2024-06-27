@@ -9,6 +9,7 @@ using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using DFI.FaultReporting.SQL.Repository.Admin;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -37,6 +38,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/FaultStatus/5
         [HttpGet("{ID}")]
+        [Authorize]
         public async Task<ActionResult<FaultStatus>> GetFaultStatus(int ID)
         {
             FaultStatus faultStatus = await _faultStatusSQLRepository.GetFaultStatus(ID);
@@ -52,6 +54,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/FaultStatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<FaultStatus>> PostFaultStatus(FaultStatus faultStatus)
         {
             faultStatus = await _faultStatusSQLRepository.CreateFaultStatus(faultStatus);
@@ -62,6 +65,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/FaultStatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<FaultStatus>> PutFaultStatus(FaultStatus faultStatus)
         {
             try
@@ -87,6 +91,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // DELETE: api/FaultStatus/5
         [HttpDelete("{ID}")]
+        [Authorize]
         public async Task<ActionResult<int>> DeleteFaultStatus(int ID)
         {
             FaultStatus faultStatus = await _faultStatusSQLRepository.GetFaultStatus(ID);

@@ -1,12 +1,13 @@
 using DFI.FaultReporting.Common.SessionStorage;
+using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Interfaces.Files;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Files;
 using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Emails;
-using DFI.FaultReporting.Services.Interfaces.Files;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.Services.Interfaces.Users;
@@ -14,34 +15,44 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
-using System.DrawingCore;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Security.Claims;
+using static DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step1Model;
+using DFI.FaultReporting.Services.Interfaces.Files;
 
-namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
+namespace DFI.FaultReporting.Public.Pages.Faults.AddReport
 {
-    public class Step3Model : PageModel
+    public class AddReportModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
-        private readonly ILogger<Step3Model> _logger;
+        private readonly ILogger<AddReportModel> _logger;
         private readonly IUserService _userService;
         private readonly IFaultService _faultService;
+        private readonly IFaultPriorityService _faultPriorityService;
+        private readonly IFaultStatusService _faultStatusService;
+        private readonly IFaultTypeService _faultTypeService;
         private readonly IReportService _reportService;
         private readonly IReportPhotoService _reportPhotoService;
-        private readonly IFileValidationService _fileValidationService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ISettingsService _settingsService;
         private readonly IEmailService _emailService;
         private readonly IVerificationTokenService _verificationTokenService;
+        private readonly IFileValidationService _fileValidationService;
 
         //Inject dependencies in constructor.
-        public Step3Model(ILogger<Step3Model> logger, IUserService userService, IReportService reportService, IFaultService faultService, IReportPhotoService reportPhotoService,
+        public AddReportModel(ILogger<AddReportModel> logger, IUserService userService, IFaultService faultService, IFaultTypeService faultTypeService,
+            IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService, IReportService reportService, IReportPhotoService reportPhotoService,
             IHttpContextAccessor httpContextAccessor, ISettingsService settingsService, IEmailService emailService,
             IVerificationTokenService verificationTokenService, IFileValidationService fileValidationService)
         {
             _logger = logger;
             _userService = userService;
             _faultService = faultService;
+            _faultPriorityService = faultPriorityService;
+            _faultStatusService = faultStatusService;
+            _faultTypeService = faultTypeService;
             _reportService = reportService;
             _reportPhotoService = reportPhotoService;
             _httpContextAccessor = httpContextAccessor;
@@ -56,8 +67,39 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         //Declare CurrentUser property, this is needed when calling the _userService.
         public User CurrentUser { get; set; }
 
-        //Declare ReportPhotos property, this is needed to store uploaded photos.
-        public List<ReportPhoto> ReportPhotos {  get; set; }
+        //Declare Fault property, this is needed for displaying fault info.
+        public Fault? Fault { get; set; }
+
+        //Declare Road property, this is needed for displaying Road info.
+        public string? Road {  get; set; }
+
+        //Declare FaultPriority property, this is needed for displaying priority description.
+        public FaultPriority FaultPriority { get; set; }
+
+        //Declare FaultStatus property, this is needed for displaying status description.
+        public FaultStatus FaultStatus { get; set; }
+
+        //Declare FaultType property, this is needed for displaying type description.
+        public FaultType FaultType { get; set; }
+
+        //Declare Report property, this is needed for inserting a new report
+        public Report Report { get; set; }
+
+        //Declare ReportPhotos property, this is needed for inserting new report photos.
+        public List<ReportPhoto> ReportPhotos { get; set; }
+
+        //Declare ReportDetailsInputModel property, this is needed when adding a report.
+        [BindProperty]
+        public ReportDetailsInputModel ReportDetailsInput { get; set; }
+
+        //Declare ReportDetailsInputModel class, this is needed when adding a report.
+        public class ReportDetailsInputModel
+        {
+            [DisplayName("Additional information")]
+            [Required(ErrorMessage = "You must enter additional info")]
+            [StringLength(1000, ErrorMessage = "Additional info must not be more than 1000 characters")]
+            public string? AdditionalInfo { get; set; }
+        }
 
         //Declare SelectedFile property, this is needed for storing individual photo each time one is uploaded.
         [Display(Name = "Fault photo")]
@@ -68,7 +110,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         #region Page Load
         //Method Summary:
         //This method is executed when the page loads.
-        //When executed the session is checked for any report photos that have been previously added
+        //When executed the details of the fault selected by the user are populated and displayed on screen.
         public async Task<IActionResult> OnGetAsync()
         {
             //The contexts current user exists.
@@ -77,11 +119,52 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 //The contexts current user has been authenticated.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
                 {
-                    //Get the fault from "Fault" object stored in session.
-                    Fault? sessionFault = HttpContext.Session.GetFromSession<Fault>("Fault");
+                    //Retreive the ID in the url query string.
+                    string ID = HttpContext.Request.Query["ID"].ToString();
 
-                    //Get the report from "Report" object stored in session.
-                    Report? sessionReport = HttpContext.Session.GetFromSession<Report>("Report");
+                    //Convert ID to int.
+                    int faultID = Convert.ToInt32(ID);
+
+                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
+                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
+                    string? jwtToken = jwtTokenClaim.Value;
+
+                    //Set the CurrentUser property by calling the GetUser method in the _userService.
+                    CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
+
+                    //Populate the Fault property by calling the GetFault method from the _faultService.
+                    Fault = await _faultService.GetFault(faultID, jwtToken);
+
+                    string faultRoad = Fault.RoadNumber + ", " + Fault.RoadName + ", " + Fault.RoadTown + ", " + Fault.RoadCounty;
+
+                    Road = faultRoad.Replace(", undefined", "");
+                    Road = Road.Replace("undefined, ", "");
+
+                    //Populate the FaultType property by calling the GetFaultType method from the _faultTypeService.
+                    FaultType = await _faultTypeService.GetFaultType(Fault.FaultTypeID, jwtToken);
+
+                    //Populate the FaultStatus property by calling the GetFaultStatus method from the _faultStatusService.
+                    FaultStatus = await _faultStatusService.GetFaultStatus(Fault.FaultStatusID, jwtToken);
+
+                    //Populate the FaultPriority property by calling the GetFaultPriority method from the _faultPriorityService.
+                    FaultPriority = await _faultPriorityService.GetFaultPriority(Fault.FaultPriorityID, jwtToken);
+
+                    //Set the FaultType in session, needed for displaying details of fault user selected on map.
+                    HttpContext.Session.SetInSession("FaultType", FaultType);
+
+                    //Set the FaultStatus in session, needed for displaying details of fault user selected on map.
+                    HttpContext.Session.SetInSession("FaultStatus", FaultStatus);
+
+                    //Set the FaultPriority in session, needed for displaying details of fault user selected on map.
+                    HttpContext.Session.SetInSession("FaultPriority", FaultPriority);
+
+                    //Set the Fault in session, needed for displaying details of fault user selected on map.
+                    HttpContext.Session.SetInSession("Fault", Fault);
 
                     //Get the report photos from "ReportPhotos" object stored in session.
                     List<ReportPhoto>? sessionReportPhotos = HttpContext.Session.GetFromSession<List<ReportPhoto>>("ReportPhotos");
@@ -92,31 +175,40 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                         ReportPhotos = sessionReportPhotos.ToList();
                     }
 
-                    //Return the page.
+                    //Return the Page.
                     return Page();
                 }
-                //The contexts current user has not been authenticated.
-                else
-                {
-                    //Redirect user to no permission.
-                    return Redirect("/NoPermission");
-                }
             }
-            //The contexts current user does not exist.
-            else
-            {
-                //Redirect user to no permission
-                return Redirect("/NoPermission");
-            }
+
+            //Return the Page.
+            return Page();
         }
         #endregion Page Load
 
-        #region Step3
+        #region AddReport
         //Method Summary:
         //This method is executed when the upload button is clicked.
         //When excuted the selected file is validated and if valid is added to the ReportPhotos list and displayed on screen for the user.
         public async Task<IActionResult> OnPostUpload()
         {
+            //Set the ReportDetailsInput in session, needed for maintaining additional details value after post.
+            HttpContext.Session.SetInSession("ReportDetailsInput", ReportDetailsInput);
+
+            //Get the fault from "Fault" object stored in session.
+            Fault = HttpContext.Session.GetFromSession<Fault>("Fault");
+
+            //Get the status from "FaultStatus" object stored in session.
+            FaultStatus = HttpContext.Session.GetFromSession<FaultStatus>("FaultStatus");
+
+            //Get the priority from "FaultPriority" object stored in session.
+            FaultPriority = HttpContext.Session.GetFromSession<FaultPriority>("FaultPriority");
+
+            //Get the type from "FaultType" object stored in session.
+            FaultType = HttpContext.Session.GetFromSession<FaultType>("FaultType");
+
+            //Get the additional details from "ReportDetailsInput" object stored in session.
+            ReportDetailsInput = HttpContext.Session.GetFromSession<ReportDetailsInputModel>("ReportDetailsInput");
+
             //Get the report photos from "ReportPhotos" object stored in session.
             List<ReportPhoto>? sessionReportPhotos = HttpContext.Session.GetFromSession<List<ReportPhoto>>("ReportPhotos");
 
@@ -266,7 +358,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
 
                 //Return the page.
                 return Page();
-            }          
+            }
         }
 
         //Method Summary:
@@ -274,6 +366,24 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         //When executed the selected photo is removed from the ReportPhotos list.
         public async Task<IActionResult> OnPostRemovePhoto(string removePhotoValue)
         {
+            //Set the ReportDetailsInput in session, needed for maintaining additional details value after post.
+            HttpContext.Session.SetInSession("ReportDetailsInput", ReportDetailsInput);
+
+            //Get the fault from "Fault" object stored in session.
+            Fault = HttpContext.Session.GetFromSession<Fault>("Fault");
+
+            //Get the status from "FaultStatus" object stored in session.
+            FaultStatus = HttpContext.Session.GetFromSession<FaultStatus>("FaultStatus");
+
+            //Get the priority from "FaultPriority" object stored in session.
+            FaultPriority = HttpContext.Session.GetFromSession<FaultPriority>("FaultPriority");
+
+            //Get the type from "FaultType" object stored in session.
+            FaultType = HttpContext.Session.GetFromSession<FaultType>("FaultType");
+
+            //Get the additional details from "ReportDetailsInput" object stored in session.
+            ReportDetailsInput = HttpContext.Session.GetFromSession<ReportDetailsInputModel>("ReportDetailsInput");
+
             //Get the report photos from "ReportPhotos" object stored in session.
             List<ReportPhoto>? sessionReportPhotos = HttpContext.Session.GetFromSession<List<ReportPhoto>>("ReportPhotos");
 
@@ -307,20 +417,92 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         }
 
         //Method Summary:
-        //This method is executed when the next button is clicked.
-        //When executed the user is redirected to Step4.
-        public async Task<IActionResult> OnPostNext()
+        //This method is executed when the submit button is clicked.
+        //When executed the the session faul, report, and report photos list are inserted to the DB and the user is redirected to the SubmittedReport page.
+        public async Task<IActionResult> OnPostSubmitReport()
         {
-            return Redirect("/Faults/ReportFault/Step4");
+            //Set the ReportDetailsInput in session, needed for maintaining additional details value after post.
+            HttpContext.Session.SetInSession("ReportDetailsInput", ReportDetailsInput);
+
+            //Get the fault from "Fault" object stored in session.
+            Fault = HttpContext.Session.GetFromSession<Fault>("Fault");
+
+            //Get the status from "FaultStatus" object stored in session.
+            FaultStatus = HttpContext.Session.GetFromSession<FaultStatus>("FaultStatus");
+
+            //Get the priority from "FaultPriority" object stored in session.
+            FaultPriority = HttpContext.Session.GetFromSession<FaultPriority>("FaultPriority");
+
+            //Get the type from "FaultType" object stored in session.
+            FaultType = HttpContext.Session.GetFromSession<FaultType>("FaultType");
+
+            //Get the additional details from "ReportDetailsInput" object stored in session.
+            ReportDetailsInput = HttpContext.Session.GetFromSession<ReportDetailsInputModel>("ReportDetailsInput");
+
+            //Get the report photos from "ReportPhotos" object stored in session.
+            List<ReportPhoto>? sessionReportPhotos = HttpContext.Session.GetFromSession<List<ReportPhoto>>("ReportPhotos");
+
+            if (ModelState.IsValid)
+            {           
+                //User has previously uploaded images.
+                if (sessionReportPhotos != null && sessionReportPhotos.Count > 0)
+                {
+                    ReportPhotos = sessionReportPhotos.ToList();
+                }
+                //User has not uploaded any images.
+                else
+                {
+                    ReportPhotos = new List<ReportPhoto>();
+                }
+
+                //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
+                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+                //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
+                string? jwtToken = jwtTokenClaim.Value;
+
+                //Set the CurrentUser property by calling the GetUser method in the _userService.
+                CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
+
+                //Create a new report object and populate.
+                Report newReport = new Report();
+                newReport.FaultID = Fault.ID;
+                newReport.AdditionalInfo = ReportDetailsInput.AdditionalInfo;
+                newReport.UserID = CurrentUser.ID;
+                newReport.InputBy = CurrentUser.Email;
+                newReport.InputOn = DateTime.Now;
+                newReport.Active = true;
+
+                //Insert session report to DB.
+                Report? insertedReport = await _reportService.CreateReport(newReport, jwtToken);
+
+                if (sessionReportPhotos != null && sessionReportPhotos.Count > 0)
+                {
+                    foreach (ReportPhoto reportPhoto in sessionReportPhotos)
+                    {
+                        reportPhoto.ReportID = insertedReport.ID;
+
+                        //Insert session reportPhoto to DB.
+                        ReportPhoto? insertedReportPhoto = await _reportPhotoService.CreateReportPhoto(reportPhoto, jwtToken);
+                    }
+                }
+
+                return Redirect("/Faults/ReportFault/SubmittedReport");
+            }    
+            
+            return Page();
         }
 
         //Method Summary:
         //This method is executed when the back button is clicked.
-        //When executed the user is redirected to Step2.
+        //When executed the user is redirected to Faults.
         public async Task<IActionResult> OnPostBack()
         {
-            return Redirect("/Faults/ReportFault/Step2");
+            return Redirect("/Faults/Faults");
         }
-        #endregion Step3
+        #endregion Add Report
     }
 }

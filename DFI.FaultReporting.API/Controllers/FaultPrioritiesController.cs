@@ -9,6 +9,7 @@ using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using DFI.FaultReporting.SQL.Repository.Admin;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -37,6 +38,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/FaultPriorities/5
         [HttpGet("{ID}")]
+        [Authorize]
         public async Task<ActionResult<FaultPriority>> GetFaultPriority(int ID)
         {
             FaultPriority faultPriority = await _faultPrioritySQLRepository.GetFaultPriority(ID);
@@ -52,6 +54,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/FaultPriorities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<FaultPriority>> PostFaultPriority(FaultPriority faultPriority)
         {
             faultPriority = await _faultPrioritySQLRepository.CreateFaultPriority(faultPriority);
@@ -62,6 +65,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/FaultPriorities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize]
         public async Task<ActionResult<FaultPriority>> PutFaultPriority(FaultPriority faultPriority)
         {
             try
@@ -87,6 +91,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // DELETE: api/FaultPriorities/5
         [HttpDelete("{ID}")]
+        [Authorize]
         public async Task<ActionResult<int>> DeleteFaultPriority(int ID)
         {
             FaultPriority faultPriority = await _faultPrioritySQLRepository.GetFaultPriority(ID);

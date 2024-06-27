@@ -14,6 +14,20 @@
         <h2>View all currently reported faults</h2>
         <hr />
         <div class="row">
+            <div class="col-md-6">
+                <form id="typeFilterForm" method="post">
+                    <div class="form-floating mb-3">
+                        <select asp-for="FaultTypeFilter" class="form-select" asp-items="Model.FaultTypesList" onchange="this.form.submit()">
+                            <option value="0">
+                                All
+                            </option>
+                        </select>
+                        <label asp-for="FaultTypeFilter" class="form-label"></label>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
             <div class="col-md-12">
                 <div class="d-flex justify-content-center">
                     <div id="faultsMap" style="height: 1000px; width: 100%;">
@@ -25,275 +39,26 @@
                 </div>
             </div>
         </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="small-tile">
+                    <a class="nav-link" aria-label="Report a fault link" title="Report faults" asp-page="/Faults/ReportFault/ReportFault">Report a fault</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <br />
 </body>
 
 <script type="text/javascript">
-    // Azure Maps Subscription Key - Needed to access the service
-    const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
 
-    // Global variables used throughout code
-    var map, marker, searchURL, source, popup
+    //Retrieve session data to be used for displaying on map/popup.
+    var faults = @Json.Serialize(HttpContext.Session.GetFromSession<List<Fault>>("Faults"));
+    var faultTypes = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes"));
+    var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
+    var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
+    var reports = @Json.Serialize(HttpContext.Session.GetFromSession<List<Report>>("Reports"));
 
-    // Define map boundaries - this will restrict how far a user can pan on the map control and also the search results returned in the autocomplete
-    const mapBounds = [-8.3, 53.9, -5.3, 55.4]
-
-    // FUNCTION SUMMARY:
-    // This method is used for setting up the map control and adding event listeners to the map - uses the Azure Maps Web SDK
-    function initViewMap() {
-        // Create new map control
-        map = new atlas.Map('faultsMap', {
-            // Center map on Northern Ireland
-            center: [-6.8, 54.65],
-            // Set zoom to 3 to show as much of Northern Ireland as possible
-            zoom: 3,
-            // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
-            maxBounds: mapBounds,
-            // Set lanuage to GB for better localisation
-            language: 'en-GB',
-            // Set auth
-            authOptions: {
-                authType: 'subscriptionKey',
-                subscriptionKey: azureMapsSubscriptionKey
-            },
-            style: 'road'
-        });
-
-        // Add full screen control to the map
-        map.controls.add(new atlas.control.FullscreenControl(), {
-            position: 'bottom-right',
-            style: 'auto'
-        });
-
-        // Add zoom control to the map
-        map.controls.add(new atlas.control.ZoomControl(), {
-            position: 'bottom-right'
-        });
-
-        map.controls.add(new atlas.control.StyleControl(), {
-            position: 'bottom-right',
-            mapStyles: 'all'
-        });
-
-        // Use MapControlCredential to share authentication between a map control and the service module
-        var pipeline = atlas.service.MapsURL.newPipeline(new atlas.service.MapControlCredential(map));
-
-        // Create an instance of the SearchURL client
-        searchURL = new atlas.service.SearchURL(pipeline);
-
-        //Wait until the map resources are ready.
-        map.events.add('ready', function () {
-            var faults = @Json.Serialize(HttpContext.Session.GetFromSession<List<Fault>>("Faults"));
-            var faultTypes = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes"));
-            var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
-            var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
-
-            console.log(faults);
-            console.log(faultTypes);
-            console.log(faultPriorities);
-            console.log(faultStatuses);
-
-            const geoJsonFaults = [];
-
-            faults.forEach(function (fault) {
-                // console.log(fault);
-
-                var type, priority, status
-
-                faultTypes.forEach(function (faultType) {
-                    if (fault.faultTypeID == faultType.id) 
-                    {
-                        type = faultType.faultTypeDescription;
-                    }
-                });
-
-                faultPriorities.forEach(function (faultPriority) {
-                    if (fault.faultPriorityID == faultPriority.id) 
-                    {
-                        priority = faultPriority.faultPriorityDescription;
-                    }
-                });
-
-                faultStatuses.forEach(function (faultStatus) {
-                    if (fault.faultStatusID == faultStatus.id) 
-                    {
-                        status = faultStatus.faultStatusDescription;
-                    }
-                });
-
-                var position = [];
-                position[0] = fault.longitude;
-                position[1] = fault.latitude;
-
-                var road = fault.roadNumber + ", " + fault.roadName + ", " + fault.roadTown + ", " + fault.RoadCounty;
-                console.log(road);
-                road = road.replaceAll(", undefined", "");
-                road = road.replaceAll("undefined, ", "");
-
-                var geoJsonFault = new atlas.data.Feature(new atlas.data.Point(position), {
-                    "id": fault.id,
-                    "type": type,
-                    "status": status,
-                    "priority": priority,
-                    "firstReported": fault.inputOn,
-                    "road": road
-                });
-
-                // console.log(geoJsonFault);
-
-                geoJsonFaults.push(geoJsonFault);
-
-                // console.log(position);
-
-                // marker = new atlas.HtmlMarker({
-                //     htmlContent: "<div><div class='pin bounce'></div><div class='pulse'></div></div>",
-                //     position: position,
-                //     pixelOffset: [5, -18]
-                // });
-
-                // map.markers.add(marker);
-            });
-
-            console.log(geoJsonFaults);
-
-            //Create a reusable popup.
-            popup = new atlas.Popup({
-                pixelOffset: [0, -20],
-                closeButton: false
-            });
-
-            //Create a data source and add it to the map.
-            source = new atlas.source.DataSource(null, {
-                //Tell the data source to cluster point data.
-                cluster: true
-            });
-
-            map.sources.add(source);
-
-            //Create a HTML marker layer for rendering data points.
-            markerLayer = new atlas.layer.HtmlMarkerLayer(source, null, {
-                markerCallback: (id, position, properties) => {
-                    //Check to see if marker represents a cluster.
-                    if (properties.cluster) {
-                        console.log("Properties:");
-                        console.log(properties);
-
-                        const count = properties.point_count_abbreviated;
-
-                        //Return either an HtmlMarker
-                        return new atlas.HtmlMarker({
-                            // position: position,
-                            htmlContent: "<div><div class='marker'></div><div class='pulse'></div></div>",
-                            position: position,
-                            pixelOffset: [5, -18]
-                        });
-                    }
-
-                    //Business logic to define color of marker.
-                    var markerClass = '';
-                    var pulseClass = '';
-
-                    console.log("Properties:");
-                    console.log(properties);
-
-                    // switch (properties.type) {
-                    //     case 'Pothole':
-                    //         markerClass = 'marker-pothole';
-                    //         pulseClass = 'pulse-pothole';
-                    //         break;
-                    //     case 'Street lighting fault':
-                    //         markerClass = 'marker-lighting';
-                    //         pulseClass = 'pulse-lighting';
-                    //         break;
-                    //     case 'Obstructions':
-                    //         markerClass = 'marker-obstructions';
-                    //         pulseClass = 'pulse-obstructions';
-                    //         break;
-                    //     case 'Spillages':
-                    //         markerClass = 'marker-spillage';
-                    //         pulseClass = 'pulse-spillage';
-                    //         break;
-                    //     case 'Ironwork(Manholes/Gullies)':
-                    //         markerClass = 'marker-ironwork';
-                    //         pulseClass = 'pulse-ironwork';
-                    //         break;
-                    //     case 'Traffic Lights':
-                    //         markerClass = 'marker-trafficlights';
-                    //         pulseClass = 'pulse-trafficlights';
-                    //         break;
-                    //     case 'Crash barrier and guard-rail':
-                    //         markerClass = 'marker-crashbarrier';
-                    //         pulseClass = 'pulse-crashbarrier';
-                    //         break;
-                    //     case 'Ice or snow':
-                    //         markerClass = 'marker-ice';
-                    //         pulseClass = 'pulse-ice';
-                    //         break;
-                    //     default:
-                    //         break;
-                    // }
-
-                    //Create an HtmlMarker with a random color using a promise.
-                    return Promise.resolve(new atlas.HtmlMarker({
-                        // htmlContent: "<div><div class='" + markerClass + ' ' + "marker'></div><div class='" + pulseClass + ' ' + "pulse'></div></div>",
-                        htmlContent: "<div><div class='marker'></div><div class='pulse'></div></div>",
-                        pixelOffset: [5, -18],
-                        position: position
-                    }));
-                }
-            });
-            //Add mouse events to the layer to show/hide a popup when hovering over a marker.
-            // map.events.add('mouseover', markerLayer, markerHovered);
-            // map.events.add('mouseout', markerLayer, hidePopup);
-
-            map.events.add('click', markerLayer, markerClicked);
-
-            //Add marker layer to the map.
-            map.layers.add(markerLayer);
-
-            //Import the GeoJSON data into the data source.
-            source.add(geoJsonFaults);
-        });
-    }
-    function markerClicked(e) {
-        var content;
-        var marker = e.target;
-        console.log("Marker Properties:");
-        console.log(marker.properties);
-        if (marker.properties.cluster) {
-            content = `${marker.properties.point_count_abbreviated} faults`;
-            //Update the content and position of the popup.
-            popup.setOptions({
-                content: `<div style="padding:10px;"><strong>${content}</strong></div>`,
-                position: marker.getOptions().position,
-                closeButton: true
-            });
-        } else {
-            var contentType = marker.properties.type;
-            var contentPriority = marker.properties.priority;
-            var contentStatus = marker.properties.status;
-            var contentRoad = marker.properties.road;
-            //Update the content and position of the popup.
-            popup.setOptions({
-                content: `<div style="padding:10px;">
-                              <p><strong>Type:</strong> ${contentType}</p>
-                              <p><strong>Priority:</strong> ${contentPriority}</p>
-                              <p><strong>Status:</strong> ${contentStatus}</p>
-                              <p><strong>Road:</strong> ${contentRoad}</p>
-                              <a id="linkAddReport" href="/Index" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-circle-plus"></i> Add report</button>
-                           </div>`,
-                position: marker.getOptions().position,
-                closeButton: true
-            });
-        }
-
-        //Open the popup.
-        popup.open(map);
-    }
-
-    function hidePopup() {
-        popup.close();
-    }
 </script>
+<script src="~/js/mapping/ViewFaults.js"></script>
 <script src="~/js/mapping/AutoCompleteSearch.js"></script>

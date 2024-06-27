@@ -91,17 +91,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-12 col-sm-6">
-                    @{
-                        if (Model.ReportPhotos != null)
-                        {
-                            foreach (var photo in Model.ReportPhotos)
+                <div class="col-12 col-md-6">
+                    <div class="row">
+                        @{
+                            if (Model.ReportPhotos != null)
                             {
-                                <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
-                                <br />
+                                foreach (var photo in Model.ReportPhotos)
+                                {
+                                    <div class="col-sm-6 col-md-4 text-center">
+                                        <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                                        <br />
+                                        <br />
+                                    </div>
+                                }
                             }
                         }
-                    }
+                    </div>
                 </div>
             </div>
             <br />

@@ -27,9 +27,9 @@ namespace DFI.FaultReporting.Services.Admin
             return FaultPriorities;
         }
 
-        public async Task<FaultPriority> GetFaultPriority(int ID)
+        public async Task<FaultPriority> GetFaultPriority(int ID, string token)
         {
-            FaultPriority faultPriority = await _faultPriorityHttp.GetFaultPriority(ID);
+            FaultPriority faultPriority = await _faultPriorityHttp.GetFaultPriority(ID, token);
 
             return faultPriority;
         }

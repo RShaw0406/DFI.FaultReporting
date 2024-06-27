@@ -185,6 +185,8 @@ function reverseAddressSearch(position) {
 
         if (result.features[0].properties.address.countrySubdivisionName == "Northern Ireland") {
 
+            document.getElementById('selectionError').style.display = "none";
+
             placeMarker(position);
 
             if (result.features.length > 0 && result.features[0].properties && result.features[0].properties.address) {
@@ -204,7 +206,11 @@ function reverseAddressSearch(position) {
             }
         }
         else {
-            alert('Please select a road within Northern Ireland')
+            document.getElementById('selectionError').style.display = "block";
+
+            setTimeout(() => {
+                document.getElementById('selectionError').style.display = "none";
+            }, 3000);
         }
     });
 }

@@ -11,7 +11,7 @@ namespace DFI.FaultReporting.Interfaces.Admin
     {
         Task<List<FaultStatus>> GetFaultStatuses();
 
-        Task<FaultStatus> GetFaultStatus(int ID);
+        Task<FaultStatus> GetFaultStatus(int ID, string token);
 
         Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus);
 

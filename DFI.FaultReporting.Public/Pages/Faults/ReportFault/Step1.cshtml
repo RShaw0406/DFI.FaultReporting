@@ -39,6 +39,10 @@
                                 <label for="searchBox" class="form-label" hidden></label>
                                 <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
                             </div>
+                            <div id="selectionError" class="alert alert-danger col-md-4" style="display: none; z-index: 200; margin: 0.25rem;">
+                                <strong>Error: </strong>
+                                <p>You can only select a location within Northern Ireland.</p>
+                            </div>
                         </div>
                     </div>
                     <span asp-validation-for="Step1Input.Latitude" class="text-danger"></span>

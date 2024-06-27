@@ -13,6 +13,9 @@ using DFI.FaultReporting.Services.Interfaces.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using static DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step1Model;
 
 namespace DFI.FaultReporting.Public.Pages.Faults
@@ -27,6 +30,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         private readonly IFaultPriorityService _faultPriorityService;
         private readonly IFaultStatusService _faultStatusService;
         private readonly IFaultTypeService _faultTypeService;
+        private readonly IReportService _reportService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ISettingsService _settingsService;
         private readonly IEmailService _emailService;
@@ -34,7 +38,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
 
         //Inject dependencies in constructor.
         public FaultsModel(ILogger<FaultsModel> logger, IUserService userService, IFaultService faultService, IFaultTypeService faultTypeService,
-            IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService,
+            IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService, IReportService reportService,
             IHttpContextAccessor httpContextAccessor, ISettingsService settingsService, IEmailService emailService,
             IVerificationTokenService verificationTokenService)
         {
@@ -44,6 +48,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
             _faultPriorityService = faultPriorityService;
             _faultStatusService = faultStatusService;
             _faultTypeService = faultTypeService;
+            _reportService = reportService;
             _httpContextAccessor = httpContextAccessor;
             _settingsService = settingsService;
             _emailService = emailService;
@@ -58,6 +63,9 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         //Declare Faults property, this is needed for displaying faults on the map.
         public List<Fault> Faults { get; set; }
 
+        //Declare Reports property, this is needed for displaying the number of reports for each fault.
+        public List<Report> Reports { get; set; }
+
         //Declare FaultPriorities property, this is needed for displaying on map.
         public List<FaultPriority> FaultPriorities { get; set; }
 
@@ -69,9 +77,17 @@ namespace DFI.FaultReporting.Public.Pages.Faults
 
         //Declare FaultTypesList property, this is needed for populating fault types dropdown list.
         public IEnumerable<SelectListItem> FaultTypesList { get; set; }
+
+        //Declare FaultTypeFilter, this is needed for filtering the faults.
+        [DisplayName("Fault type")]
+        [BindProperty]
+        public int FaultTypeFilter { get; set; }
         #endregion Properties
 
         #region Page Load
+        //Method Summary:
+        //This method is executed when the page loads.
+        //When executed the FaultTypes, Faults, FaultPriorities, and FaultStatuses properties are populated.
         public async Task<IActionResult> OnGetAsync()
         {
             //Clear session to ensure fresh start.
@@ -96,13 +112,65 @@ namespace DFI.FaultReporting.Public.Pages.Faults
             //Get all fault statuses by calling the GetFaultStatuses method from the _faultStatusService.
             FaultStatuses = await _faultStatusService.GetFaultStatuses();
 
+            //Get all Reports by calling the GetReports method from the _reportService.
+            Reports = await _reportService.GetReports();
+
             //Set the Faults in session, needed for displaying on map.
             HttpContext.Session.SetInSession("Faults", Faults);
             HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
             HttpContext.Session.SetInSession("FaultPriorities", FaultPriorities);
             HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
+            HttpContext.Session.SetInSession("Reports", Reports);
 
             //Return the page.
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPost()
+        {
+            //Get fault types for dropdown.
+            FaultTypes = HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes");
+
+            //Populate fault types dropdown.
+            FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
+            {
+                Text = ft.FaultTypeDescription,
+                Value = ft.ID.ToString()
+            });
+
+            //Get all current faults by calling the GetFaults method from the _faultService.
+            Faults = await _faultService.GetFaults();
+
+            //Get all fault priorities by calling the GetFaultPriorities method from the _faultPriorityService.
+            FaultPriorities = await _faultPriorityService.GetFaultPriorities();
+
+            //Get all fault statuses by calling the GetFaultStatuses method from the _faultStatusService.
+            FaultStatuses = await _faultStatusService.GetFaultStatuses();
+
+            //Get all Reports by calling the GetReports method from the _reportService.
+            Reports = await _reportService.GetReports();
+
+            //Set FaultTypeFilter in session so that user selection is maintained after post.
+            HttpContext.Session.SetInSession("FaultTypeFilter", FaultTypeFilter);
+
+            //Set the value of FaultTypeFilter as session value.
+            FaultTypeFilter = HttpContext.Session.GetFromSession<int>("FaultTypeFilter");
+
+            //User has selected an type that is not "All"
+            if (FaultTypeFilter != 0)
+            {
+                //Get the faults for the selected type.
+                Faults = Faults.Where(f => f.FaultTypeID == FaultTypeFilter).ToList();
+            }
+
+            //Set the Faults in session, needed for displaying on map.
+            HttpContext.Session.SetInSession("Faults", Faults);
+            HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
+            HttpContext.Session.SetInSession("FaultPriorities", FaultPriorities);
+            HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
+            HttpContext.Session.SetInSession("Reports", Reports);
+
+            //return the page.
             return Page();
         }
         #endregion Page Load
@@ -118,11 +186,6 @@ namespace DFI.FaultReporting.Public.Pages.Faults
 
             //Return fault types.
             return faultTypes;
-        }
-
-        public void OnGetAddReport()
-        {
-            Redirect("/Faults/ReportFault/ReportFault");
         }
         #endregion Fault Types
     }

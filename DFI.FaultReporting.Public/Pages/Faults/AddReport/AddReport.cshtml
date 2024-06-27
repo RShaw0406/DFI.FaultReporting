@@ -1,0 +1,253 @@
+﻿@page
+@model AddReportModel
+@{
+    ViewData["Title"] = "Add report";
+}
+<body onload="initFaultMap()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>Add a report to a current fault</h2>
+        <hr />
+        @if (User.Identity != null)
+        {
+            @if (User.Identity.IsAuthenticated == true)
+            {
+                <form id="showFaultDetailsForm" method="get">
+                    <div class="row">
+                        <h3>Fault details</h3>
+                        <br />
+                        <div class="col-md-6">
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input asp-for="Fault.Latitude" id="lat" class="form-control" />
+                                        <label asp-for="Fault.Latitude" class="form-label"></label>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" hidden>
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input asp-for="Fault.Longitude" id="long" class="form-control" />
+                                        <label asp-for="Fault.Longitude" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="FaultType.FaultTypeDescription" class="form-control" disabled />
+                                        <label asp-for="FaultType.FaultTypeDescription" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="FaultPriority.FaultPriorityDescription" class="form-control" disabled />
+                                        <label asp-for="FaultPriority.FaultPriorityDescription" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="FaultStatus.FaultStatusDescription" class="form-control" disabled />
+                                        <label asp-for="FaultStatus.FaultStatusDescription" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="Fault.RoadNumber" class="form-control" disabled />
+                                        <label asp-for="Fault.RoadNumber" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="Fault.RoadName" class="form-control" disabled />
+                                        <label asp-for="Fault.RoadName" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="Fault.RoadTown" class="form-control" disabled />
+                                        <label asp-for="Fault.RoadTown" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="Fault.RoadCounty" class="form-control" disabled />
+                                        <label asp-for="Fault.RoadCounty" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="d-flex justify-content-center">
+                                        <div id="faultMap" style="height: 500px; width: 100%;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <form id="addReportForm" enctype="multipart/form-data" method="post">
+                    <div class="row">
+                        <h3>New report details</h3>
+                        <br />
+                        <div class="col-md-12">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                                <span><strong>Please review and correct the following errors:</strong></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <textarea asp-for="ReportDetailsInput.AdditionalInfo" style="height: auto!important" class="form-control" autocomplete="additionalInfo" placeholder="Enter additional info" rows="10"></textarea>
+                                        <label asp-for="ReportDetailsInput.AdditionalInfo" class="form-label"></label>
+                                        <span asp-validation-for="ReportDetailsInput.AdditionalInfo" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-info">
+                                <strong>Info: </strong>
+                                <p>You are not required to upload any photos, however doing so will help us identify and prioritise the fault.</p>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-floating mb-3">
+                                        <input id="fileUpload" name="SelectedFile" type="file" />
+                                        <label asp-for="SelectedFile" for="fileUpload" class="form-label" hidden>Upload photo</label>
+                                        <br />
+                                        <br />
+                                        <button id="uploadbutton" type="submit" class="btn btn-lg btn-outline-primary" asp-page-handler="Upload"><i class="fa-solid fa-upload"></i> Upload</button>
+                                        <br />
+                                        <span asp-validation-for="SelectedFile" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @{
+                                    if (Model.ReportPhotos != null)
+                                    {
+                                        foreach (var photo in Model.ReportPhotos)
+                                        {
+                                            <div class="col-sm-3 col-md-2 text-center">
+                                                <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                                                <br />
+                                                <br />
+                                                <button id="btnRemovePhoto" name="removePhotoValue" value="@photo.Description" asp-page-handler="RemovePhoto" type="submit" class="btn btn-lg btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                                                <br />
+                                                <br />
+                                            </div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="btn-group">
+                        <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                        &nbsp;
+                        <button id="btnSubmit" asp-page-handler="SubmitReport" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Submit</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    <strong>Warning: </strong>
+                    <p>You must have an account and be logged in to report a fault.</p>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="small-tile">
+                            <a class="nav-link" aria-label="Login link" title="Login" asp-page="/Account/Login">Login</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="small-tile">
+                            <a class="nav-link" aria-label="Register link" title="Register" asp-page="/Account/Register">Register</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <br />
+</body>
+<script type="text/javascript">
+    function initFaultMap() {
+
+        // Azure Maps Subscription Key - Needed to access the service
+        const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
+
+        // Global variables used throughout code
+        var map, marker, searchURL
+
+        // Define map boundaries - this will restrict how far a user can pan on the map control and also the search results returned in the autocomplete
+        const mapBounds = [-8.3, 53.9, -5.3, 55.4]
+
+        const position = [];
+        position[0] = document.getElementById('long').value;
+        position[1] = document.getElementById('lat').value;
+
+        // Create new map control
+        map = new atlas.Map('faultMap', {
+            // Center map on marker
+            center: [Number(position[0]), Number(position[1])],
+            // Set zoom to 18 to get close to marker
+            zoom: 18,
+            // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
+            maxBounds: mapBounds,
+            // Set lanuage to GB for better localisation
+            language: 'en-GB',
+            // Set auth
+            authOptions: {
+                authType: 'subscriptionKey',
+                subscriptionKey: azureMapsSubscriptionKey
+            },
+            style: 'road'
+        });
+
+        // Add full screen control to the map
+        map.controls.add(new atlas.control.FullscreenControl(), {
+            position: 'bottom-right',
+            style: 'auto'
+        });
+
+        // Add zoom control to the map
+        map.controls.add(new atlas.control.ZoomControl(), {
+            position: 'bottom-right'
+        });
+
+        map.controls.add(new atlas.control.StyleControl(), {
+            position: 'bottom-right',
+            mapStyles: 'all'
+        });
+
+        marker = new atlas.HtmlMarker({
+            htmlContent: "<div><div class='marker'></div><div class='pulse'></div></div>",
+            position: position,
+            pixelOffset: [5, -18]
+        });
+
+        map.markers.add(marker);
+    }
+</script>

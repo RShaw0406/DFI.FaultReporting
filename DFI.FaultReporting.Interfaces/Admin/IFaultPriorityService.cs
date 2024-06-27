@@ -11,7 +11,7 @@ namespace DFI.FaultReporting.Services.Interfaces.Admin
     {
         Task<List<FaultPriority>> GetFaultPriorities();
 
-        Task<FaultPriority> GetFaultPriority(int ID);
+        Task<FaultPriority> GetFaultPriority(int ID, string token);
 
         Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority);
 

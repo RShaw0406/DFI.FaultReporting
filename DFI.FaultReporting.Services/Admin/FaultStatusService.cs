@@ -27,9 +27,9 @@ namespace DFI.FaultReporting.Services.Admin
             return FaultStatuses;
         }
 
-        public async Task<FaultStatus> GetFaultStatus(int ID)
+        public async Task<FaultStatus> GetFaultStatus(int ID, string token)
         {
-            FaultStatus faultStatus = await _faultStatusHttp.GetFaultStatus(ID);
+            FaultStatus faultStatus = await _faultStatusHttp.GetFaultStatus(ID, token);
 
             return faultStatus;
         }
