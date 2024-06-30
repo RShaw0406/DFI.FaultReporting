@@ -14,6 +14,9 @@ using DFI.FaultReporting.Common.SessionStorage;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Models.Admin;
 using System.Security.Claims;
+using SendGrid.Helpers.Mail;
+using SendGrid;
+using System.Net.Mail;
 
 namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
 {
@@ -184,7 +187,21 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 }
             }
 
-            return Redirect("/Faults/ReportFault/SubmittedReport");
+            //If the insertedReport is not null, send an email to the user.
+            if (insertedReport != null)
+            {
+                //Send an email to the user.
+                Response emailResponse = await SendSubmittedReportEmail(CurrentUser.Email);
+
+                //If the email was sent successfully, redirect the user to the SubmittedReport page.
+                return Redirect("/Faults/ReportFault/SubmittedReport");
+            }
+            //If the insertedReport is null, redirect the user to the Error page.
+            else
+            {
+                //Redirect user to error page.
+                return Redirect("/Error");
+            }
         }
 
         //Method Summary:
@@ -193,6 +210,36 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         public async Task<IActionResult> OnPostBack()
         {
             return Redirect("/Faults/ReportFault/Step3");
+        }
+
+        //Method Summary:
+        //This method is executed when the "Submit" button is clicked.
+        //When executed this method attempts to send an email to the user and returns the response from the _emailService.
+        public async Task<Response> SendSubmittedReportEmail(string emailAddress)
+        {
+            //Set the subject of the email explaining that the user has deleted their account.
+            string subject = "DFI Fault Reporting: Fault Report Submitted";
+
+            //Declare a new EmailAddress object and assign the users email address as the value.
+            EmailAddress to = new EmailAddress(emailAddress);
+
+            //Set textContent to empty string as it will not be used here.
+            string textContent = string.Empty;
+
+            //Set the htmlContent to a message explaining to the user that their account has been successfully deleted.
+            string htmlContent = "<p>Hello,</p><p>Thank you for submitting a fault report.</p>" +
+                "<p>DFI staff will now review your report and you will receive update emails as the status of the report progress.</p>" +
+                "<br/>" +
+                "<p><strong>Report details:</strong></p>" +
+                "<p>"+ FaultType.FaultTypeDescription +"</p>" +
+                "<p>"+ Fault.RoadNumber + ", " + Fault.RoadName + ", " + Fault.RoadTown + ", " + Fault.RoadCounty +"</p>" +
+                "<p>"+ Report.AdditionalInfo + "</p>";
+
+            //Set the attachment to null as it will not be used here.
+            SendGrid.Helpers.Mail.Attachment? attachment = null;
+
+            //Call the SendEmail in the _emailService and return the response.
+            return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
         }
         #endregion Step4
     }
