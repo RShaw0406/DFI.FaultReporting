@@ -1,4 +1,30 @@
 ﻿@page
 @model DFI.FaultReporting.Public.Pages.NoPermissionModel
 @{
+    ViewData["Title"] = "No permission";
 }
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>View the fault reports you have made</h2>
+    <hr />
+    <div class="alert alert-warning">
+        <strong>Warning: </strong>
+        <p>You do not have permission to view this page. You must be a registered user and be logged in to proceed.</p>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Register link" title="Register" asp-page="/Account/Register"><i class="fa-solid fa-user-plus"></i> Register</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Login link" title="Login" asp-page="/Account/Login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+            </div>
+        </div>
+    </div>
+</div>

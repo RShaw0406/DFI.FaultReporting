@@ -172,6 +172,27 @@ namespace DFI.FaultReporting.Public.Pages.Account
                 //The RegistrationRequest model is valid.
                 if (isRegistrationRequestValid)
                 {
+                    //The entered year is invalid.
+                    if (InValidYearDOB)
+                    {
+                        //Add an error to the ModelState to inform the user that they have entered a year that is in the future or too far in the past.
+                        ModelState.AddModelError(string.Empty, InValidYearDOBMessage);
+                    }
+
+                    //The entered DOB is not valid.
+                    if (!ValidDOB)
+                    {
+                        //Add an error to the ModelState to inform the user that they have not entered a valid date.
+                        ModelState.AddModelError(string.Empty, "New date of birth must contain a valid day, month, and year");
+                    }
+
+                    //Either the DOB or the year are invalid.
+                    if (!ValidDOB || InValidYearDOB)
+                    {
+                        //Return the Page();
+                        return Page();
+                    }
+
                     //Set the RegistrationRequest model in session so that it can be accessed again after the post.
                     HttpContext.Session.SetInSession("RegistrationRequest", RegistrationRequest);
 

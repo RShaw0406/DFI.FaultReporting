@@ -138,16 +138,16 @@ namespace DFI.FaultReporting.API.Controllers
 
             User? requestUser = Users.Where(u => u.Email == request.Email && u.Email != null).FirstOrDefault();
 
-            if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd > DateTime.Now)
-            {
-                //return Unauthorized("Account locked");
-                return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
-            }
-
             if (requestUser == null)
             {
                 //return Unauthorized("Invalid email");
                 return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid email" });
+            }
+
+            if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd > DateTime.Now)
+            {
+                //return Unauthorized("Account locked");
+                return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
             }
 
             byte[] salt = Convert.FromBase64String(requestUser.PasswordSalt);

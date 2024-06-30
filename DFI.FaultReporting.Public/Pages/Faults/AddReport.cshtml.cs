@@ -18,10 +18,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Claims;
-using static DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step1Model;
 using DFI.FaultReporting.Services.Interfaces.Files;
 
-namespace DFI.FaultReporting.Public.Pages.Faults.AddReport
+namespace DFI.FaultReporting.Public.Pages.Faults
 {
     public class AddReportModel : PageModel
     {
@@ -71,7 +70,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults.AddReport
         public Fault? Fault { get; set; }
 
         //Declare Road property, this is needed for displaying Road info.
-        public string? Road {  get; set; }
+        public string? Road { get; set; }
 
         //Declare FaultPriority property, this is needed for displaying priority description.
         public FaultPriority FaultPriority { get; set; }
@@ -443,7 +442,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults.AddReport
             List<ReportPhoto>? sessionReportPhotos = HttpContext.Session.GetFromSession<List<ReportPhoto>>("ReportPhotos");
 
             if (ModelState.IsValid)
-            {           
+            {
                 //User has previously uploaded images.
                 if (sessionReportPhotos != null && sessionReportPhotos.Count > 0)
                 {
@@ -491,8 +490,8 @@ namespace DFI.FaultReporting.Public.Pages.Faults.AddReport
                 }
 
                 return Redirect("/Faults/ReportFault/SubmittedReport");
-            }    
-            
+            }
+
             return Page();
         }
 

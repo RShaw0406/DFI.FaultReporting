@@ -13,11 +13,13 @@ using DFI.FaultReporting.Services.Files;
 using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Emails;
 using DFI.FaultReporting.Services.Interfaces.Files;
+using DFI.FaultReporting.Services.Interfaces.Pagination;
 using DFI.FaultReporting.Services.Interfaces.Passwords;
 using DFI.FaultReporting.Services.Interfaces.Roles;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.Services.Interfaces.Users;
+using DFI.FaultReporting.Services.Pagination;
 using DFI.FaultReporting.Services.Passwords;
 using DFI.FaultReporting.Services.Roles;
 using DFI.FaultReporting.Services.Settings;
@@ -76,6 +78,7 @@ builder.Services.AddScoped<IFileDetectorService, ImageFileDetectorService>();
 builder.Services.AddScoped<IFileDetectorService, PDFFileDetectorService>();
 builder.Services.AddScoped<IFileDetectorService, WordFileDetectorService>();
 builder.Services.AddScoped<IFileValidationService, FileValidationService>();
+builder.Services.AddScoped<IPagerService, PagerService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -104,6 +107,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseCookiePolicy();
 app.UseSession();
 app.UseRouting();
 app.UseAuthentication();

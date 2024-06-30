@@ -768,7 +768,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
                         PersonalDetailsInput.DOB = null;
 
                         //Add an error to the ModelState to inform the user that they have not entered a valid date.
-                        ModelState.AddModelError(string.Empty, "New date of birth must contain day, month, and year");
+                        ModelState.AddModelError(string.Empty, "New date of birth must contain a valid day, month, and year");
                     }
 
                     //Either the DOB or the year are invalid.

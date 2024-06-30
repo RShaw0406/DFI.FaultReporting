@@ -14,5 +14,6 @@ namespace DFI.FaultReporting.Common.Constants
         public const string JWTAUDIENCE = "JWT:Audience";
         public const string EMAILFROM = "Mail:From";
         public const string EMAILKEY = "Mail:Key";
+        public const string PAGESIZE = "PageSize";
     }
 }

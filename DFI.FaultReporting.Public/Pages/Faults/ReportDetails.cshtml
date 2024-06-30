@@ -9,6 +9,178 @@
         <br />
         <h2>Details of your reported fault</h2>
         <hr />
+        <form id="showFaultDetailsForm" method="get">
+            <div class="row">
+                <h3>Fault details</h3>
+                <br />
+                <div class="col-md-6">
+                    <div class="row" hidden>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.Latitude" id="lat" class="form-control" />
+                                <label asp-for="Fault.Latitude" class="form-label"></label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" hidden>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Fault.Longitude" id="long" class="form-control" />
+                                <label asp-for="Fault.Longitude" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="FaultType.FaultTypeDescription" class="form-control" disabled />
+                                <label asp-for="FaultType.FaultTypeDescription" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="FaultPriority.FaultPriorityDescription" class="form-control" disabled />
+                                <label asp-for="FaultPriority.FaultPriorityDescription" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="FaultStatus.FaultStatusDescription" class="form-control" disabled />
+                                <label asp-for="FaultStatus.FaultStatusDescription" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="Fault.RoadNumber" class="form-control" disabled />
+                                <label asp-for="Fault.RoadNumber" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="Fault.RoadName" class="form-control" disabled />
+                                <label asp-for="Fault.RoadName" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="Fault.RoadTown" class="form-control" disabled />
+                                <label asp-for="Fault.RoadTown" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="Fault.RoadCounty" class="form-control" disabled />
+                                <label asp-for="Fault.RoadCounty" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-center">
+                                <div id="reviewMap" style="height: 500px; width: 100%;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <h3>Report details</h3>
+            <br />
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Information/description
+                                </th>
+                                <th>
+                                    Date reported
+                                </th>
+                                <th class="text-center">
+                                    View images
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var report in Model.PagedReports)
+                            {
+                                <tr>
+                                    <td>
+                                        @report.AdditionalInfo
+                                    </td>
+                                    <td>
+                                        @report.InputOn.ToShortDateString()
+                                    </td>
+                                    <td class="text-center">
+                                        <form method="post">
+                                            <button type="submit" asp-page-handler="ViewImages" asp-route-id="@report.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @{
+                    var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+                }
+                <div>
+                    <ul class="pagination text-center">
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="First page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="Previous page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span> Prev
+                            </a>
+                        </li>
+                        <li>
+                            &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                               class="btn btn-outline-primary btn-sm @nextDisabled"
+                               aria-label="Next page button"
+                               style="font-size: 1em !important;">
+                                Next <span class="fa fa-chevron-right"></span>
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                               class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                               style="font-size: 1em !important;">
+                                Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 <script src="~/js/mapping/ReviewMap.js"></script>

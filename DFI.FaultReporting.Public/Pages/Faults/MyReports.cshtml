@@ -1,25 +1,209 @@
 ﻿@page
-@model DFI.FaultReporting.Public.Pages.Faults.MyFaultsModel
+@using DFI.FaultReporting.Common.SessionStorage
+@using DFI.FaultReporting.Models.FaultReports
+@using DFI.FaultReporting.Models.Admin
+@model DFI.FaultReporting.Public.Pages.Faults.MyReportsModel
 @{
     ViewData["Title"] = "My reports";
 }
-
-<div class="container">
-    <h1>@ViewData["Title"]</h1>
-    <br />
-    <h2>View the fault reports you have made</h2>
-    <hr />
-    <div class="row">
-        <div class="col-6 text-center">
-            <div class="small-tile">
-                <a class="nav-link" id="linkShowMapView" aria-label="Map view link" title="Map view" asp-page-handler="ShowMapView"><i class="fa-solid fa-map-location-dot"></i> Map</a>
+<body onload="initViewMap()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>View the fault reports you have made</h2>
+        <hr />
+        @if (Model.UserHasReports)
+        {
+            <div class="row">
+                <div class="col-6 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" id="linkShowMapView" asp-page-handler="ShowMapView" aria-label="Map view link" title="Map view"><i class="fa-solid fa-map-location-dot"></i> Map</a>
+                    </div>
+                </div>
+                <div class="col-6 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" id="linkShowTableView" asp-page-handler="ShowTableView"  aria-label="Table view link" title="Table view"><i class="fa-solid fa-table-list"></i> Table</a>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="col-6 text-center">
-            <div class="small-tile">
-                <a class="nav-link" id="linkShowTableView" aria-label="Table view link" title="Table view" asp-page-handler="ShowTableView"><i class="fa-solid fa-table-list"></i> Table</a>
+            <div class="row">
+                <div class="col-md-6">
+                    <form name="typeFilterForm" id="typeFilterForm" method="post">
+                        <div class="form-floating mb-3">
+                            <select asp-for="FaultTypeFilter" class="form-select" asp-items="Model.FaultTypesList" onchange="this.form.submit()">
+                                <option value="0">
+                                    All
+                                </option>
+                            </select>
+                            <a id="hiddenDropDownLink" asp-route-CurrentPage="1" hidden></a>
+                            <button id="hiddenDropDownButton" type="submit" hidden></button>
+                            <label asp-for="FaultTypeFilter" class="form-label"></label>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                </div>
+            </div>
+            @if (Model.ShowFaultMap)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-center">
+                            <div id="userFaultsMap" style="height: 1000px; width: 100%;">
+                                <div class="autocomplete">
+                                    <label for="searchBox" class="form-label" hidden></label>
+                                    <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (Model.ShowFaultTable)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            Type
+                                        </th>
+                                        <th>
+                                            Status
+                                        </th>
+                                        <th>
+                                            Priority
+                                        </th>
+                                        <th>
+                                            Location
+                                        </th>
+                                        <th class="text-center">
+                                            View details
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var fault in Model.PagedFaults)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Model.FaultTypes.FirstOrDefault(ft => ft.ID == fault.FaultTypeID).FaultTypeDescription
+                                            </td>
+                                            <td>
+                                                @Model.FaultStatuses.FirstOrDefault(fs => fs.ID == fault.FaultStatusID).FaultStatusDescription
+                                            </td>
+                                            <td>
+                                                @Model.FaultPriorities.FirstOrDefault(fp => fp.ID == fault.FaultPriorityID).FaultPriorityDescription
+                                            </td>
+                                            <td>
+                                                @if (fault.RoadNumber != "undefined" && fault.RoadNumber != null)
+                                                {
+                                                    @fault.RoadNumber
+                                                    <br />
+                                                }
+                                                @if (fault.RoadName != "undefined" && fault.RoadName != null)
+                                                {
+                                                    @fault.RoadName
+                                                    <br />
+                                                }
+                                                @if (fault.RoadTown != "undefined" && fault.RoadTown != null)
+                                                {
+                                                    @fault.RoadTown
+                                                    <br />
+                                                }
+                                                @if (fault.RoadCounty != "undefined" && fault.RoadCounty != null)
+                                                {
+                                                    @fault.RoadCounty
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                    <a asp-page-handler="ViewDetails" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        @{
+                            var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                            var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+                        }
+                        <div>
+                            <ul class="pagination text-center">
+                                <li>
+                                    <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                                       class="btn btn-outline-primary btn-sm @prevDisabled"
+                                       aria-label="First page button" style="font-size: 1em !important;">
+                                        <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                                    </a>&nbsp;
+                                </li>
+                                <li>
+                                    <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                                       class="btn btn-outline-primary btn-sm @prevDisabled"
+                                       aria-label="Previous page button" style="font-size: 1em !important;">
+                                        <span class="fa fa-chevron-left"></span> Prev
+                                    </a>
+                                </li>
+                                <li>
+                                    &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                                </li>
+                                <li>
+                                    <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                                       class="btn btn-outline-primary btn-sm @nextDisabled"
+                                       aria-label="Next page button"
+                                       style="font-size: 1em !important;">
+                                        Next <span class="fa fa-chevron-right"></span>
+                                    </a>&nbsp;
+                                </li>
+                                <li>
+                                    <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                                       class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                                       style="font-size: 1em !important;">
+                                        Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        @if (!Model.UserHasReports)
+        {
+            <div class="alert alert-warning">
+                <strong>Warning: </strong>
+                <p>You have not submitted any reports.</p>
+            </div>
+        }
+        <br />
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="small-tile">
+                    <a class="nav-link" aria-label="Report a fault link" title="Report faults" asp-page="/Faults/ReportFault/ReportFault"><i class="fa-solid fa-road-circle-exclamation"></i> Report a fault</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</body>
+<script type="text/javascript">
 
+    function resetPage() {
+        document.getElementById('hiddenDropDownLink').click();
+    }
+
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    //Retrieve session data to be used for displaying on map/popup.
+    var faults = @Json.Serialize(HttpContext.Session.GetFromSession<List<Fault>>("Faults"));
+    var faultTypes = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes"));
+    var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
+    var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
+    var reports = @Json.Serialize(HttpContext.Session.GetFromSession<List<Report>>("Reports"));
+
+</script>
+<script src="~/js/mapping/UserFaults.js"></script>
+<script src="~/js/mapping/AutoCompleteSearch.js"></script>

@@ -4,8 +4,10 @@ function initSearch() {
     // Find search box on page
     var searchBox = document.getElementById('searchBox');
 
-    // Add event for when user begins to input text
-    searchBox.addEventListener('input', search);
+    if (searchBox != null) {
+        // Add event for when user begins to input text
+        searchBox.addEventListener('input', search);
+    }
 }
 
 // Initialise the search

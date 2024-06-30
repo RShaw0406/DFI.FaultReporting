@@ -175,49 +175,8 @@ function initViewMap() {
                     });
                 }
 
-                //Business logic to define color of marker.
-                // var markerClass = '';
-                // var pulseClass = '';
-
                 console.log("Properties:");
                 console.log(properties);
-
-                // switch (properties.type) {
-                //     case 'Pothole':
-                //         markerClass = 'marker-pothole';
-                //         pulseClass = 'pulse-pothole';
-                //         break;
-                //     case 'Street lighting fault':
-                //         markerClass = 'marker-lighting';
-                //         pulseClass = 'pulse-lighting';
-                //         break;
-                //     case 'Obstructions':
-                //         markerClass = 'marker-obstructions';
-                //         pulseClass = 'pulse-obstructions';
-                //         break;
-                //     case 'Spillages':
-                //         markerClass = 'marker-spillage';
-                //         pulseClass = 'pulse-spillage';
-                //         break;
-                //     case 'Ironwork(Manholes/Gullies)':
-                //         markerClass = 'marker-ironwork';
-                //         pulseClass = 'pulse-ironwork';
-                //         break;
-                //     case 'Traffic Lights':
-                //         markerClass = 'marker-trafficlights';
-                //         pulseClass = 'pulse-trafficlights';
-                //         break;
-                //     case 'Crash barrier and guard-rail':
-                //         markerClass = 'marker-crashbarrier';
-                //         pulseClass = 'pulse-crashbarrier';
-                //         break;
-                //     case 'Ice or snow':
-                //         markerClass = 'marker-ice';
-                //         pulseClass = 'pulse-ice';
-                //         break;
-                //     default:
-                //         break;
-                // }
 
                 //Use a promise to create a marker.
                 return Promise.resolve(new atlas.HtmlMarker({
@@ -259,7 +218,7 @@ function markerClicked(e) {
 
         //Setup popup.
         popup.setOptions({
-            content: `<div style="padding:5px;"><strong>${content}</strong></div>`,
+            content: `<div style="padding:10px;"><strong>${content}</strong></div>`,
             position: marker.getOptions().position,
             closeButton: true
         });
@@ -275,15 +234,15 @@ function markerClicked(e) {
         var contentReports = marker.properties.reportCount;
 
         //Create an href value for the "Add report" link and add the ID of the fault as a query parameter. This is needed for linking a report to a fault on the "AddReport" page.
-        var url = "/Faults/AddReport/AddReport/?ID=" + marker.properties.id;
+        var url = "/Faults/AddReport/?ID=" + marker.properties.id;
 
         //Setup popup.
         popup.setOptions({
-            content: `<div style="padding:5px;">
+            content: `<div style="padding:10px;">
                               <p><strong>Type:</strong> ${contentType}</p>
                               <p><strong>Priority:</strong> ${contentPriority}</p>
                               <p><strong>Status:</strong> ${contentStatus}</p>
-                              <p><strong>Road:</strong> ${contentRoad}</p>
+                              <p><strong>Location:</strong> ${contentRoad}</p>
                               <p><strong>Reports:</strong> ${contentReports}</p>
                               <a id="linkAddReport" href="${url}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-circle-plus"></i> Add report</button>
                            </div>`,

@@ -61,21 +61,27 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         public User CurrentUser { get; set; }
 
         //Declare Faults property, this is needed for displaying faults on the map.
+        [BindProperty]
         public List<Fault> Faults { get; set; }
 
         //Declare Reports property, this is needed for displaying the number of reports for each fault.
+        [BindProperty]
         public List<Report> Reports { get; set; }
 
         //Declare FaultPriorities property, this is needed for displaying on map.
+        [BindProperty]
         public List<FaultPriority> FaultPriorities { get; set; }
 
         //Declare FaultStatuses property, this is needed for displaying on map.
+        [BindProperty]
         public List<FaultStatus> FaultStatuses { get; set; }
 
         //Declare FaultTypes property, this is needed for populating fault types dropdown list.
+        [BindProperty]
         public List<FaultType> FaultTypes { get; set; }
 
         //Declare FaultTypesList property, this is needed for populating fault types dropdown list.
+        [BindProperty]
         public IEnumerable<SelectListItem> FaultTypesList { get; set; }
 
         //Declare FaultTypeFilter, this is needed for filtering the faults.
@@ -125,36 +131,15 @@ namespace DFI.FaultReporting.Public.Pages.Faults
             //Return the page.
             return Page();
         }
+        #endregion Page Load
 
+        #region Dropdown Filter Change
+        //This method is executed when either of the dropdown filters are changed.
+        //When executed the Faults property is filtered based on the selected filter.
         public async Task<IActionResult> OnPost()
         {
-            //Get fault types for dropdown.
-            FaultTypes = HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes");
-
-            //Populate fault types dropdown.
-            FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
-            {
-                Text = ft.FaultTypeDescription,
-                Value = ft.ID.ToString()
-            });
-
             //Get all current faults by calling the GetFaults method from the _faultService.
             Faults = await _faultService.GetFaults();
-
-            //Get all fault priorities by calling the GetFaultPriorities method from the _faultPriorityService.
-            FaultPriorities = await _faultPriorityService.GetFaultPriorities();
-
-            //Get all fault statuses by calling the GetFaultStatuses method from the _faultStatusService.
-            FaultStatuses = await _faultStatusService.GetFaultStatuses();
-
-            //Get all Reports by calling the GetReports method from the _reportService.
-            Reports = await _reportService.GetReports();
-
-            //Set FaultTypeFilter in session so that user selection is maintained after post.
-            HttpContext.Session.SetInSession("FaultTypeFilter", FaultTypeFilter);
-
-            //Set the value of FaultTypeFilter as session value.
-            FaultTypeFilter = HttpContext.Session.GetFromSession<int>("FaultTypeFilter");
 
             //User has selected an type that is not "All"
             if (FaultTypeFilter != 0)
@@ -165,15 +150,21 @@ namespace DFI.FaultReporting.Public.Pages.Faults
 
             //Set the Faults in session, needed for displaying on map.
             HttpContext.Session.SetInSession("Faults", Faults);
-            HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
-            HttpContext.Session.SetInSession("FaultPriorities", FaultPriorities);
-            HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
-            HttpContext.Session.SetInSession("Reports", Reports);
+
+            //Get fault types for dropdown.
+            FaultTypes = await GetFaultTypes();
+
+            //Populate fault types dropdown.
+            FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
+            {
+                Text = ft.FaultTypeDescription,
+                Value = ft.ID.ToString()
+            });
 
             //return the page.
             return Page();
         }
-        #endregion Page Load
+        #endregion Dropdown Filter Change
 
         #region Fault Types
         //Method Summary:
