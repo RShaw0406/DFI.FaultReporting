@@ -86,7 +86,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         #region Page Load
         //Method Summary:
         //This method is executed when the page loads.
-        //When executed the details of the fault selected by the user are populated and displayed on screen.
+        //When executed the details of the reported fault selected by the user are populated and displayed on screen.
         public async Task<IActionResult> OnGetAsync()
         {
             //The contexts current user exists.
@@ -172,6 +172,20 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         }
         #endregion Page Load
 
+        #region View Images
+        //Method Summary:
+        //This method is excuted when the "View Images" button in the reports table view is clicked.
+        //When executed the report ID is stored in TempData and the user is redirected to the ReportImages page.
+        public async Task<IActionResult> OnGetViewImages(int ID)
+        {
+            //Set the report ID in TempData.
+            TempData["ReportID"] = ID;
+            TempData.Keep();
+
+            //Redirect user to the ReportImages page.
+            return Redirect("/Faults/ReportImages");
+        }
+        #endregion View Images
 
         #region Pagination
         //Method Summary:

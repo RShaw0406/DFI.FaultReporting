@@ -130,9 +130,7 @@
                                         @report.InputOn.ToShortDateString()
                                     </td>
                                     <td class="text-center">
-                                        <form method="post">
-                                            <button type="submit" asp-page-handler="ViewImages" asp-route-id="@report.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                                        </form>
+                                            <a  asp-page-handler="ViewImages" asp-route-id="@report.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
                                     </td>
                                 </tr>
                             }
