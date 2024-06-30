@@ -20,6 +20,8 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using DFI.FaultReporting.Models.Admin;
+using DFI.FaultReporting.Models.FaultReports;
 
 namespace DFI.FaultReporting.Public.Pages.Account
 {
@@ -334,6 +336,9 @@ namespace DFI.FaultReporting.Public.Pages.Account
 
                         _logger.LogInformation("User registered.");
 
+                        //Send an email to the user.
+                        Response emailResponse = await SendRegistrationEmail(authResponse.UserName);
+
                         //Redirect to the Index/Home page.
                         return Redirect("/Index");
                     }
@@ -394,6 +399,31 @@ namespace DFI.FaultReporting.Public.Pages.Account
 
             //Call the SendVerificationCodeEmail in the _emailService and return the response.
             return await _emailService.SendVerificationCodeEmail(to, verficationToken);
+        }
+
+        //Method Summary:
+        //This method is executed when the "Register" button is clicked.
+        //When executed this method attempts to send an email to the user and returns the response from the _emailService.
+        public async Task<Response> SendRegistrationEmail(string emailAddress)
+        {
+            //Set the subject of the email explaining that the user has deleted their account.
+            string subject = "DFI Fault Reporting: Fault Report Submitted";
+
+            //Declare a new EmailAddress object and assign the users email address as the value.
+            EmailAddress to = new EmailAddress(emailAddress);
+
+            //Set textContent to empty string as it will not be used here.
+            string textContent = string.Empty;
+
+            //Set the htmlContent to a message explaining to the user that their account has been successfully deleted.
+            string htmlContent = "<p>Hello,</p><p>Thank you registering to use the DFI Fault Reporting application.</p>" +
+                "<p>You can now use the application to report faults on the road network and submit compensation claims.</p>";
+
+            //Set the attachment to null as it will not be used here.
+            SendGrid.Helpers.Mail.Attachment? attachment = null;
+
+            //Call the SendEmail in the _emailService and return the response.
+            return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
         }
 
         //Method Summary:
