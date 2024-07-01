@@ -1,4 +1,5 @@
-﻿using DFI.FaultReporting.Models.Users;
+﻿using DFI.FaultReporting.JWT.Response;
+using DFI.FaultReporting.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,16 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
 {
     public interface IStaffService
     {
-        Task<List<Staff>> GetAllStaff();
+        Task<AuthResponse> Login(JWT.Requests.LoginRequest loginRequest);
+        Task<AuthResponse> Lock(string emailAddress);
+        Task<List<Staff>> GetAllStaff(string token);
 
-        Task<Staff> GetStaff(int ID);
+        Task<Staff> GetStaff(int ID, string token);
 
-        Task<Staff> CreateStaff(Staff staff);
+        Task<Staff> CreateStaff(Staff staff, string token);
 
-        Task<Staff> UpdateStaff(Staff staff);
+        Task<Staff> UpdateStaff(Staff staff, string token);
 
-        Task<Staff> DeleteStaff(int ID);
+        Task<int> DeleteStaff(int ID, string token);
     }
 }

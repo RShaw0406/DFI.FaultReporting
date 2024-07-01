@@ -49,6 +49,8 @@ builder.Services.AddScoped<IReportPhotoSQLRepository, ReportPhotoSQLRepository>(
 builder.Services.AddScoped<IRoleSQLRepository, RoleSQLRepository>();
 builder.Services.AddScoped<IUserSQLRepository, UserSQLRepository>();
 builder.Services.AddScoped<IUserRoleSQLRepository, UserRoleSQLRepository>();
+builder.Services.AddScoped<IStaffSQLRepository, StaffSQLRepository>();
+builder.Services.AddScoped<IStaffRoleSQLRepository, StaffRoleSQLRepository>();
 
 builder.Services.AddScoped<DFI.FaultReporting.JWT.Requests.LoginRequest, DFI.FaultReporting.JWT.Requests.LoginRequest>();
 builder.Services.AddScoped<RegistrationRequest, RegistrationRequest>();

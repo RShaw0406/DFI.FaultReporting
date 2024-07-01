@@ -47,5 +47,9 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         public DbSet<User> User { get; set; } = null!;
 
         public DbSet<UserRole> UserRole { get; set; } = null!;
+
+        public DbSet<Staff> Staff { get; set; } = null!;
+
+        public DbSet<StaffRole> StaffRole { get; set; } = null!;
     }
 }

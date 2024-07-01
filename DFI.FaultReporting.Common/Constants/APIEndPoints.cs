@@ -18,7 +18,9 @@ namespace DFI.FaultReporting.Common.Constants
         public const string ReportPhoto = "/api/reportphotos";
         public const string Role = "/api/roles";
         public const string User = "/api/users";
+        public const string Staff = "/api/staffs";
         public const string UserRole = "/api/userroles";
+        public const string StaffRole = "/api/staffroles";
         public const string AuthRegister = "/api/auth/register";
         public const string AuthLogin = "/api/auth/login";
         public const string AuthLock = "/api/auth/lock";

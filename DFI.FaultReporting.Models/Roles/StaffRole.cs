@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DFI.FaultReporting.Models.Roles
 {
-    public class UserRole
+    public class StaffRole
     {
         public int ID { get; set; }
 
@@ -16,9 +16,9 @@ namespace DFI.FaultReporting.Models.Roles
         [Required(ErrorMessage = "You must enter a role")]
         public int RoleID { get; set; }
 
-        [DisplayName("User")]
-        [Required(ErrorMessage = "You must enter a user")]
-        public int UserID { get; set; }
+        [DisplayName("Staff")]
+        [Required(ErrorMessage = "You must enter a staff")]
+        public int StaffID { get; set; }
 
         [DisplayName("Input By")]
         [Required(ErrorMessage = "You must provide an input by")]

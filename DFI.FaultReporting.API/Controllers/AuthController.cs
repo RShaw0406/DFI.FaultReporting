@@ -32,15 +32,17 @@ namespace DFI.FaultReporting.API.Controllers
     public class AuthController : ControllerBase
     {
         private IUserSQLRepository _userSQLRepository;
+        private IStaffSQLRepository _staffSQLRepository;
         private IRoleSQLRepository _roleSQLRepository;
         private IUserRoleSQLRepository _userRoleSQLRepository;
         private IJWTTokenService _tokenService;
         public ILogger<AuthController> _logger;
         public ISettingsService _settingsService;
 
-        public AuthController(IUserSQLRepository userSQLRepository, IRoleSQLRepository roleSQLRepository, IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, IJWTTokenService tokenService, ISettingsService settingsService)
+        public AuthController(IUserSQLRepository userSQLRepository, IStaffSQLRepository staffSQLRepository, IRoleSQLRepository roleSQLRepository, IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, IJWTTokenService tokenService, ISettingsService settingsService)
         {
             _userSQLRepository = userSQLRepository;
+            _staffSQLRepository = staffSQLRepository;
             _roleSQLRepository = roleSQLRepository;
             _userRoleSQLRepository = userRoleSQLRepository;
             _logger = logger;
@@ -49,6 +51,8 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         public List<User>? Users { get; set; }
+
+        public List<Staff>? Staff { get; set; }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequest request)
@@ -122,7 +126,7 @@ namespace DFI.FaultReporting.API.Controllers
 
             await _userRoleSQLRepository.CreateUserRole(userRole);
 
-            SecurityToken token = await _tokenService.GenerateToken(createdUser);
+            SecurityToken token = await _tokenService.GenerateToken(createdUser, null);
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
@@ -136,50 +140,99 @@ namespace DFI.FaultReporting.API.Controllers
         {
             Users = await _userSQLRepository.GetUsers();
 
+            Staff = await _staffSQLRepository.GetStaff(); 
+
             User? requestUser = Users.Where(u => u.Email == request.Email && u.Email != null).FirstOrDefault();
 
-            if (requestUser == null)
+            Staff? requestStaff = Staff.Where(s => s.Email == request.Email && s.Email != null).FirstOrDefault();
+
+            if (requestUser == null && requestStaff == null)
             {
                 //return Unauthorized("Invalid email");
                 return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid email" });
             }
 
-            if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd > DateTime.Now)
+            if (requestUser != null)
             {
-                //return Unauthorized("Account locked");
-                return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
+                if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd > DateTime.Now)
+                {
+                    //return Unauthorized("Account locked");
+                    return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
+                }
+
+                byte[] salt = Convert.FromBase64String(requestUser.PasswordSalt);
+
+                string requestPasswordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                    password: request.Password!,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: 100000,
+                    numBytesRequested: 256 / 8));
+
+                if (requestPasswordHash != requestUser.Password)
+                {
+                    //return Unauthorized("Invalid password");
+                    return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid password" });
+                }
+
+                if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd < DateTime.Now)
+                {
+                    requestUser.AccountLocked = false;
+                    requestUser.AccountLockedEnd = null;
+
+                    await _userSQLRepository.UpdateUser(requestUser);
+                }
+
+                SecurityToken token = await _tokenService.GenerateToken(requestUser, null);
+
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+                string tokenString = tokenHandler.WriteToken(token);
+
+                return Ok(new AuthResponse { UserID = requestUser.ID, UserName = requestUser.Email, Token = tokenString });
             }
 
-            byte[] salt = Convert.FromBase64String(requestUser.PasswordSalt);
-
-            string requestPasswordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: request.Password!,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
-
-            if (requestPasswordHash != requestUser.Password)
+            if (requestStaff != null)
             {
-                //return Unauthorized("Invalid password");
-                return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid password" });
+                if (requestStaff.AccountLocked == true && requestStaff.AccountLockedEnd > DateTime.Now)
+                {
+                    //return Unauthorized("Account locked");
+                    return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
+                }
+
+                byte[] salt = Convert.FromBase64String(requestStaff.PasswordSalt);
+
+                string requestPasswordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                    password: request.Password!,
+                    salt: salt,
+                    prf: KeyDerivationPrf.HMACSHA256,
+                    iterationCount: 100000,
+                    numBytesRequested: 256 / 8));
+
+                if (requestPasswordHash != requestStaff.Password)
+                {
+                    //return Unauthorized("Invalid password");
+                    return Unauthorized(new AuthResponse { ReturnStatusCodeMessage = "Invalid password" });
+                }
+
+                if (requestStaff.AccountLocked == true && requestStaff.AccountLockedEnd < DateTime.Now)
+                {
+                    requestStaff.AccountLocked = false;
+                    requestStaff.AccountLockedEnd = null;
+
+                    await _staffSQLRepository.UpdateStaff(requestStaff);
+                }
+
+                SecurityToken token = await _tokenService.GenerateToken(null, requestStaff);
+
+                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+                string tokenString = tokenHandler.WriteToken(token);
+
+                return Ok(new AuthResponse { UserID = requestStaff.ID, UserName = requestStaff.Email, Token = tokenString });
             }
 
-            if (requestUser.AccountLocked == true && requestUser.AccountLockedEnd < DateTime.Now)
-            {
-                requestUser.AccountLocked = false;
-                requestUser.AccountLockedEnd = null;
-
-                await _userSQLRepository.UpdateUser(requestUser);
-            }
-
-            SecurityToken token = await _tokenService.GenerateToken(requestUser);
-
-            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-
-            string tokenString = tokenHandler.WriteToken(token);
-
-            return Ok(new AuthResponse {  UserID = requestUser.ID, UserName = requestUser.Email, Token = tokenString });
+            return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Account not found" });
         }
 
         [HttpPut("lock")]
@@ -187,14 +240,33 @@ namespace DFI.FaultReporting.API.Controllers
         {
             Users = await _userSQLRepository.GetUsers();
 
+            Staff = await _staffSQLRepository.GetStaff();
+
             User? lockedUser = Users.Where(u => u.Email == emailAddress && u.Email != null).FirstOrDefault();
 
-            lockedUser.AccountLocked = true;
-            lockedUser.AccountLockedEnd = DateTime.Now.AddMinutes(30);
+            Staff? lockedStaff = Staff.Where(s => s.Email == emailAddress && s.Email != null).FirstOrDefault();
 
-            await _userSQLRepository.UpdateUser(lockedUser);
+            if (lockedUser != null)
+            {
+                lockedUser.AccountLocked = true;
+                lockedUser.AccountLockedEnd = DateTime.Now.AddMinutes(30);
 
-            return Ok(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
+                await _userSQLRepository.UpdateUser(lockedUser);
+
+                return Ok(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
+            }
+
+            if (lockedStaff != null)
+            {
+                lockedStaff.AccountLocked = true;
+                lockedStaff.AccountLockedEnd = DateTime.Now.AddMinutes(30);
+
+                await _staffSQLRepository.UpdateStaff(lockedStaff);
+
+                return Ok(new AuthResponse { ReturnStatusCodeMessage = "Account locked" });
+            }
+
+            return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Account not found" });
         }
     }
 }

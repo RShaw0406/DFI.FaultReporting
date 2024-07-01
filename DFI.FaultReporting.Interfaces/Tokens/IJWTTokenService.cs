@@ -10,6 +10,6 @@ namespace DFI.FaultReporting.Services.Interfaces.Tokens
 {
     public interface IJWTTokenService
     {
-        Task<SecurityToken> GenerateToken(User user);
+        Task<SecurityToken> GenerateToken(User? user, Staff? staff);
     }
 }
