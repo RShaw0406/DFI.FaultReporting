@@ -11,6 +11,7 @@ using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Admin;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -31,6 +32,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/Roles
         [HttpGet]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<IEnumerable<Role>>> GetRole()
         {
             Roles = await _roleSQLRepository.GetRoles();
@@ -39,6 +41,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/Roles/5
         [HttpGet("{ID}")]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<Role>> GetRole(int ID)
         {
             Role role = await _roleSQLRepository.GetRole(ID);
@@ -54,6 +57,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/Roles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<Role>> PostRole(Role role)
         {
             role = await _roleSQLRepository.CreateRole(role);
@@ -64,6 +68,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/Roles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<Role>> PutRole(Role role)
         {
             try
@@ -89,6 +94,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // DELETE: api/Roles/5
         [HttpDelete("{ID}")]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<int>> DeleteRole(int ID)
         {
             Role role = await _roleSQLRepository.GetRole(ID);

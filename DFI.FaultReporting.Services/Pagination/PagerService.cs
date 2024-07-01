@@ -1,4 +1,5 @@
 ﻿using DFI.FaultReporting.Models.FaultReports;
+using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,12 @@ namespace DFI.FaultReporting.Services.Pagination
         public async Task<List<Report>> GetPaginatedReports(List<Report> reports, int currentPage, int pageSize)
         {
             return reports.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+        //Method to get paginated staff.
+        public async Task<List<Staff>> GetPaginatedStaff(List<Staff> staff, int currentPage, int pageSize)
+        {
+            return staff.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
     }
 }

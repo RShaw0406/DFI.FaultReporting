@@ -11,14 +11,14 @@ namespace DFI.FaultReporting.Services.Interfaces.Roles
 {
     public interface IRoleService
     {
-        Task<List<Role>> GetRoles();
+        Task<List<Role>> GetRoles(string token);
 
-        Task<Role> GetRole(int ID);
+        Task<Role> GetRole(int ID, string token);
 
-        Task<Role> CreateRole(Role role);
+        Task<Role> CreateRole(Role role, string token);
 
-        Task<Role> UpdateRole(Role role);
+        Task<Role> UpdateRole(Role role, string token);
 
-        Task<int> DeleteRole(int ID);
+        Task<int> DeleteRole(int ID, string token);
     }
 }

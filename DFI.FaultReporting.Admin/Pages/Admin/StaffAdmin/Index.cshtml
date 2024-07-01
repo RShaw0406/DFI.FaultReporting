@@ -1,0 +1,329 @@
+﻿@page
+@using DFI.FaultReporting.Common.SessionStorage
+@using DFI.FaultReporting.Models.Users
+@model DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin.IndexModel
+
+@{
+    ViewData["Title"] = "Staff admin";
+}
+<body onload="initSearch()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>View and manage staff members</h2>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <form name="filterForm" id="filterForm" method="post">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="autocomplete-page">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="SearchString" id="searchBox" autocomplete="off" class="form-control" />
+                                    <label asp-for="SearchString" for="searchBox" class="form-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="RoleFilter" class="form-select" asp-items="Model.RolesList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                </select>
+                                <label asp-for="RoleFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="AccountLockedFilter" class="form-select" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                    <option value="1">
+                                        Yes
+                                    </option>
+                                    <option value="2">
+                                        No
+                                    </option>
+                                </select>
+                                <label asp-for="AccountLockedFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Staff details
+                                </th>
+                                <th>
+                                    Account details
+                                </th>
+                                <th class="text-center">Edit</th>
+                                <th class="text-center">Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var staff in Model.PagedStaff)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>Email:</strong>
+                                        <br />
+                                        @Html.DisplayFor(modelItem => staff.Email)
+                                        <br />
+                                        <br />
+                                        <strong>Name:</strong>
+                                        <br />
+                                        @Html.DisplayFor(modelItem => staff.Prefix)
+                                        <br />
+                                        @Html.DisplayFor(modelItem => staff.FirstName)
+                                        <br />
+                                        @Html.DisplayFor(modelItem => staff.LastName)
+                                    </td>
+                                    <td>
+                                        <strong>Account locked:</strong>
+                                        <br />
+                                        @if (staff.AccountLocked == true)
+                                        {
+                                            <span class="badge bg-danger">@staff.AccountLocked</span>
+                                            <br />
+                                            @Html.DisplayFor(modelItem => staff.AccountLockedEnd)
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">@staff.AccountLocked</span>
+                                        }
+                                        <br />
+                                        <br />
+                                        <strong>Input:</strong>
+                                        <br />
+                                        @Html.DisplayFor(modelItem => staff.InputBy)
+                                        <br />
+                                        @Html.DisplayFor(modelItem => staff.InputOn)
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./Edit" asp-route-id="@staff.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./Delete" asp-route-id="@staff.ID" class="btn btn-outline-danger btn-lg"><i class="fa-regular fa-trash-can"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @{
+                    var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+                }
+                <div>
+                    <ul class="pagination text-center">
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="First page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="Previous page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span> Prev
+                            </a>
+                        </li>
+                        <li>
+                            &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                               class="btn btn-outline-primary btn-sm @nextDisabled"
+                               aria-label="Next page button"
+                               style="font-size: 1em !important;">
+                                Next <span class="fa fa-chevron-right"></span>
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                               class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                               style="font-size: 1em !important;">
+                                Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="small-tile">
+                    <a class="nav-link" aria-label="New staff link" title="New staff" asp-page="./Create"><i class="fa-solid fa-circle-plus"></i> Add new staff</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+
+    function initSearch() {
+        // Find search box on page
+        var searchBox = document.getElementById('searchBox');
+
+        if (searchBox != null) {
+            // Add event for when user begins to input text
+            searchBox.addEventListener('input', search);
+        }
+    }
+
+
+    function search() {
+        var query = document.getElementById('searchBox').value;
+
+        var staff = @Json.Serialize(HttpContext.Session.GetFromSession<List<Staff>>("Staff"));
+
+        if (!query) {
+            document.getElementById("filterForm").submit();
+        }
+        else 
+        {
+            autocomplete(document.getElementById("searchBox"), staff);
+        }
+    }
+
+    function autocomplete(inp, staff) {
+        /*the autocomplete function takes two arguments,
+        the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) { return false; }
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            staff.forEach(function (staffmember) {
+                if (staffmember.firstName.substr(0, val.length).toUpperCase() == val.toUpperCase() || staffmember.lastName.substr(0, val.length).toUpperCase() == val.toUpperCase()){
+                    
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + staffmember.firstName.substr(0, val.length) + "</strong>";
+                    b.innerHTML += staffmember.firstName.substr(val.length) + staffmember.lastName;
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + staffmember.firstName + " " + staffmember.lastName + "'>";
+                                
+                    // if (staffmember.firstName.toUpperCase() == val.toUpperCase()) 
+                    // {
+                    //     /*make the matching letters bold:*/
+                    //     b.innerHTML = "<strong>" + staffmember.firstName.substr(0, val.length) + "</strong>";
+                    //     b.innerHTML += staffmember.firstName.substr(val.length) + staffmember.lastName;
+                    //     /*insert a input field that will hold the current array item's value:*/
+                    //     b.innerHTML += "<input type='hidden' value='" + staffmember.id + "'>";
+                    // }
+
+                    // if (staffmember.lastName.toUpperCase() == val.toUpperCase()) 
+                    // {
+                    //     /*make the matching letters bold:*/
+                    //     b.innerHTML = "<strong>" + staffmember.lastName.substr(0, val.length) + "</strong>";
+                    //     b.innerHTML += staffmember.lastName.substr(val.length);
+                    //     /*insert a input field that will hold the current array item's value:*/
+                    //     b.innerHTML += "<input type='hidden' value='" + staffmember.id + "'>";
+                    // }
+
+                    // if (staffmember.email.toUpperCase() == val.toUpperCase()) 
+                    // {
+                    //     /*make the matching letters bold:*/
+                    //     b.innerHTML = "<strong>" + staffmember.email.substr(0, val.length) + "</strong>";
+                    //     b.innerHTML += staffmember.email.substr(val.length);
+                    //     /*insert a input field that will hold the current array item's value:*/
+                    //     b.innerHTML += "<input type='hidden' value='" + staffmember.id + "'>";
+                    // }
+
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+
+                        document.getElementById("filterForm").submit();
+                    });
+                    a.appendChild(b);
+                }
+            });
+        });
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+        /*execute a function when someone clicks in the document:*/
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+        });
+    }
+</script>

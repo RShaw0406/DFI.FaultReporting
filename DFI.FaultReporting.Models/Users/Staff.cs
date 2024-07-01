@@ -42,7 +42,6 @@ namespace DFI.FaultReporting.Models.Users
         public bool? AccountLocked { get; set; }
 
         [DisplayName("Account locked end")]
-        [DataType(DataType.Date)]
         public DateTime? AccountLockedEnd { get; set; }
 
         [DisplayName("Input by")]

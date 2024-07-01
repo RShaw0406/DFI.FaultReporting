@@ -22,37 +22,37 @@ namespace DFI.FaultReporting.Services.Roles
             _roleHttp = roleHttp;
         }
 
-        public async Task<List<Role>> GetRoles()
+        public async Task<List<Role>> GetRoles(string token)
         {
-            Roles = await _roleHttp.GetRoles();
+            Roles = await _roleHttp.GetRoles(token);
 
             return Roles;
         }
 
-        public async Task<Role> GetRole(int ID)
+        public async Task<Role> GetRole(int ID, string token)
         {
-            Role role = await _roleHttp.GetRole(ID);
+            Role role = await _roleHttp.GetRole(ID, token);
 
             return role;
         }
 
-        public async Task<Role> CreateRole(Role role)
+        public async Task<Role> CreateRole(Role role, string token)
         {
-            role = await _roleHttp.CreateRole(role);
+            role = await _roleHttp.CreateRole(role, token);
 
             return role;
         }
 
-        public async Task<Role> UpdateRole(Role role)
+        public async Task<Role> UpdateRole(Role role, string token)
         {
-            role = await _roleHttp.UpdateRole(role);
+            role = await _roleHttp.UpdateRole(role, token);
 
             return role;
         }
 
-        public async Task<int> DeleteRole(int ID)
+        public async Task<int> DeleteRole(int ID, string token)
         {
-            await _roleHttp.DeleteRole(ID);
+            await _roleHttp.DeleteRole(ID, token);
 
             return ID;
         }

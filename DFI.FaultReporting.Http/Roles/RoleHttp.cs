@@ -27,11 +27,13 @@ namespace DFI.FaultReporting.Http.Roles
 
         public List<Role>? Roles { get; set; }
 
-        public async Task<List<Role>> GetRoles()
+        public async Task<List<Role>> GetRoles(string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
             var request = new HttpRequestMessage
             {
@@ -60,11 +62,13 @@ namespace DFI.FaultReporting.Http.Roles
             }
         }
 
-        public async Task<Role> GetRole(int ID)
+        public async Task<Role> GetRole(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
             var request = new HttpRequestMessage
             {
@@ -93,11 +97,13 @@ namespace DFI.FaultReporting.Http.Roles
             }
         }
 
-        public async Task<Role> CreateRole(Role role)
+        public async Task<Role> CreateRole(Role role, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
             var roleJSON = JsonConvert.SerializeObject(role);
 
@@ -131,11 +137,13 @@ namespace DFI.FaultReporting.Http.Roles
             }
         }
 
-        public async Task<Role> UpdateRole(Role role)
+        public async Task<Role> UpdateRole(Role role, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
             var roleJSON = JsonConvert.SerializeObject(role);
 
@@ -171,11 +179,13 @@ namespace DFI.FaultReporting.Http.Roles
             }
         }
 
-        public async Task<int> DeleteRole(int ID)
+        public async Task<int> DeleteRole(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
 
             var request = new HttpRequestMessage
             {

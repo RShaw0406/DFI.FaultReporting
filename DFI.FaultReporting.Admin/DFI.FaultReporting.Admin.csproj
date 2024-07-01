@@ -14,16 +14,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DFI.FaultReporting.Models\DFI.FaultReporting.Models.csproj" />
     <ProjectReference Include="..\DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj" />
+    <ProjectReference Include="..\DFI.FaultReporting.SQL.Repository\DFI.FaultReporting.SQL.Repository.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Admin\" />
     <Folder Include="wwwroot\js\mapping\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
