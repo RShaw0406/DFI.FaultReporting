@@ -1,0 +1,77 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<h1>@ViewData["Title"]</h1>
+<br />
+<div class="row">
+    <div class="col-md-12">
+        <section>
+            @if (Model.verificationCodeSent == false)
+            {
+                <form id="loginForm" method="post">
+                    <h2>Enter your log in details below</h2>
+                    <hr />
+                    <div class="alert alert-info">
+                        <strong>Info: </strong>
+                        <p>This application implements Two-Factor Authentication (2FA).</p>
+                        <p>
+                            Enter your log in details below and click the "Request Verification Code"
+                            button to recieve an email containing your code.
+                        </p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="loginInput.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                                <label asp-for="loginInput.Email" class="form-label">Email</label>
+                                <span asp-validation-for="loginInput.Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="loginInput.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                                <label asp-for="loginInput.Password" class="form-label">Password</label>
+                                <span asp-validation-for="loginInput.Password" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-outline-primary"><i class="fa-regular fa-envelope"></i> Request verification code</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+        </section>
+        <section>
+            @if (Model.verificationCodeSent == true)
+            {
+                <form id="verificationCodeForm" method="post">
+                    <h2>Enter your verification code below</h2>
+                    <hr />
+                    <div class="alert alert-info">
+                        <strong>Info: </strong>
+                        <p>You should receive an email containing your verification code within the next few minutes.</p>
+                        <p>
+                            Please check your spam/junk folder.
+                            Enter the code below to log in.
+                        </p>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="verificationCodeInput.VerificationCode" class="form-control" autocomplete="off" aria-required="true" placeholder="verification code" />
+                                <label asp-for="verificationCodeInput.VerificationCode" class="form-label">Verification Code</label>
+                                <span asp-validation-for="verificationCodeInput.VerificationCode" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <button id="btnLogin" asp-page-handler="Login" type="submit" class="btn btn-lg btn-outline-primary"><i class="fa-solid fa-arrow-right-to-bracket"></i> Log in</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            }
+        </section>
+    </div>
+</div>

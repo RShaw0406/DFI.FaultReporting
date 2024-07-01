@@ -1,10 +1,85 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home";
 }
+<div class="container">
+    <h1>DFI Fault Reporting Administration</h1>
+    <br />
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+    @{
+        if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite") || User.IsInRole("StaffRead"))
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Faults menu link" title="Faults" asp-page="/Faults/Faults"><i class="fa-solid fa-circle-exclamation"></i> Faults</a>
+                    </div>
+                </div>
+            </div>
+        }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core hello dev</a>.</p>
+        if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite") || User.IsInRole("StaffRead"))
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Repairs link" title="Repairs" asp-page="/Repairs/Repairs"><i class="fa-solid fa-screwdriver-wrench"></i> Repairs</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite") || User.IsInRole("StaffRead"))
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Claims link" title="Claims" asp-page="/Claims/Claims"><i class="fa-solid fa-file-pen"></i> Claims</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffAdmin"))
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Admin link" title="Admin" asp-page="/Admin/AdminMenu"><i class="fa-solid fa-screwdriver-wrench"></i> Administration</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    @{
+        if (User.Identity.IsAuthenticated == true)
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="My account link" title="Account details" asp-page="/Account/Details"><i class="fa-solid fa-user"></i> Account</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Logout link" title="Logout" asp-page="/Account/Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Login link" title="Login" asp-page="/Account/Login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
 </div>

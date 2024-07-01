@@ -3,42 +3,117 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DFI.FaultReporting.Admin</title>
+    <title>@ViewData["Title"] - DFI FaultReporting Admin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DFI.FaultReporting.Admin.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome-free-6.5.2-web/css/all.min.css" />
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.css" type="text/css">
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/3/atlas.min.js"></script>
+    <script src="https://atlas.microsoft.com/sdk/javascript/service/2/atlas-service.min.js"></script>
+    <script src="~/lib/azure-maps/azure-maps-fullscreen-control.min.js"></script>
+    <script src="~/lib/azure-maps/azure-maps-html-marker-layer.min.js"></script>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-light border-bottom box-shadow mb-3 fixed-top">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">DFI.FaultReporting.Admin</a>
+                <div class="d-none d-xl-block">
+                    <a class="navbar-brand" asp-page="/Index">
+                        <img src="~/images/infrastructure-full_0.png" alt="Department for Infrastructure Logo" width="500" height="60" />
+                    </a>
+                </div>
+                <div class="d-block d-xl-none d-xxl-none">
+                    <a class="navbar-brand" asp-page="/Index">
+                        <img src="~/images/dfi-logo-sm.png" alt="Department for Infrastructure Logo" />
+                    </a>
+                </div>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1 ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link" asp-page="/Index"><i class="fa-solid fa-house"></i> Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+
+                        @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite") || User.IsInRole("StaffRead"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Faults/Faults"><i class="fa-solid fa-circle-exclamation"></i> Faults</a>
+                            </li>
+                        }
+
+                        @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite") || User.IsInRole("StaffRead"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Repairs/Repairs"><i class="fa-solid fa-screwdriver-wrench"></i> Repairs</a>
+                            </li>
+                        }
+
+                        @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite") || User.IsInRole("StaffRead"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-page="/Claims/Claims"><i class="fa-solid fa-file-pen"></i> Claims</a>
+                            </li>
+                        }
+
+                        @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffAdmin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><i class="fa-solid fa-gears"></i> Admin</a>
+                                <ul class="dropdown-menu bg-light">
+                                    <li><a class="dropdown-item" asp-page="/Admin/StaffAdmin"><i class="fa-solid fa-gear"></i> Staff</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/ContractorAdmin"><i class="fa-solid fa-gear"></i> Contractors</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/ClaimStatusAdmin"><i class="fa-solid fa-gear"></i> Claim Status</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/ClaimTypeAdmin"><i class="fa-solid fa-gear"></i> Claim Type</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/FaultStatusAdmin"><i class="fa-solid fa-gear"></i> Fault Status</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/FaultTypeAdmin"><i class="fa-solid fa-gear"></i> Fault Type</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/FaultPriorityAdmin"><i class="fa-solid fa-gear"></i> Fault Priority</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/RolesAdmin"><i class="fa-solid fa-gear"></i> Roles</a></li>
+                                </ul>
+                            </li>
+                        }
+                        @{
+                            if (User.Identity.IsAuthenticated == true)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-page="/Account/Details" title="Account Details"><i class="fa-solid fa-user"></i> Account</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-page="/Account/Logout" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-page="/Account/Login" title="Login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+                                </li>
+                            }
+                        }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+    <br />
+    <br />
+    <br />
+    <br />
     <div class="container">
+        <br />
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="navbar-light bg-light border-top footer text-muted box-shadow mb-3 fixed-bottom">
         <div class="container">
-            &copy; 2024 - DFI.FaultReporting.Admin - <a asp-area="" asp-page="/Privacy">Privacy</a>
+            &copy; 2024 - DFI Fault Reporting | <a asp-area="" asp-page="/Privacy">Privacy</a> |
+            <a class="navbar-brand" asp-area="" asp-page="/Index">
+                <img src="~/images/dfi-logo-sm.png" alt="Department for Infrastructure Logo" />
+            </a>
         </div>
     </footer>
 

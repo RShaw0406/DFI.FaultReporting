@@ -1,11 +1,31 @@
 using DFI.FaultReporting.Http.Admin;
 using DFI.FaultReporting.Http.FaultReports;
+using DFI.FaultReporting.Http.Files;
+using DFI.FaultReporting.Http.Roles;
+using DFI.FaultReporting.Http.Users;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
+using DFI.FaultReporting.Interfaces.Files;
 using DFI.FaultReporting.Services.Admin;
+using DFI.FaultReporting.Services.Emails;
 using DFI.FaultReporting.Services.FaultReports;
+using DFI.FaultReporting.Services.Files;
+using DFI.FaultReporting.Services.Interfaces.Admin;
+using DFI.FaultReporting.Services.Interfaces.Emails;
+using DFI.FaultReporting.Services.Interfaces.Files;
+using DFI.FaultReporting.Services.Interfaces.Pagination;
+using DFI.FaultReporting.Services.Interfaces.Passwords;
+using DFI.FaultReporting.Services.Interfaces.Roles;
 using DFI.FaultReporting.Services.Interfaces.Settings;
+using DFI.FaultReporting.Services.Interfaces.Tokens;
+using DFI.FaultReporting.Services.Interfaces.Users;
+using DFI.FaultReporting.Services.Pagination;
+using DFI.FaultReporting.Services.Passwords;
+using DFI.FaultReporting.Services.Roles;
 using DFI.FaultReporting.Services.Settings;
+using DFI.FaultReporting.Services.Tokens;
+using DFI.FaultReporting.Services.Users;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,19 +39,58 @@ builder.Services.AddHttpClient("API", api =>
     api.BaseAddress = new Uri(builder.Configuration.GetValue<string>("API:BaseURL"));
 });
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddScoped<IClaimStatusService, ClaimStatusService>();
 builder.Services.AddScoped<IClaimTypeService, ClaimTypeService>();
+builder.Services.AddScoped<IFaultPriorityService, FaultPriorityService>();
 builder.Services.AddScoped<IFaultStatusService, FaultStatusService>();
 builder.Services.AddScoped<IFaultTypeService, FaultTypeService>();
 builder.Services.AddScoped<IFaultService, FaultService>();
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IReportPhotoService, ReportPhotoService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IStaffService, StaffService>();
+builder.Services.AddScoped<IStaffRoleService, StaffRoleService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
+builder.Services.AddScoped<FaultPriorityHttp, FaultPriorityHttp>();
 builder.Services.AddScoped<FaultStatusHttp, FaultStatusHttp>();
 builder.Services.AddScoped<FaultTypeHttp, FaultTypeHttp>();
 builder.Services.AddScoped<FaultHttp, FaultHttp>();
+builder.Services.AddScoped<ReportHttp, ReportHttp>();
+builder.Services.AddScoped<ReportPhotoHttp, ReportPhotoHttp>();
+builder.Services.AddScoped<RoleHttp, RoleHttp>();
+builder.Services.AddScoped<StaffHttp, StaffHttp>();
+builder.Services.AddScoped<StaffRoleHttp, StaffRoleHttp>();
+
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IVerificationTokenService, VerificationTokenService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IMimeSnifferService, MimeSnifferService>();
+builder.Services.AddScoped<IFileDetectorService, ImageFileDetectorService>();
+builder.Services.AddScoped<IFileDetectorService, PDFFileDetectorService>();
+builder.Services.AddScoped<IFileDetectorService, WordFileDetectorService>();
+builder.Services.AddScoped<IFileValidationService, FileValidationService>();
+builder.Services.AddScoped<IPagerService, PagerService>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        //options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+        options.AccessDeniedPath = "/Error/";
+    });
+
+//Added for session state
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(60);
+});
 
 var app = builder.Build();
 
@@ -45,11 +104,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseCookiePolicy();
+app.UseSession();
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapRazorPages();
-
 app.Run();

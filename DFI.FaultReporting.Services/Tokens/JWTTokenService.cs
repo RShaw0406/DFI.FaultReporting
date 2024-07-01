@@ -21,22 +21,28 @@ namespace DFI.FaultReporting.Services.Tokens
     {
         public ISettingsService _settingsService;
         private IUserRoleSQLRepository _userRoleSQLRepository;
+        private IStaffRoleSQLRepository _staffRoleSQLRepository;
         private IRoleSQLRepository _roleSQLRepository;
 
-        public JWTTokenService(ISettingsService settingsService, IUserRoleSQLRepository userRoleSQLRepository, IRoleSQLRepository roleSQLRepository)
+        public JWTTokenService(ISettingsService settingsService, IUserRoleSQLRepository userRoleSQLRepository, IStaffRoleSQLRepository staffRoleSQLRepository, IRoleSQLRepository roleSQLRepository)
         {
             _settingsService = settingsService;
             _userRoleSQLRepository = userRoleSQLRepository;
+            _staffRoleSQLRepository = staffRoleSQLRepository;
             _roleSQLRepository = roleSQLRepository;
         }
 
         public List<UserRole>? UserRoles { get; set; }
+
+        public List<StaffRole>? StaffRoles { get; set; }
 
         public List<Role>? Roles { get; set; }
 
         public async Task<SecurityToken> GenerateToken(User? user, Staff? staff)
         {
             UserRoles = await _userRoleSQLRepository.GetUserRoles();
+
+            StaffRoles = await _staffRoleSQLRepository.GetStaffRoles();
 
             Roles = await _roleSQLRepository.GetRoles();
 
@@ -85,13 +91,13 @@ namespace DFI.FaultReporting.Services.Tokens
 
             if (staff != null)
             {
-                List<UserRole> assignedUserRoles = UserRoles.Where(ur => ur.UserID == staff.ID).ToList();
+                List<StaffRole> assignedStaffRoles = StaffRoles.Where(sr => sr.StaffID == staff.ID).ToList();
 
                 List<Role> assignedRoles = new List<Role>();
 
-                foreach (UserRole userRole in assignedUserRoles)
+                foreach (StaffRole staffRole in assignedStaffRoles)
                 {
-                    Role role = Roles.Where(r => r.ID == userRole.RoleID).FirstOrDefault();
+                    Role role = Roles.Where(r => r.ID == staffRole.RoleID).FirstOrDefault();
 
                     assignedRoles.Add(role);
                 }

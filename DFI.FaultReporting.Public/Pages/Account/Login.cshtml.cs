@@ -108,6 +108,7 @@ namespace DFI.FaultReporting.Public.Pages.Account
             //The HttpContext user is already authenticated.
             if (HttpContext.User.Identity.IsAuthenticated == true)
             {
+                return RedirectToPage("/Index");
             }
 
             //Redirect to already logged in page.

@@ -16,7 +16,7 @@ namespace DFI.FaultReporting.Models.FaultReports
 
         [DisplayName("Fault")]
         [Required(ErrorMessage = "You must enter a fault")]
-        public required int FaultID { get; set; }
+        public int FaultID { get; set; }
 
         [DisplayName("Repair Target Date")]
         [Required(ErrorMessage = "You must enter a repair target date")]
@@ -34,22 +34,18 @@ namespace DFI.FaultReporting.Models.FaultReports
 
         [DisplayName("Assigned Contractor")]
         [Required(ErrorMessage = "You must provide a contractor")]
-        public required int ContractorID { get; set; }
+        public int ContractorID { get; set; }
 
         [DisplayName("Input By")]
         [Required(ErrorMessage = "You must provide an input by")]
-        public required string InputBy { get; set; }
+        public string? InputBy { get; set; }
 
         [DisplayName("Input On")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
-        public required DateTime InputOn { get; set; }
+        public DateTime InputOn { get; set; }
 
         [Required(ErrorMessage = "You must provide an active")]
-        public required bool Active { get; set; }
-
-        public virtual Fault? Fault { get; set; }
-
-        public virtual Contractor? Contractor { get; set; }
+        public bool Active { get; set; }
     }
 }

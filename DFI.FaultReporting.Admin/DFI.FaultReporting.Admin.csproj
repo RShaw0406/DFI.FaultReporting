@@ -22,4 +22,10 @@
     <ProjectReference Include="..\DFI.FaultReporting.Services\DFI.FaultReporting.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Admin\" />
+    <Folder Include="wwwroot\js\mapping\" />
+    <Folder Include="wwwroot\images\" />
+  </ItemGroup>
+
 </Project>

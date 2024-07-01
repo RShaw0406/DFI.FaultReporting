@@ -127,9 +127,9 @@ namespace DFI.FaultReporting.Http.Users
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                Staff = JsonConvert.DeserializeObject<List<Staff>>(response);
+                Staff staff = JsonConvert.DeserializeObject<Staff>(response);
 
-                return Staff.FirstOrDefault();
+                return staff;
             }
             else
             {
@@ -162,9 +162,9 @@ namespace DFI.FaultReporting.Http.Users
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                Staff = JsonConvert.DeserializeObject<List<Staff>>(response);
+                staff = JsonConvert.DeserializeObject<Staff>(response);
 
-                return Staff.FirstOrDefault();
+                return staff;
             }
             else
             {
@@ -197,9 +197,9 @@ namespace DFI.FaultReporting.Http.Users
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                Staff = JsonConvert.DeserializeObject<List<Staff>>(response);
+                staff = JsonConvert.DeserializeObject<Staff>(response);
 
-                return Staff.FirstOrDefault();
+                return staff;
             }
             else
             {
