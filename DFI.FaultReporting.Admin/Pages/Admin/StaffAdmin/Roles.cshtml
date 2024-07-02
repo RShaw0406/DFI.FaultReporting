@@ -1,0 +1,54 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin.RolesModel
+@{
+    ViewData["Title"] = "Assign staff roles";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Assign roles to staff members</h2>
+    <hr />
+    @if (Model.UpdateSuccess)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>Success: </strong>
+            <p>Staff members roles have been successfully updated.</p>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @for (var i = 0; i < Model.SelectedRoles.Count(); i++)
+                {
+                    <div class="form-check">
+                        <input id="@Model.SelectedRoles[i].RoleID" asp-for="@Model.SelectedRoles[i].RoleID" hidden />
+                        <label for="@Model.SelectedRoles[i].RoleID" asp-for="@Model.SelectedRoles[i].RoleID" hidden></label>
+
+                        <input id="@Model.SelectedRoles[i].Role" asp-for="@Model.SelectedRoles[i].Role" hidden />
+                        <label for="@Model.SelectedRoles[i].Role" asp-for="@Model.SelectedRoles[i].Role" hidden></label>
+
+                        <input id="@Model.SelectedRoles[i].StaffRoleID" asp-for="@Model.SelectedRoles[i].StaffRoleID" hidden />
+                        <label for="@Model.SelectedRoles[i].StaffRoleID" asp-for="@Model.SelectedRoles[i].StaffRoleID" hidden></label>
+
+                        <input id="@Model.SelectedRoles[i]" asp-for="@Model.SelectedRoles[i].isSelected" class="form-check-input" />
+                        <label for="@Model.SelectedRoles[i]" asp-for="@Model.SelectedRoles[i].isSelected" class="form-check-label">@Model.SelectedRoles[i].Role</label>
+                    </div>
+                    <br />
+                }
+                <br />
+                <div class="btn-group">
+                    <a asp-page="Index" class="btn btn-lg btn-outline-secondary"><i class="fa-solid fa-ban"></i> Cancel</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

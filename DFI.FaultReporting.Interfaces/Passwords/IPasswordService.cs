@@ -9,8 +9,6 @@ namespace DFI.FaultReporting.Services.Interfaces.Passwords
 {
     public interface IPasswordService
     {
-        Task<bool> VerifyHashedPassword(string hashedPassword, string providedPassword);
-
-        Task<string> HashPassword(string password);
+        Task<string> GenerateRandomPassword();
     }
 }

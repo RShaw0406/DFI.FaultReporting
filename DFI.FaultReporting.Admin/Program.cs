@@ -76,6 +76,7 @@ builder.Services.AddScoped<IFileDetectorService, PDFFileDetectorService>();
 builder.Services.AddScoped<IFileDetectorService, WordFileDetectorService>();
 builder.Services.AddScoped<IFileValidationService, FileValidationService>();
 builder.Services.AddScoped<IPagerService, PagerService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

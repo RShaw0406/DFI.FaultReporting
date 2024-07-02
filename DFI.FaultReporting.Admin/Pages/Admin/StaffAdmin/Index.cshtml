@@ -66,6 +66,7 @@
                                 <th>
                                     Account details
                                 </th>
+                                <th class="text-center">Roles</th>
                                 <th class="text-center">Edit</th>
                                 <th class="text-center">Delete</th>
                             </tr>
@@ -108,6 +109,9 @@
                                         @Html.DisplayFor(modelItem => staff.InputBy)
                                         <br />
                                         @Html.DisplayFor(modelItem => staff.InputOn)
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./Roles" asp-route-id="@staff.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-key"></i></a>
                                     </td>
                                     <td class="text-center">
                                         <a asp-page="./Edit" asp-route-id="@staff.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
@@ -225,36 +229,10 @@
 
                     /*make the matching letters bold:*/
                     b.innerHTML = "<strong>" + staffmember.firstName.substr(0, val.length) + "</strong>";
-                    b.innerHTML += staffmember.firstName.substr(val.length) + staffmember.lastName;
+                    b.innerHTML += staffmember.firstName.substr(val.length) + " " + staffmember.lastName;
                     /*insert a input field that will hold the current array item's value:*/
                     b.innerHTML += "<input type='hidden' value='" + staffmember.firstName + " " + staffmember.lastName + "'>";
                                 
-                    // if (staffmember.firstName.toUpperCase() == val.toUpperCase()) 
-                    // {
-                    //     /*make the matching letters bold:*/
-                    //     b.innerHTML = "<strong>" + staffmember.firstName.substr(0, val.length) + "</strong>";
-                    //     b.innerHTML += staffmember.firstName.substr(val.length) + staffmember.lastName;
-                    //     /*insert a input field that will hold the current array item's value:*/
-                    //     b.innerHTML += "<input type='hidden' value='" + staffmember.id + "'>";
-                    // }
-
-                    // if (staffmember.lastName.toUpperCase() == val.toUpperCase()) 
-                    // {
-                    //     /*make the matching letters bold:*/
-                    //     b.innerHTML = "<strong>" + staffmember.lastName.substr(0, val.length) + "</strong>";
-                    //     b.innerHTML += staffmember.lastName.substr(val.length);
-                    //     /*insert a input field that will hold the current array item's value:*/
-                    //     b.innerHTML += "<input type='hidden' value='" + staffmember.id + "'>";
-                    // }
-
-                    // if (staffmember.email.toUpperCase() == val.toUpperCase()) 
-                    // {
-                    //     /*make the matching letters bold:*/
-                    //     b.innerHTML = "<strong>" + staffmember.email.substr(0, val.length) + "</strong>";
-                    //     b.innerHTML += staffmember.email.substr(val.length);
-                    //     /*insert a input field that will hold the current array item's value:*/
-                    //     b.innerHTML += "<input type='hidden' value='" + staffmember.id + "'>";
-                    // }
 
                     /*execute a function when someone clicks on the item value (DIV element):*/
                     b.addEventListener("click", function (e) {

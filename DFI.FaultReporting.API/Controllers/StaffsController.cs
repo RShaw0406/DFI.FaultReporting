@@ -91,31 +91,30 @@ namespace DFI.FaultReporting.API.Controllers
             staff.PasswordSalt = Convert.ToBase64String(salt);
             staff.AccountLocked = false;
             staff.AccountLockedEnd = null;
-            staff.InputBy = "system admin";
             staff.InputOn = DateTime.Now;
             staff.Active = true;
 
             staff = await _staffSQLRepository.CreateStaff(staff);
 
-            int roleID = 6;
+            //int roleID = 6;
 
-            Role role = await _roleSQLRepository.GetRole(roleID);
+            //Role role = await _roleSQLRepository.GetRole(roleID);
 
-            if (role == null)
-            {
-                return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Role not found: StaffReadWrite" });
-            }
+            //if (role == null)
+            //{
+            //    return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Role not found: StaffReadWrite" });
+            //}
 
-            StaffRole staffReadRole = new StaffRole
-            {
-                RoleID = role.ID,
-                StaffID = staff.ID,
-                InputBy = "system admin",
-                InputOn = DateTime.Now,
-                Active = true
-            };
+            //StaffRole staffReadRole = new StaffRole
+            //{
+            //    RoleID = role.ID,
+            //    StaffID = staff.ID,
+            //    InputBy = "system admin",
+            //    InputOn = DateTime.Now,
+            //    Active = true
+            //};
 
-            await _staffRoleSQLRepository.CreateStaffRole(staffReadRole);
+            //await _staffRoleSQLRepository.CreateStaffRole(staffReadRole);
 
             return CreatedAtAction("GetStaff", new { staff.ID }, staff);
         }
@@ -123,7 +122,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/Staffs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        [Authorize(Roles = "StaffAdmin, StaffReadWrite")]
+        [Authorize(Roles = "StaffAdmin, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<Staff>> PutStaff(Staff staff)
         {
             try

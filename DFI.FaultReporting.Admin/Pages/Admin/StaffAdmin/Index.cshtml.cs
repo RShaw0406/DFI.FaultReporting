@@ -112,10 +112,9 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
             //The contexts current user exists.
             if (_httpContextAccessor.HttpContext.User != null)
             {
-                //The contexts current user has been authenticated.
-                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
+                //The contexts current user has been authenticated and has admin role
+                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-
                     //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
                     string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
@@ -205,6 +204,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
             //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
             string? jwtToken = jwtTokenClaim.Value;
 
+            //User has entered a search string.
             if (SearchString != null && SearchString != string.Empty)
             {
                 Staff = Staff.Where(s => s.FirstName + " " + s.LastName == SearchString).ToList();
@@ -233,31 +233,30 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                     }
                 }
 
+                //User has entered a search string.
                 if (SearchString != null && SearchString != string.Empty)
                 {
+                    //Declare a new list of staff.
                     Staff = new List<Staff>();
 
+                    //Loop through each staff in the StaffInRole list.
                     foreach (Staff staff in StaffInRole)
                     {
+                        //Check if the staffs first and last name matches the search string.
                         if (staff.FirstName + " " + staff.LastName == SearchString)
                         {
+                            //Add the staff to the Staff list.
                             Staff.Add(staff);
                         }
                     }
                 }
+                //User has not entered a search string.
                 else
                 {
                     //Set the Staff list to the StaffInRole list.
                     Staff = StaffInRole;
                 }
             }
-
-            //User has selected all roles.
-            //else
-            //{
-            //    //Get all staff from the DB.
-            //    Staff = await _staffService.GetAllStaff(jwtToken);              
-            //}
 
             //User has selected a account locked status.
             if (AccountLockedFilter != 0)

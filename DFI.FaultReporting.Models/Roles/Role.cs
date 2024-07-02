@@ -19,14 +19,14 @@ namespace DFI.FaultReporting.Models.Roles
 
         [DisplayName("Input By")]
         [Required(ErrorMessage = "You must provide an input by")]
-        public required string InputBy { get; set; }
+        public string? InputBy { get; set; }
 
         [DisplayName("Input On")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
-        public required DateTime InputOn { get; set; }
+        public  DateTime InputOn { get; set; }
 
         [Required(ErrorMessage = "You must provide an active")]
-        public required bool Active { get; set; }
+        public  bool Active { get; set; }
     }
 }

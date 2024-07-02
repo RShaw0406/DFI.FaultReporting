@@ -11,6 +11,7 @@ using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Roles;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -76,7 +77,7 @@ namespace DFI.FaultReporting.API.Controllers
 
                 return staffRole;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 StaffRoles = await _staffRoleSQLRepository.GetStaffRoles();
 
@@ -86,7 +87,7 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
         }
