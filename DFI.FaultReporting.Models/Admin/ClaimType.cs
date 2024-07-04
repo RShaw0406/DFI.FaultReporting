@@ -12,21 +12,21 @@ namespace DFI.FaultReporting.Models.Admin
     {
         public int ID { get; set; }
 
-        [DisplayName("Claim Type")]
+        [DisplayName("Claim type")]
         [Required(ErrorMessage = "You must enter a claim type description")]
         [StringLength(50, ErrorMessage = "Claim type description must not be more than 50 characters")]
-        public required string ClaimTypeDescription { get; set; }
+        public string? ClaimTypeDescription { get; set; }
 
-        [DisplayName("Input By")]
+        [DisplayName("Input by")]
         [Required(ErrorMessage = "You must provide an input by")]
-        public required string InputBy { get; set; }
+        public string? InputBy { get; set; }
 
-        [DisplayName("Input On")]
+        [DisplayName("Input on")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
-        public required DateTime InputOn { get; set; }
+        public DateTime InputOn { get; set; }
 
         [Required(ErrorMessage = "You must provide an active")]
-        public required bool Active { get; set; }
+        public bool Active { get; set; }
     }
 }

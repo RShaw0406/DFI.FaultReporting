@@ -9,14 +9,12 @@ namespace DFI.FaultReporting.Interfaces.Admin
 {
     public interface IClaimTypeService
     {
-        Task<List<ClaimType>> GetClaimTypes();
+        Task<List<ClaimType>> GetClaimTypes(string token);
 
-        Task<ClaimType> GetClaimType(int ID);
+        Task<ClaimType> GetClaimType(int ID, string token);
 
-        Task<ClaimType> CreateClaimType(ClaimType claimType);
+        Task<ClaimType> CreateClaimType(ClaimType claimType, string token);
 
-        Task<ClaimType> UpdateClaimType(ClaimType claimType);
-
-        Task<int> DeleteClaimType(int ID);
+        Task<ClaimType> UpdateClaimType(ClaimType claimType, string token);
     }
 }

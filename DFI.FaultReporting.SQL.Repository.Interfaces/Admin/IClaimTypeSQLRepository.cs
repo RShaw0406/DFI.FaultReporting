@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.SQL.Repository.Interfaces.Admin
         Task<ClaimType> CreateClaimType(ClaimType claimType);
 
         Task<ClaimType> UpdateClaimType(ClaimType claimType);
-
-        Task<int> DeleteClaimType(int ID);
     }
 }

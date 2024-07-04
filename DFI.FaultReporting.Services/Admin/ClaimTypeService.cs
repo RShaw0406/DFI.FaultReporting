@@ -20,39 +20,32 @@ namespace DFI.FaultReporting.Services.Admin
             _claimTypeHttp = claimTypeHttp;
         }
 
-        public async Task<List<ClaimType>> GetClaimTypes()
+        public async Task<List<ClaimType>> GetClaimTypes(string token)
         {
-            ClaimTypes = await _claimTypeHttp.GetClaimTypes();
+            ClaimTypes = await _claimTypeHttp.GetClaimTypes(token);
 
             return ClaimTypes;
         }
 
-        public async Task<ClaimType> GetClaimType(int ID)
+        public async Task<ClaimType> GetClaimType(int ID, string token)
         {
-            ClaimType claimType = await _claimTypeHttp.GetClaimType(ID);
+            ClaimType claimType = await _claimTypeHttp.GetClaimType(ID, token);
 
             return claimType;
         }
 
-        public async Task<ClaimType> CreateClaimType(ClaimType claimType)
+        public async Task<ClaimType> CreateClaimType(ClaimType claimType, string token)
         {
-            claimType = await _claimTypeHttp.CreateClaimType(claimType);
+            claimType = await _claimTypeHttp.CreateClaimType(claimType, token);
 
             return claimType;
         }
 
-        public async Task<ClaimType> UpdateClaimType(ClaimType claimType)
+        public async Task<ClaimType> UpdateClaimType(ClaimType claimType, string token)
         {
-            claimType = await _claimTypeHttp.UpdateClaimType(claimType);
+            claimType = await _claimTypeHttp.UpdateClaimType(claimType, token);
 
             return claimType;
-        }
-
-        public async Task<int> DeleteClaimType(int ID)
-        {
-            await _claimTypeHttp.DeleteClaimType(ID);
-
-            return ID;
         }
     }
 }

@@ -5,35 +5,36 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Users;
-using DFI.FaultReporting.Common.Pagination;
 using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.Admin;
 using System.Security.Claims;
 
-namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
+namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin
 {
-    public class CreateModel : PageModel
+    public class EditModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
-        private readonly ILogger<CreateModel> _logger;
-        private readonly IClaimStatusService _claimStatusService;
+        private readonly ILogger<EditModel> _logger;
+        private readonly IClaimTypeService _claimTypeService;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public CreateModel(ILogger<CreateModel> logger, IClaimStatusService claimStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
+        public EditModel(ILogger<EditModel> logger, IClaimTypeService claimTypeService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
             IPagerService pagerService, ISettingsService settingsService)
         {
             _logger = logger;
-            _claimStatusService = claimStatusService;
+            _claimTypeService = claimTypeService;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
@@ -45,16 +46,19 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare ClaimStatus property, this is needed when inputting a new claim status.
+        //Declare ClaimType property, this is needed when inputting a new claim type.
         [BindProperty]
-        public ClaimStatus ClaimStatus { get; set; }
+        public ClaimType ClaimType { get; set; }
+
+        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
+        public bool UpdateSuccess { get; set; }
         #endregion Properties
 
         #region Page Load
         //Method Summary:
         //This method is called when the page is loaded.
-        //It checks if the current user is authenticated and if so, it gets the current user and returns the page.
-        public async Task<IActionResult> OnGetAsync()
+        //It checks if the current user is authenticated and if so, it gets the claim type details from the DB.
+        public async Task<IActionResult> OnGetAsync(int? ID)
         {
             //The contexts current user exists.
             if (_httpContextAccessor.HttpContext.User != null)
@@ -77,11 +81,14 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Created and populate a new ClaimStatus object.
-                    ClaimStatus = new ClaimStatus();
-                    ClaimStatus.InputBy = CurrentStaff.Email;
-                    ClaimStatus.InputOn = DateTime.Now;
-                    ClaimStatus.Active = true;
+                    //Get claim type from the DB.
+                    ClaimType = await _claimTypeService.GetClaimType((int)ID, jwtToken);
+
+                    //Store the claim type description in TempData.
+                    TempData["Description"] = ClaimType.ClaimTypeDescription;
+
+                    //Keep the TempData.
+                    TempData.Keep();
 
                     //Return the page.
                     return Page();
@@ -92,7 +99,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
                 //Redirect user to no permission.
@@ -101,13 +107,13 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         }
         #endregion Page Load
 
-        #region Create Claim Status
+        #region Edit Claim Type
         //Method Summary:
-        //This method is executed when the "Submit" button is clicked.
-        //When executed this method attempts to create a new claim status and returns the user to the index page.
+        //This method is executed when the update button is clicked.
+        //When executed, it updates the claim type in the DB.
         public async Task<IActionResult> OnPostAsync()
         {
-            //Model state is not valid.
+            //Modelstate is not valid.
             if (!ModelState.IsValid)
             {
                 //Loop through all model state items.
@@ -128,7 +134,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                 //Return the page.
                 return Page();
             }
-            //ModelState is valid.
+            //Modelstate is valid.
             else
             {
                 //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
@@ -143,40 +149,59 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                 //Set the CurrentStaff property by calling the GetUser method in the _userService.
                 CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-                //Get all claim statuses from the DB.
-                List<ClaimStatus> claimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
+                //Get all claim types from the DB.
+                List<ClaimType> claimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
 
-                //Claim status already exists.
-                if (claimStatuses.Any(cs => cs.ClaimStatusDescription == ClaimStatus.ClaimStatusDescription))
+                //Claim type description has changed.
+                if (ClaimType.ClaimTypeDescription != TempData["Description"].ToString())
                 {
-                    //Add model state error.
-                    ModelState.AddModelError(string.Empty, "Claim status already exists");
-                    ModelState.AddModelError("ClaimStatus.ClaimStatusDescription", "Claim status already exists");
+                    //Claim type already exists.
+                    if (claimTypes.Any(ct => ct.ClaimTypeDescription == ClaimType.ClaimTypeDescription))
+                    {
+                        //Keep the TempData.
+                        TempData.Keep();
+
+                        //Add model state error.
+                        ModelState.AddModelError(string.Empty, "Claim type already exists");
+                        ModelState.AddModelError("ClaimType.ClaimTypeDescription", "Claim type already exists");
+
+                        //Return the page.
+                        return Page();
+                    }
+                }
+
+                //Update claim type in the DB.
+                ClaimType updatedClaimType = await _claimTypeService.UpdateClaimType(ClaimType, jwtToken);
+
+                //Claim type was updated.
+                if (updatedClaimType != null)
+                {
+                    //Set the UpdateSuccess property to true.
+                    UpdateSuccess = true;
+
+                    //Store the claim type description in TempData.
+                    TempData["Description"] = updatedClaimType.ClaimTypeDescription;
+
+                    //Keep the TempData.
+                    TempData.Keep();
 
                     //Return the page.
                     return Page();
                 }
-
-                //Create the new claim status in the DB.
-                ClaimStatus insertedClaimStatus = await _claimStatusService.CreateClaimStatus(ClaimStatus, jwtToken);
-
-                //If the claim status was successfully created.
-                if (insertedClaimStatus != null)
-                {
-                    //Return to the index page.
-                    return RedirectToPage("./Index");
-                }
-                //Claim status was not successfully created.
+                //Claim status could not be updated.
                 else
                 {
-                    //Return an error message.
-                    ModelState.AddModelError(string.Empty, "An error occurred while creating the claim status");
+                    //Add model state error.
+                    ModelState.AddModelError(string.Empty, "Claim type could not be updated");
+
+                    //Keep the TempData.
+                    TempData.Keep();
 
                     //Return the page.
                     return Page();
                 }
             }
         }
-        #endregion Create Claim Status
+        #endregion Edit Claim Type
     }
 }

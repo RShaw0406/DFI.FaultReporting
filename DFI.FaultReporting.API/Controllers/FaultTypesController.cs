@@ -11,6 +11,7 @@ using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using DFI.FaultReporting.SQL.Repository.Admin;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -73,7 +74,7 @@ namespace DFI.FaultReporting.API.Controllers
 
                 return faultType;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 FaultTypes = await _faultTypeSQLRepository.GetFaultTypes();
 
@@ -83,7 +84,7 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
         }        

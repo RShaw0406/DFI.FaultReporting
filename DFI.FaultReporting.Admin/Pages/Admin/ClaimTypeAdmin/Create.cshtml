@@ -1,0 +1,46 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin.CreateModel
+
+@{
+    ViewData["Title"] = "Add new claim type";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Add details of new claim type</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="ClaimType.ClaimTypeDescription" class="form-control" />
+                    <label asp-for="ClaimType.ClaimTypeDescription" class="control-label"></label>
+                    <span asp-validation-for="ClaimType.ClaimTypeDescription" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="ClaimType.InputBy" class="form-control" />
+                    <label asp-for="ClaimType.InputBy" class="control-label"></label>
+                    <span asp-validation-for="ClaimType.InputBy" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="ClaimType.InputOn" class="form-control" />
+                    <label asp-for="ClaimType.InputOn" class="control-label"></label>
+                    <span asp-validation-for="ClaimType.InputOn" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="ClaimType.Active" /> @Html.DisplayNameFor(model => model.ClaimType.Active)
+                    </label>
+                </div>
+                <div class="btn-group">
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -11,6 +11,7 @@ using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Roles;
 using System.Data;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -73,7 +74,7 @@ namespace DFI.FaultReporting.API.Controllers
 
                 return userRole;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 UserRoles = await _userRoleSQLRepository.GetUserRoles();
 
@@ -83,7 +84,7 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString()); ;
                 }
             }
         }

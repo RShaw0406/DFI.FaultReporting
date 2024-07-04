@@ -1,0 +1,44 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin.DetailsModel
+
+@{
+    ViewData["Title"] = "Claim type details";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Details of claim type</h2>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimType.ClaimTypeDescription)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimType.ClaimTypeDescription)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimType.InputBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimType.InputBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimType.InputOn)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimType.InputOn)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimType.Active)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimType.Active)
+        </dd>
+    </dl>
+    <div class="btn-group">
+        <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+        &nbsp;
+        <a asp-page="./Edit" class="btn btn-outline-primary btn-lg" asp-route-id="@Model.ClaimType.ID"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+    </div>
+    <br />
+</div>

@@ -46,13 +46,5 @@ namespace DFI.FaultReporting.SQL.Repository.Admin
             await _context.SaveChangesAsync();
             return claimType;
         }
-
-        public async Task<int> DeleteClaimType(int ID)
-        {
-            ClaimType claimType = await _context.ClaimType.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
-            _context.ClaimType.Remove(claimType);
-            await _context.SaveChangesAsync();
-            return ID;
-        }
     }
 }

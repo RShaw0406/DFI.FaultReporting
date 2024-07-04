@@ -10,6 +10,7 @@ using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Net;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -75,7 +76,7 @@ namespace DFI.FaultReporting.API.Controllers
 
                 return claimStatus;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 ClaimStatuses = await _claimStatusSQLRepository.GetClaimStatuses();
 
@@ -85,7 +86,7 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
         }

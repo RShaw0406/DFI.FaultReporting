@@ -7,39 +7,33 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
-using DFI.FaultReporting.Services.Interfaces.Emails;
+using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
-using DFI.FaultReporting.Services.Interfaces.Roles;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Users;
-using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Common.Pagination;
-using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel;
 using System.Security.Claims;
-using DFI.FaultReporting.Services.Settings;
 
-namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
+namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin
 {
     public class IndexModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
         private readonly ILogger<IndexModel> _logger;
-        private readonly IClaimStatusService _claimStatusService;
+        private readonly IClaimTypeService _claimTypeService;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public IndexModel(ILogger<IndexModel> logger, IClaimStatusService claimStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor, 
+        public IndexModel(ILogger<IndexModel> logger, IClaimTypeService claimTypeService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
             IPagerService pagerService, ISettingsService settingsService)
         {
             _logger = logger;
-            _claimStatusService = claimStatusService;
+            _claimTypeService = claimTypeService;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
@@ -51,13 +45,13 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare ClaimStatuses property, this is needed when getting all claim statuses from the DB.
+        //Declare ClaimTypes property, this is needed when getting all claim types from the DB.
         [BindProperty]
-        public List<ClaimStatus> ClaimStatuses { get; set; }
+        public List<ClaimType> ClaimTypes { get; set; }
 
-        //Declare PagedClaimStatuses property, this is needed for displaying claim statuses in the table.
+        //Declare PagedClaimTypes property, this is needed for displaying claim types in the table.
         [BindProperty]
-        public List<ClaimStatus> PagedClaimStatuses { get; set; }
+        public List<ClaimType> PagedClaimTypes { get; set; }
 
         //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
@@ -77,7 +71,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
                     //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
 
                     //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
@@ -91,8 +85,8 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Set the ClaimStatuses property by calling the GetClaimStatuses method in the _claimStatusService.
-                    ClaimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
+                    //Get all claim types from the DB.
+                    ClaimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
 
                     //Set the current page to 1.
                     Pager.CurrentPage = 1;
@@ -100,14 +94,15 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                     //Set the page size to the value from the settings.
                     Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
 
-                    //Set the pager to the count of claim statuses.
-                    Pager.Count = ClaimStatuses.Count;
+                    //Set the pager to the count of claim types.
+                    Pager.Count = ClaimTypes.Count;
 
-                    //Set the PagedClaimStatuses property by calling the GetPaginatedClaimStatuses method in the _pagerService.
-                    PagedClaimStatuses = await _pagerService.GetPaginatedClaimStatuses(ClaimStatuses, Pager.CurrentPage, Pager.PageSize);
+                    //Set the PagedClaimTypes property by calling the GetPaginatedClaimTypes method in the _pagerService.
+                    PagedClaimTypes = await _pagerService.GetPaginatedClaimTypes(ClaimTypes, Pager.CurrentPage, Pager.PageSize);
 
                     //Return the page.
                     return Page();
+
                 }
                 //The contexts current user has not been authenticated.
                 else
@@ -128,14 +123,14 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         #region Pagination
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
-        //When executed the desired page of claim statuses is displayed.
+        //When executed the desired page of claim types is displayed.
         public async void OnGetPaging()
         {
-            //Set the pager count to the number of claim statuses.
-            Pager.Count = ClaimStatuses.Count;
+            //Set the pager count to the number of claim types.
+            Pager.Count = ClaimTypes.Count;
 
-            //Get the page of claimStatuses by calling the GetPaginatedClaimStatuses method from the _pagerService.
-            PagedClaimStatuses = await _pagerService.GetPaginatedClaimStatuses(ClaimStatuses, Pager.CurrentPage, Pager.PageSize);
+            //Set the PagedClaimTypes property by calling the GetPaginatedClaimTypes method in the _pagerService.
+            PagedClaimTypes = await _pagerService.GetPaginatedClaimTypes(ClaimTypes, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
     }

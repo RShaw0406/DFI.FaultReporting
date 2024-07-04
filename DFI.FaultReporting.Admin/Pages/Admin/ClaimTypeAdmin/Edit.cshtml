@@ -1,20 +1,20 @@
 ﻿@page
-@model DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin.EditModel
+@model DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin.EditModel
 
 @{
-    ViewData["Title"] = "Edit claim status";
+    ViewData["Title"] = "Edit claim type";
 }
 <div class="container">
     <h1>@ViewData["Title"]</h1>
     <br />
-    <h2>Edit the details of claim status</h2>
+    <h2>Edit the details of claim type</h2>
     <hr />
     @if (Model.UpdateSuccess)
     {
         <div class="alert alert-success alert-dismissible">
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             <strong>Success: </strong>
-            <p>Claim status details have been successfully updated.</p>
+            <p>Claim type details have been successfully updated.</p>
         </div>
     }
     <div class="row">
@@ -23,29 +23,29 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger">
                     <span><strong>Please review and correct the following errors:</strong></span>
                 </div>
-                <input type="hidden" asp-for="ClaimStatus.ID" />
+                <input type="hidden" asp-for="ClaimType.ID" />
                 <div class="form-floating mb-3">
-                    <input asp-for="ClaimStatus.ClaimStatusDescription" class="form-control" />
-                    <label asp-for="ClaimStatus.ClaimStatusDescription" class="control-label"></label>
-                    <span asp-validation-for="ClaimStatus.ClaimStatusDescription" class="text-danger"></span>
+                    <input asp-for="ClaimType.ClaimTypeDescription" class="form-control" />
+                    <label asp-for="ClaimType.ClaimTypeDescription" class="control-label"></label>
+                    <span asp-validation-for="ClaimType.ClaimTypeDescription" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3" hidden>
-                    <input asp-for="ClaimStatus.InputBy" class="form-control" />
-                    <label asp-for="ClaimStatus.InputBy" class="control-label"></label>
-                    <span asp-validation-for="ClaimStatus.InputBy" class="text-danger"></span>
+                    <input asp-for="ClaimType.InputBy" class="form-control" />
+                    <label asp-for="ClaimType.InputBy" class="control-label"></label>
+                    <span asp-validation-for="ClaimType.InputBy" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3" hidden>
-                    <input asp-for="ClaimStatus.InputOn" class="form-control" />
-                    <label asp-for="ClaimStatus.InputOn" class="control-label"></label>
-                    <span asp-validation-for="ClaimStatus.InputOn" class="text-danger"></span>
+                    <input asp-for="ClaimType.InputOn" class="form-control" />
+                    <label asp-for="ClaimType.InputOn" class="control-label"></label>
+                    <span asp-validation-for="ClaimType.InputOn" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3">
-                    <select asp-for="ClaimStatus.Active" class="form-select">
+                    <select asp-for="ClaimType.Active" class="form-select">
                         <option value="true">Active</option>
                         <option value="false">Inactive</option>
                     </select>
-                    <label asp-for="ClaimStatus.Active" class="control-label"></label>
-                    <span asp-validation-for="ClaimStatus.Active" class="text-danger"></span>
+                    <label asp-for="ClaimType.Active" class="control-label"></label>
+                    <span asp-validation-for="ClaimType.Active" class="text-danger"></span>
                 </div>
                 <div class="btn-group">
                     <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>

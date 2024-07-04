@@ -9,6 +9,8 @@ using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using DFI.FaultReporting.SQL.Repository.Admin;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -29,6 +31,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/ClaimTypes
         [HttpGet]
+        [Authorize(Roles = "User, StaffAdmin, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<IEnumerable<ClaimType>>> GetClaimType()
         {
             ClaimTypes = await _claimTypeSQLRepository.GetClaimTypes();
@@ -37,6 +40,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/ClaimTypes/5
         [HttpGet("{ID}")]
+        [Authorize(Roles = "User, StaffAdmin, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<ClaimType>> GetClaimType(int ID)
         {
             ClaimType claimType = await _claimTypeSQLRepository.GetClaimType(ID);
@@ -52,6 +56,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/ClaimTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<ClaimType>> PostClaimType(ClaimType claimType)
         {
             claimType = await _claimTypeSQLRepository.CreateClaimType(claimType);
@@ -62,6 +67,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/ClaimTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<ClaimType>> PutClaimType(ClaimType claimType)
         {
             try
@@ -70,7 +76,7 @@ namespace DFI.FaultReporting.API.Controllers
 
                 return claimType;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 ClaimTypes = await _claimTypeSQLRepository.GetClaimTypes();
 
@@ -80,25 +86,9 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
-        }
-
-        // DELETE: api/ClaimTypes/5
-        [HttpDelete("{ID}")]
-        public async Task<ActionResult<int>> DeleteClaimType(int ID)
-        {
-            ClaimType claimType = await _claimTypeSQLRepository.GetClaimType(ID);
-
-            if (claimType == null)
-            {
-                return NotFound();
-            }
-
-            await _claimTypeSQLRepository.DeleteClaimType(ID);
-
-            return ID;
         }
     }
 }

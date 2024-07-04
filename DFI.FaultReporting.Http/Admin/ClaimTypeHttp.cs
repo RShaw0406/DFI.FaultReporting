@@ -25,11 +25,13 @@ namespace DFI.FaultReporting.Http.Admin
 
         public List<ClaimType>? ClaimTypes { get; set; }
 
-        public async Task<List<ClaimType>> GetClaimTypes()
+        public async Task<List<ClaimType>> GetClaimTypes(string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -49,20 +51,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Claim Types data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimTypeHttp",
-                    ExceptionFunction = "GetClaimTypes",
-                };
+                return null;
             }
         }
 
-        public async Task<ClaimType> GetClaimType(int ID)
+        public async Task<ClaimType> GetClaimType(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -82,20 +81,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Claim Type data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimTypeHttp",
-                    ExceptionFunction = "GetClaimType",
-                };
+                return null;
             }
         }
 
-        public async Task<ClaimType> CreateClaimType(ClaimType claimType)
+        public async Task<ClaimType> CreateClaimType(ClaimType claimType, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var claimTypeJSON = JsonConvert.SerializeObject(claimType);
 
@@ -120,20 +116,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Claim Type data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimTypeHttp",
-                    ExceptionFunction = "CreateClaimType",
-                };
+                return null;
             }
         }
 
-        public async Task<ClaimType> UpdateClaimType(ClaimType claimType)
+        public async Task<ClaimType> UpdateClaimType(ClaimType claimType, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var claimTypeJSON = JsonConvert.SerializeObject(claimType);
 
@@ -145,8 +138,6 @@ namespace DFI.FaultReporting.Http.Admin
                 RequestUri = new Uri(baseURL + APIEndPoints.ClaimType),
                 Content = content
             };
-
-            //request.Headers.Add("Accept", "application/json");
 
             var result = await client.SendAsync(request);
 
@@ -160,41 +151,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Claim Type data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimTypeHttp",
-                    ExceptionFunction = "UpdateClaimType",
-                };
-            }
-        }
-
-        public async Task<int> DeleteClaimType(int ID)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.ClaimType + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Claim Type data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimTypeHttp",
-                    ExceptionFunction = "DeleteClaimType",
-                };
+                return null;
             }
         }
     }

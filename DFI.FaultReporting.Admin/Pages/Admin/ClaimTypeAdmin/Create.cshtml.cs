@@ -14,26 +14,27 @@ using DFI.FaultReporting.Services.Interfaces.Users;
 using DFI.FaultReporting.Common.Pagination;
 using DFI.FaultReporting.Models.Users;
 using System.Security.Claims;
+using DFI.FaultReporting.Services.Admin;
 
-namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
+namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin
 {
     public class CreateModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
         private readonly ILogger<CreateModel> _logger;
-        private readonly IClaimStatusService _claimStatusService;
+        private readonly IClaimTypeService _claimTypeService;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public CreateModel(ILogger<CreateModel> logger, IClaimStatusService claimStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
+        public CreateModel(ILogger<CreateModel> logger, IClaimTypeService claimTypeService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
             IPagerService pagerService, ISettingsService settingsService)
         {
             _logger = logger;
-            _claimStatusService = claimStatusService;
+            _claimTypeService = claimTypeService;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
@@ -45,9 +46,9 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare ClaimStatus property, this is needed when inputting a new claim status.
+        //Declare ClaimType property, this is needed when inputting a new claim type.
         [BindProperty]
-        public ClaimStatus ClaimStatus { get; set; }
+        public ClaimType ClaimType { get; set; }
         #endregion Properties
 
         #region Page Load
@@ -63,7 +64,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
                     //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
 
                     //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
@@ -77,11 +78,11 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Created and populate a new ClaimStatus object.
-                    ClaimStatus = new ClaimStatus();
-                    ClaimStatus.InputBy = CurrentStaff.Email;
-                    ClaimStatus.InputOn = DateTime.Now;
-                    ClaimStatus.Active = true;
+                    //Create a new claim type.
+                    ClaimType = new ClaimType();
+                    ClaimType.InputBy = CurrentStaff.Email;
+                    ClaimType.InputOn = DateTime.Now;
+                    ClaimType.Active = true;
 
                     //Return the page.
                     return Page();
@@ -104,7 +105,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         #region Create Claim Status
         //Method Summary:
         //This method is executed when the "Submit" button is clicked.
-        //When executed this method attempts to create a new claim status and returns the user to the index page.
+        //When executed this method attempts to create a new claim type and returns the user to the index page.
         public async Task<IActionResult> OnPostAsync()
         {
             //Model state is not valid.
@@ -132,7 +133,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
             else
             {
                 //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
 
                 //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
                 Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
@@ -143,34 +144,34 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                 //Set the CurrentStaff property by calling the GetUser method in the _userService.
                 CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-                //Get all claim statuses from the DB.
-                List<ClaimStatus> claimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
+                //Get all claim types from the DB.
+                List<ClaimType> claimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
 
-                //Claim status already exists.
-                if (claimStatuses.Any(cs => cs.ClaimStatusDescription == ClaimStatus.ClaimStatusDescription))
+                //Claim type already exists.
+                if (claimTypes.Any(ct => ct.ClaimTypeDescription == ClaimType.ClaimTypeDescription))
                 {
                     //Add model state error.
-                    ModelState.AddModelError(string.Empty, "Claim status already exists");
-                    ModelState.AddModelError("ClaimStatus.ClaimStatusDescription", "Claim status already exists");
+                    ModelState.AddModelError(string.Empty, "Claim type already exists");
+                    ModelState.AddModelError("ClaimType.ClaimTypeDescription", "Claim type already exists");
 
                     //Return the page.
                     return Page();
                 }
 
-                //Create the new claim status in the DB.
-                ClaimStatus insertedClaimStatus = await _claimStatusService.CreateClaimStatus(ClaimStatus, jwtToken);
+                //Create the claim type in the DB.
+                ClaimType insertedClaimType = await _claimTypeService.CreateClaimType(ClaimType, jwtToken);
 
-                //If the claim status was successfully created.
-                if (insertedClaimStatus != null)
+                //If the claim type was successfully created.
+                if (insertedClaimType != null)
                 {
                     //Return to the index page.
                     return RedirectToPage("./Index");
                 }
-                //Claim status was not successfully created.
+                //Claim type was not successfully created.
                 else
                 {
                     //Return an error message.
-                    ModelState.AddModelError(string.Empty, "An error occurred while creating the claim status");
+                    ModelState.AddModelError(string.Empty, "An error occurred while creating the claim type");
 
                     //Return the page.
                     return Page();

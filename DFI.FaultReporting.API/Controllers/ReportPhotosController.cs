@@ -14,6 +14,7 @@ using DFI.FaultReporting.SQL.Repository.FaultReports;
 using System.Composition;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -78,7 +79,7 @@ namespace DFI.FaultReporting.API.Controllers
 
                 return reportPhoto;
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 ReportPhotos = await _reportPhotoSQLRepository.GetReportPhotos();
 
@@ -88,7 +89,7 @@ namespace DFI.FaultReporting.API.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
         }
