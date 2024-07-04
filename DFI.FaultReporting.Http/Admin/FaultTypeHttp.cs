@@ -50,12 +50,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Fault Types data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultTypeHttp",
-                    ExceptionFunction = "GetFaultTypes",
-                };
+                return null;
             }
         }
 
@@ -85,20 +80,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Fault Type data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultTypeHttp",
-                    ExceptionFunction = "GetFaultType",
-                };
+                return null;
             }
         }
 
-        public async Task<FaultType> CreateFaultType(FaultType faultType)
+        public async Task<FaultType> CreateFaultType(FaultType faultType, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultTypeJSON = JsonConvert.SerializeObject(faultType);
 
@@ -123,20 +115,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Fault Type data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultTypeHttp",
-                    ExceptionFunction = "CreateFaultType",
-                };
+                return null;
             }
         }
 
-        public async Task<FaultType> UpdateFaultType(FaultType faultType)
+        public async Task<FaultType> UpdateFaultType(FaultType faultType, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultTypeJSON = JsonConvert.SerializeObject(faultType);
 
@@ -148,8 +137,6 @@ namespace DFI.FaultReporting.Http.Admin
                 RequestUri = new Uri(baseURL + APIEndPoints.FaultType),
                 Content = content
             };
-
-            //request.Headers.Add("Accept", "application/json");
 
             var result = await client.SendAsync(request);
 
@@ -163,41 +150,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Fault Type data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultTypeHttp",
-                    ExceptionFunction = "UpdateFaultType",
-                };
-            }
-        }
-
-        public async Task<int> DeleteFaultType(int ID)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.FaultType + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Fault Type data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultTypeHttp",
-                    ExceptionFunction = "DeleteFaultType",
-                };
+                return null;
             }
         }
     }

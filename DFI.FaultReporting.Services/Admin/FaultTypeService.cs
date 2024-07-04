@@ -35,25 +35,18 @@ namespace DFI.FaultReporting.Services.Admin
             return faultType;
         }
 
-        public async Task<FaultType> CreateFaultType(FaultType faultType)
+        public async Task<FaultType> CreateFaultType(FaultType faultType, string token)
         {
-            faultType = await _faultTypeHttp.CreateFaultType(faultType);
+            faultType = await _faultTypeHttp.CreateFaultType(faultType, token);
 
             return faultType;
         }
 
-        public async Task<FaultType> UpdateFaultType(FaultType faultType)
+        public async Task<FaultType> UpdateFaultType(FaultType faultType, string token)
         {
-            faultType = await _faultTypeHttp.UpdateFaultType(faultType);
+            faultType = await _faultTypeHttp.UpdateFaultType(faultType, token);
 
             return faultType;
-        }
-
-        public async Task<int> DeleteFaultType(int ID)
-        {
-            await _faultTypeHttp.DeleteFaultType(ID);
-
-            return ID;
         }
     }
 }

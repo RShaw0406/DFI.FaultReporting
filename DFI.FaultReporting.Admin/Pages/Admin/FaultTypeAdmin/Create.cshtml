@@ -1,13 +1,13 @@
 ﻿@page
-@model DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin.CreateModel
+@model DFI.FaultReporting.Admin.Pages.Admin.FaultTypeAdmin.CreateModel
 
 @{
-    ViewData["Title"] = "Add new claim status";
+    ViewData["Title"] = "Add new fault type";
 }
 <div class="container">
     <h1>@ViewData["Title"]</h1>
     <br />
-    <h2>Add details of new claim status</h2>
+    <h2>Add details of new fault type</h2>
     <hr />
     <div class="row">
         <div class="col-md-4">
@@ -16,23 +16,23 @@
                     <span><strong>Please review and correct the following errors:</strong></span>
                 </div>
                 <div class="form-floating mb-3">
-                    <input asp-for="FaultStatus.FaultStatusDescription" class="form-control" />
-                    <label asp-for="FaultStatus.FaultStatusDescription" class="control-label"></label>
-                    <span asp-validation-for="FaultStatus.FaultStatusDescription" class="text-danger"></span>
+                    <input asp-for="FaultType.FaultTypeDescription" class="form-control" />
+                    <label asp-for="FaultType.FaultTypeDescription" class="control-label"></label>
+                    <span asp-validation-for="FaultType.FaultTypeDescription" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3" hidden>
-                    <input asp-for="FaultStatus.InputBy" class="form-control" />
-                    <label asp-for="FaultStatus.InputBy" class="control-label"></label>
-                    <span asp-validation-for="FaultStatus.InputBy" class="text-danger"></span>
+                    <input asp-for="FaultType.InputBy" class="form-control" />
+                    <label asp-for="FaultType.InputBy" class="control-label"></label>
+                    <span asp-validation-for="FaultType.InputBy" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3" hidden>
-                    <input asp-for="FaultStatus.InputOn" class="form-control" />
-                    <label asp-for="FaultStatus.InputOn" class="control-label"></label>
-                    <span asp-validation-for="FaultStatus.InputOn" class="text-danger"></span>
+                    <input asp-for="FaultType.InputOn" class="form-control" />
+                    <label asp-for="FaultType.InputOn" class="control-label"></label>
+                    <span asp-validation-for="FaultType.InputOn" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3" hidden>
                     <label class="form-check-label">
-                        <input class="form-check-input" asp-for="FaultStatus.Active" /> @Html.DisplayNameFor(model => model.FaultStatus.Active)
+                        <input class="form-check-input" asp-for="FaultType.Active" /> @Html.DisplayNameFor(model => model.FaultType.Active)
                     </label>
                 </div>
                 <div class="btn-group">

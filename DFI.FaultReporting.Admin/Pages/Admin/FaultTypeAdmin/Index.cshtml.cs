@@ -15,26 +15,27 @@ using DFI.FaultReporting.Common.Pagination;
 using DFI.FaultReporting.Models.Users;
 using System.Security.Claims;
 using DFI.FaultReporting.Common.SessionStorage;
+using DFI.FaultReporting.Services.Admin;
 
-namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
+namespace DFI.FaultReporting.Admin.Pages.Admin.FaultTypeAdmin
 {
     public class IndexModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
         private readonly ILogger<IndexModel> _logger;
-        private readonly IFaultStatusService _faultStatusService;
+        private readonly IFaultTypeService _faultTypeService;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public IndexModel(ILogger<IndexModel> logger, IFaultStatusService faultStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
+        public IndexModel(ILogger<IndexModel> logger, IFaultTypeService faultTypeService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
             IPagerService pagerService, ISettingsService settingsService)
         {
             _logger = logger;
-            _faultStatusService = faultStatusService;
+            _faultTypeService = faultTypeService;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
@@ -46,13 +47,13 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
         //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare FaultStatuses property, this is needed when getting all fault statuses from the DB.
+        //Declare FaultTypes property, this is needed when getting all fault types from the DB.
         [BindProperty]
-        public List<FaultStatus> FaultStatuses { get; set; }
+        public List<FaultType> FaultTypes { get; set; }
 
-        //Declare PagedFaultStatuses property, this is needed for displaying fault statuses in the table.
+        //Declare PagedFaultTypes property, this is needed for displaying fault types in the table.
         [BindProperty]
-        public List<FaultStatus> PagedFaultStatuses { get; set; }
+        public List<FaultType> PagedFaultTypes { get; set; }
 
         //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
@@ -62,7 +63,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
         #region Page Load
         //Method Summary:
         //This method is called when the page is loaded.
-        //It checks if the current user is authenticated and if so, it gets the current user and all fault statuses from the DB.
+        //It checks if the current user is authenticated and if so, it gets the current user and all fault types from the DB.
         public async Task<IActionResult> OnGetAsync()
         {
             //The contexts current user exists.
@@ -86,11 +87,14 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Get all fault statuses from the DB.
-                    FaultStatuses = await _faultStatusService.GetFaultStatuses();
+                    //Get all fault types from the DB.
+                    FaultTypes = await _faultTypeService.GetFaultTypes();
 
-                    //Set the FaultStatuses in session.
-                    HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
+                    //Order the fault types by ID.
+                    FaultTypes = FaultTypes.OrderBy(ft => ft.ID).ToList();
+
+                    //Set the FaultTypes in session.
+                    HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
 
                     //Set the current page to 1.
                     Pager.CurrentPage = 1;
@@ -98,11 +102,11 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
                     //Set the page size to the value from the settings.
                     Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
 
-                    //Set the pager to the count of fault statuses.
-                    Pager.Count = FaultStatuses.Count;
+                    //Set the pager to the count of fault types.
+                    Pager.Count = FaultTypes.Count;
 
-                    //Set the PagedFaultStatuses property by calling the GetPaginatedFaultStatuses method in the _pagerService.
-                    PagedFaultStatuses = await _pagerService.GetPaginatedFaultStatuses(FaultStatuses, Pager.CurrentPage, Pager.PageSize);
+                    //Set the PagedFaultTypes property by calling the GetPaginatedFaultTypes method in the _pagerService.
+                    PagedFaultTypes = await _pagerService.GetPaginatedFaultTypes(FaultTypes, Pager.CurrentPage, Pager.PageSize);
 
                     //Return the page.
                     return Page();
@@ -126,17 +130,17 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
         #region Pagination
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
-        //When executed the desired page of fault statuses is displayed.
+        //When executed the desired page of fault types is displayed.
         public async void OnGetPaging()
         {
-            //Get the faults statuses from session.
-            FaultStatuses = HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses");
+            //Get the faults types from session.
+            FaultTypes = HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes");
 
-            //Set the pager to the count of fault statuses.
-            Pager.Count = FaultStatuses.Count;
+            //Set the pager to the count of fault types.
+            Pager.Count = FaultTypes.Count;
 
-            //Set the PagedFaultStatuses property by calling the GetPaginatedFaultStatuses method in the _pagerService.
-            PagedFaultStatuses = await _pagerService.GetPaginatedFaultStatuses(FaultStatuses, Pager.CurrentPage, Pager.PageSize);
+            //Set the PagedFaultTypes property by calling the GetPaginatedFaultTypes method in the _pagerService.
+            PagedFaultTypes = await _pagerService.GetPaginatedFaultTypes(FaultTypes, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
     }

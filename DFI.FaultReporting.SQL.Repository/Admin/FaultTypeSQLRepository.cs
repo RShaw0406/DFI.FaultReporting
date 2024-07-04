@@ -47,13 +47,5 @@ namespace DFI.FaultReporting.SQL.Repository.Admin
             await _context.SaveChangesAsync();
             return faultType;
         }
-
-        public async Task<int> DeleteFaultType(int ID)
-        {
-            FaultType faultType = await _context.FaultType.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
-            _context.FaultType.Remove(faultType);
-            await _context.SaveChangesAsync();
-            return ID;
-        }
     }
 }

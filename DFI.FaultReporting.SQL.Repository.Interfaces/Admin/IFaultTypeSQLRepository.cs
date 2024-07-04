@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.SQL.Repository.Interfaces.Admin
         Task<FaultType> CreateFaultType(FaultType faultType);
 
         Task<FaultType> UpdateFaultType(FaultType faultType);
-
-        Task<int> DeleteFaultType(int ID);
     }
 }

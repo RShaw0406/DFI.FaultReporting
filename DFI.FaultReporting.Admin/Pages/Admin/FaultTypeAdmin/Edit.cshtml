@@ -1,0 +1,58 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.FaultTypeAdmin.EditModel
+
+@{
+    ViewData["Title"] = "Edit fault status";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Edit the details of fault status</h2>
+    <hr />
+    @if (Model.UpdateSuccess)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>Success: </strong>
+            <p>Fault type details have been successfully updated.</p>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <input type="hidden" asp-for="FaultType.ID" />
+                <div class="form-floating mb-3">
+                    <input asp-for="FaultType.FaultTypeDescription" class="form-control" />
+                    <label asp-for="FaultType.FaultTypeDescription" class="control-label"></label>
+                    <span asp-validation-for="FaultType.FaultTypeDescription" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="FaultType.InputBy" class="form-control" />
+                    <label asp-for="FaultType.InputBy" class="control-label"></label>
+                    <span asp-validation-for="FaultType.InputBy" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="FaultType.InputOn" class="form-control" />
+                    <label asp-for="FaultType.InputOn" class="control-label"></label>
+                    <span asp-validation-for="FaultType.InputOn" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <select asp-for="FaultType.Active" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                    <label asp-for="FaultType.Active" class="control-label"></label>
+                    <span asp-validation-for="FaultType.Active" class="text-danger"></span>
+                </div>
+                <div class="btn-group">
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+ </div>

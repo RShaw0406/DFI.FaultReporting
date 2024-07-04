@@ -15,25 +15,25 @@ using DFI.FaultReporting.Services.Interfaces.Users;
 using DFI.FaultReporting.Services.Admin;
 using System.Security.Claims;
 
-namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
+namespace DFI.FaultReporting.Admin.Pages.Admin.FaultTypeAdmin
 {
     public class DetailsModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
         private readonly ILogger<DetailsModel> _logger;
-        private readonly IFaultStatusService _faultStatusService;
+        private readonly IFaultTypeService _faultTypeService;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public DetailsModel(ILogger<DetailsModel> logger, IFaultStatusService faultStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
+        public DetailsModel(ILogger<DetailsModel> logger, IFaultTypeService faultTypeService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
             IPagerService pagerService, ISettingsService settingsService)
         {
             _logger = logger;
-            _faultStatusService = faultStatusService;
+            _faultTypeService = faultTypeService;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
@@ -45,15 +45,15 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
         //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare FaultStatus property, this is needed when inputting new fault status to the DB.
+        //Declare FaultType property, this is needed when getting the fault type from the DB.
         [BindProperty]
-        public FaultStatus FaultStatus { get; set; }
+        public FaultType FaultType { get; set; }
         #endregion Properties
 
         #region Page Load
         //Method Summary:
         //This method is called when the page is loaded.
-        //It checks if the current user is authenticated and if so, it gets the fault status details from the DB.
+        //It checks if the current user is authenticated and if so, it gets the fault type details from the DB.
         public async Task<IActionResult> OnGetAsync(int? ID)
         {
             //The contexts current user exists.
@@ -77,8 +77,8 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Get fault status from the DB.
-                    FaultStatus = await _faultStatusService.GetFaultStatus((int)ID, jwtToken);
+                    //Get fault type from the DB.
+                    FaultType = await _faultTypeService.GetFaultType((int)ID, jwtToken);
 
                     //Return the page.
                     return Page();

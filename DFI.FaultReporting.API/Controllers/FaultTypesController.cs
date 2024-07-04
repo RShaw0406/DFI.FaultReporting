@@ -56,6 +56,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/FaultTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultType>> PostFaultType(FaultType faultType)
         {
             faultType = await _faultTypeSQLRepository.CreateFaultType(faultType);
@@ -66,6 +67,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/FaultTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultType>> PutFaultType(FaultType faultType)
         {
             try
@@ -88,21 +90,5 @@ namespace DFI.FaultReporting.API.Controllers
                 }
             }
         }        
-
-        // DELETE: api/FaultTypes/5
-        [HttpDelete("{ID}")]
-        public async Task<ActionResult<int>> DeleteFaultType(int ID)
-        {
-            FaultType faultType = await _faultTypeSQLRepository.GetFaultType(ID);
-
-            if (faultType == null)
-            {
-                return NotFound();
-            }
-
-            await _faultTypeSQLRepository.DeleteFaultType(ID);
-
-            return ID;
-        }
     }
 }
