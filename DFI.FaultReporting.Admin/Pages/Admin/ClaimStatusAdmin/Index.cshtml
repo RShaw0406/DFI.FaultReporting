@@ -1,0 +1,119 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin.IndexModel
+
+@{
+    ViewData["Title"] = "Claim status admin";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>View and manage claim statuses</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                Claim status
+                            </th>
+                            <th>
+                                Input details
+                            </th>
+                            <th class="text-center">Details</th>
+                            <th class="text-center">Edit</th>
+                            <th class="text-center">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claimStatus in Model.ClaimStatuses)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => claimStatus.ClaimStatusDescription)
+                                </td>
+                                <td>
+                                    <strong>Active:</strong>
+                                    <br />
+                                    @if (claimStatus.Active)
+                                    {
+                                        <span class="badge bg-success">@claimStatus.Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">@claimStatus.Active</span>
+                                    }
+                                    <br />
+                                    <br />
+                                    <strong>Input:</strong>
+                                    <br />
+                                    @Html.DisplayFor(modelItem => claimStatus.InputBy)
+                                    <br />
+                                    @Html.DisplayFor(modelItem => claimStatus.InputOn)
+                                </td>
+                                <td class="text-center">
+                                    <a asp-page="./Details" asp-route-id="@claimStatus.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-page="./Edit" asp-route-id="@claimStatus.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-page="./Delete" asp-route-id="@claimStatus.ID" class="btn btn-outline-danger btn-lg"><i class="fa-regular fa-trash-can"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @{
+                var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+            }
+            <div>
+                <ul class="pagination text-center">
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                           class="btn btn-outline-primary btn-sm @prevDisabled"
+                           aria-label="First page button" style="font-size: 1em !important;">
+                            <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                        </a>&nbsp;
+                    </li>
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                           class="btn btn-outline-primary btn-sm @prevDisabled"
+                           aria-label="Previous page button" style="font-size: 1em !important;">
+                            <span class="fa fa-chevron-left"></span> Prev
+                        </a>
+                    </li>
+                    <li>
+                        &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                    </li>
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                           class="btn btn-outline-primary btn-sm @nextDisabled"
+                           aria-label="Next page button"
+                           style="font-size: 1em !important;">
+                            Next <span class="fa fa-chevron-right"></span>
+                        </a>&nbsp;
+                    </li>
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                           class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                           style="font-size: 1em !important;">
+                            Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="New claim status link" title="New claim status" asp-page="./Create"><i class="fa-solid fa-circle-plus"></i> Add new claim status</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -9,14 +9,12 @@ namespace DFI.FaultReporting.Interfaces.Admin
 {
     public interface IClaimStatusService
     {
-        Task<List<ClaimStatus>> GetClaimStatuses();
+        Task<List<ClaimStatus>> GetClaimStatuses(string token);
 
-        Task<ClaimStatus> GetClaimStatus(int ID);
+        Task<ClaimStatus> GetClaimStatus(int ID, string token);
 
-        Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus);
+        Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus, string token);
 
-        Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus);
-
-        Task<int> DeleteClaimStatus(int ID);
+        Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus, string token);
     }
 }

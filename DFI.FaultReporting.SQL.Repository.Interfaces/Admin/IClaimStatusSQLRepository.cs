@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.SQL.Repository.Interfaces.Admin
         Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus);
 
         Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus);
-
-        Task<int> DeleteClaimStatus(int ID);
     }
 }

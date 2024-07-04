@@ -1,4 +1,5 @@
-﻿using DFI.FaultReporting.Models.FaultReports;
+﻿using DFI.FaultReporting.Models.Admin;
+using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -19,5 +20,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Pagination
 
         //Declare GetPaginatedStaff method, this is needed for paginating the staff.
         Task<List<Staff>> GetPaginatedStaff(List<Staff> staff, int currentPage, int pageSize);
+
+        //Declare GetPaginatedClaimStatuses method, this is needed for paginating the claim statuses.
+        Task<List<ClaimStatus>> GetPaginatedClaimStatuses(List<ClaimStatus> claimStatuses, int currentPage, int pageSize);
     }
 }

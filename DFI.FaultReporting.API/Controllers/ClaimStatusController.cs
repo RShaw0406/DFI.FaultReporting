@@ -30,7 +30,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/ClaimStatus
         [HttpGet]
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "User, StaffAdmin, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<IEnumerable<ClaimStatus>>> GetClaimStatus()
         {
             ClaimStatuses = await _claimStatusSQLRepository.GetClaimStatuses();
@@ -39,6 +39,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // GET: api/ClaimStatus/5
         [HttpGet("{ID}")]
+        [Authorize(Roles = "User, StaffAdmin, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<ClaimStatus>> GetClaimStatus(int ID)
         {
             ClaimStatus claimStatus = await _claimStatusSQLRepository.GetClaimStatus(ID);
@@ -54,6 +55,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/ClaimStatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<ClaimStatus>> PostClaimStatus(ClaimStatus claimStatus)
         {
             claimStatus = await _claimStatusSQLRepository.CreateClaimStatus(claimStatus);
@@ -64,6 +66,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/ClaimStatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<ClaimStatus>> PutClaimStatus(ClaimStatus claimStatus)
         {
             try
@@ -85,22 +88,6 @@ namespace DFI.FaultReporting.API.Controllers
                     throw;
                 }
             }
-        }
-
-        // DELETE: api/ClaimStatus/5
-        [HttpDelete("{ID}")]
-        public async Task<ActionResult<int>> DeleteClaimStatus(int ID)
-        {
-            ClaimStatus claimStatus = await _claimStatusSQLRepository.GetClaimStatus(ID);
-
-            if (claimStatus == null)
-            {
-                return NotFound();
-            }
-
-            await _claimStatusSQLRepository.DeleteClaimStatus(ID);
-
-            return ID;
         }
     }
 }

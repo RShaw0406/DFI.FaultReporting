@@ -46,13 +46,5 @@ namespace DFI.FaultReporting.SQL.Repository.Admin
             await _context.SaveChangesAsync();
             return claimStatus;
         }
-
-        public async Task<int> DeleteClaimStatus(int ID)
-        {
-            ClaimStatus claimStatus = await _context.ClaimStatus.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
-            _context.ClaimStatus.Remove(claimStatus);
-            await _context.SaveChangesAsync();
-            return ID;
-        }
     }
 }

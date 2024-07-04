@@ -6,34 +6,38 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
-using DFI.FaultReporting.Services.Interfaces.Emails;
-using DFI.FaultReporting.Services.Interfaces.Passwords;
-using DFI.FaultReporting.Services.Interfaces.Roles;
+using DFI.FaultReporting.Interfaces.Admin;
+using DFI.FaultReporting.Services.Interfaces.Pagination;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Users;
-using DFI.FaultReporting.Models.Roles;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
+using DFI.FaultReporting.Models.Users;
 using System.Security.Claims;
 
-namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
+namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
 {
     public class EditModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
         private readonly ILogger<EditModel> _logger;
+        private readonly IClaimStatusService _claimStatusService;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IPagerService _pagerService;
+        private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public EditModel(ILogger<EditModel> logger, IStaffService staffService, IHttpContextAccessor httpContextAccessor)
+        public EditModel(ILogger<EditModel> logger, IClaimStatusService claimStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
+            IPagerService pagerService, ISettingsService settingsService)
         {
             _logger = logger;
+            _claimStatusService = claimStatusService;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
+            _pagerService = pagerService;
+            _settingsService = settingsService;
         }
         #endregion Dependency Injection
 
@@ -41,50 +45,18 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare StaffInput property, this is needed when editing staff member.
+        //Declare ClaimStatus property, this is needed when inputting a new claim status.
         [BindProperty]
-        public StaffInputModel StaffInput { get; set; }
-
-        //Declare Staff property, this is needed when getting staff member from the DB.
-        public Staff Staff { get; set; }
+        public ClaimStatus ClaimStatus { get; set; }
 
         //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
-
-        //Declare StaffInputModel, this is needed for validating the input when editing staff member.
-        public class StaffInputModel
-        {
-            public int ID { get; set; }
-
-            [Required(ErrorMessage = "You must enter an email address")]
-            [DisplayName("Email address")]
-            [DataType(DataType.EmailAddress, ErrorMessage = "You must enter a valid email address")]
-            public string? Email { get; set; }
-
-            [Required(ErrorMessage = "You must enter a title")]
-            [DisplayName("Title")]
-            [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "Title must not contain special characters or numbers")]
-            [StringLength(8, ErrorMessage = "Title must not be more than 8 characters")]
-            public string? Prefix { get; set; }
-
-            [Required(ErrorMessage = "You must enter a first name")]
-            [DisplayName("First name")]
-            [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "First name must not contain special characters or numbers")]
-            [StringLength(125, ErrorMessage = "First name must not be more than 125 characters")]
-            public string? FirstName { get; set; }
-
-            [Required(ErrorMessage = "You must enter a last name")]
-            [DisplayName("Last name")]
-            [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "Last name must not contain special characters or numbers")]
-            [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
-            public string? LastName { get; set; }
-        }
         #endregion Properties
 
         #region Page Load
         //Method Summary:
         //This method is called when the page is loaded.
-        //It checks if the current user is authenticated and if so, it gets the staff details from the DB.
+        //It checks if the current user is authenticated and if so, it gets the claim status details from the DB.
         public async Task<IActionResult> OnGetAsync(int? ID)
         {
             //The contexts current user exists.
@@ -108,16 +80,14 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Get all staff from the DB.
-                    Staff = await _staffService.GetStaff((int)ID, jwtToken);
+                    //Get claim status from the DB.
+                    ClaimStatus = await _claimStatusService.GetClaimStatus((int)ID, jwtToken);
 
-                    //Set the StaffInput property with the values from the Staff property.
-                    StaffInput = new StaffInputModel();
-                    StaffInput.ID = Staff.ID;
-                    StaffInput.Email = Staff.Email;
-                    StaffInput.Prefix = Staff.Prefix;
-                    StaffInput.FirstName = Staff.FirstName;
-                    StaffInput.LastName = Staff.LastName;
+                    //Store the claim status description in TempData.
+                    TempData["Description"] = ClaimStatus.ClaimStatusDescription;
+
+                    //Keep the TempData.
+                    TempData.Keep();
 
                     //Return the page.
                     return Page();
@@ -128,7 +98,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
                 //Redirect user to no permission.
@@ -137,10 +106,10 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         }
         #endregion Page Load
 
-        #region Edit Staff
+        #region Edit Claim Status
         //Method Summary:
         //This method is executed when the update button is clicked.
-        //When executed, it updates the staff member in the DB.
+        //When executed, it updates the claim status in the DB.
         public async Task<IActionResult> OnPostAsync()
         {
             //Modelstate is not valid.
@@ -179,59 +148,59 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 //Set the CurrentStaff property by calling the GetUser method in the _userService.
                 CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-                //Get all staff from the DB.
-                List<Staff> allStaff = await _staffService.GetAllStaff(jwtToken);
+                //Get all claim statuses from the DB.
+                List<ClaimStatus> claimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
 
-                //Filter out inactive staff.
-                allStaff = allStaff.Where(s => s.Active == true).ToList();
-
-                //Get the staff member from the DB.
-                Staff = await _staffService.GetStaff(StaffInput.ID, jwtToken);
-
-                //Email address has been changed.
-                if (StaffInput.Email != Staff.Email)
+                //Claim status description has changed.
+                if (ClaimStatus.ClaimStatusDescription != TempData["Description"].ToString())
                 {
-                    //Check if the email address already exists.
-                    if (allStaff.Any(s => s.Email == StaffInput.Email))
+                    //Claim status already exists.
+                    if (claimStatuses.Any(cs => cs.ClaimStatusDescription == ClaimStatus.ClaimStatusDescription))
                     {
-                        //Return an error message.
-                        ModelState.AddModelError(string.Empty, "Email address already used");
-                        ModelState.AddModelError("StaffInput.Email", "Email address already used");
+                        //Keep the TempData.
+                        TempData.Keep();
+
+                        //Add model state error.
+                        ModelState.AddModelError(string.Empty, "Claim status already exists");
+                        ModelState.AddModelError("ClaimStatus.ClaimStatusDescription", "Claim status already exists");
 
                         //Return the page.
                         return Page();
                     }
                 }
 
-                //Set the Staff property with the values from the StaffInput property.
-                Staff.Email = StaffInput.Email;
-                Staff.Prefix = StaffInput.Prefix;
-                Staff.FirstName = StaffInput.FirstName;
-                Staff.LastName = StaffInput.LastName;
+                //Update claim status in the DB.
+                ClaimStatus updatedClaimStatus = await _claimStatusService.UpdateClaimStatus(ClaimStatus, jwtToken);
 
-                //Update the staff member in the DB.
-                Staff updatedStaff = await _staffService.UpdateStaff(Staff, jwtToken);
-
-                //If the staff member was successfully updated, send an email to the new staff member.
-                if (updatedStaff != null)
+                //Claim status was updated.
+                if (updatedClaimStatus != null)
                 {
                     //Set the UpdateSuccess property to true.
                     UpdateSuccess = true;
 
+                    //Store the claim status description in TempData.
+                    TempData["Description"] = updatedClaimStatus.ClaimStatusDescription;
+
+                    //Keep the TempData.
+                    TempData.Keep();
+
                     //Return the page.
                     return Page();
                 }
-                //If the staff member was not successfully updated, return an error message.
+                //Claim status could not be updated.
                 else
                 {
-                    //Return an error message.
-                    ModelState.AddModelError(string.Empty, "An error occurred while creating the staff member");
+                    //Add model state error.
+                    ModelState.AddModelError(string.Empty, "Claim status could not be updated");
+
+                    //Keep the TempData.
+                    TempData.Keep();
 
                     //Return the page.
                     return Page();
                 }
             }
         }
-        #endregion Edit Staff
+        #endregion Edit Claim Status
     }
 }

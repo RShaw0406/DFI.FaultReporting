@@ -4,6 +4,7 @@ using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,11 +28,13 @@ namespace DFI.FaultReporting.Http.Admin
             _settings = settings;
         }
 
-        public async Task<List<ClaimStatus>> GetClaimStatuses()
+        public async Task<List<ClaimStatus>> GetClaimStatuses(string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -51,20 +54,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Claim Statuses data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "GetClaimStatuses",
-                };
+                return null;
             }
         }
 
-        public async Task<ClaimStatus> GetClaimStatus(int ID)
+        public async Task<ClaimStatus> GetClaimStatus(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
@@ -84,20 +84,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Claim Status data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "GetClaimStatus",
-                };
+                return null;
             }
         }
 
-        public async Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus)
+        public async Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var claimStatusJSON = JsonConvert.SerializeObject(claimStatus);
 
@@ -122,20 +119,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Claim Status data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "CreateClaimStatus",
-                };
+                return null;
             }
         }
 
-        public async Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus)
+        public async Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var claimStatusJSON = JsonConvert.SerializeObject(claimStatus);
 
@@ -160,41 +154,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Claim Status data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "UpdateClaimStatus",
-                };
-            }
-        }
-
-        public async Task<int> DeleteClaimStatus(int ID)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.ClaimStatus + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Claim Status data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ClaimStatusHttp",
-                    ExceptionFunction = "DeleteClaimStatus",
-                };
+                return null;
             }
         }
     }

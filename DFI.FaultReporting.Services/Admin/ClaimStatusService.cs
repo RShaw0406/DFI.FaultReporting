@@ -21,39 +21,32 @@ namespace DFI.FaultReporting.Services.Admin
             _claimStatusHttp = claimStatusHttp;
         }
 
-        public async Task<List<ClaimStatus>> GetClaimStatuses()
+        public async Task<List<ClaimStatus>> GetClaimStatuses(string token)
         {
-            ClaimStatuses = await _claimStatusHttp.GetClaimStatuses();
+            ClaimStatuses = await _claimStatusHttp.GetClaimStatuses(token);
 
             return ClaimStatuses;
         }
 
-        public async Task<ClaimStatus> GetClaimStatus(int ID)
+        public async Task<ClaimStatus> GetClaimStatus(int ID, string token)
         {
-            ClaimStatus claimStatus = await _claimStatusHttp.GetClaimStatus(ID);
+            ClaimStatus claimStatus = await _claimStatusHttp.GetClaimStatus(ID, token);
 
             return claimStatus;
         }
 
-        public async Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus)
+        public async Task<ClaimStatus> CreateClaimStatus(ClaimStatus claimStatus, string token)
         {
-            claimStatus = await _claimStatusHttp.CreateClaimStatus(claimStatus);
+            claimStatus = await _claimStatusHttp.CreateClaimStatus(claimStatus, token);
 
             return claimStatus;
         }
 
-        public async Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus)
+        public async Task<ClaimStatus> UpdateClaimStatus(ClaimStatus claimStatus, string token)
         {
-            claimStatus = await _claimStatusHttp.UpdateClaimStatus(claimStatus);
+            claimStatus = await _claimStatusHttp.UpdateClaimStatus(claimStatus, token);
 
             return claimStatus;
-        }
-
-        public async Task<int> DeleteClaimStatus(int ID)
-        {
-            await _claimStatusHttp.DeleteClaimStatus(ID);
-
-            return ID;
         }
     }
 }

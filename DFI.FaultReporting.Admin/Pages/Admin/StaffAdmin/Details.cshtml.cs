@@ -40,7 +40,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         public Staff Staff { get; set; }
         #endregion Properties
 
-
         #region Page Load
         //Method Summary:
         //This method is called when the page is loaded.
@@ -68,7 +67,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Get all staff from the DB.
+                    //Get staff from the DB.
                     Staff = await _staffService.GetStaff((int)ID, jwtToken);
 
                     //Return the page.

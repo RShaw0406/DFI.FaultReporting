@@ -21,6 +21,7 @@ using DFI.FaultReporting.Services.Interfaces.Passwords;
 using SendGrid.Helpers.Mail;
 using SendGrid;
 using System.ComponentModel.DataAnnotations;
+using DFI.FaultReporting.Models.Admin;
 
 namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
 {
@@ -149,7 +150,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         #region Create Staff
         //Method Summary:
         //This method is executed when the "Submit" button is clicked.
-        //When executed this method attempts to create a new staff member and returns the user to the roles page.
+        //When executed this method attempts to create a new staff member and returns the user to the index page.
         public async Task<IActionResult> OnPostAsync()
         {
             //ModelState is not valid.
@@ -188,19 +189,36 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 //Set the CurrentStaff property by calling the GetUser method in the _userService.
                 CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-                //Loop through all staff and check if the email address already exists.
-                foreach (Staff staff in Staff)
-                {
-                    //If the email address already exists, return an error message.
-                    if (staff.Email == StaffInput.Email)
-                    {
-                        //Return an error message.
-                        ModelState.AddModelError(string.Empty, "Email address already used");
+                //Get all staff from the DB.
+                Staff = await _staffService.GetAllStaff(jwtToken);
 
-                        //Return the page.
-                        return Page();
-                    }
+                //Filter out inactive staff.
+                Staff = Staff.Where(s => s.Active == true).ToList();
+
+                //Check if the email address already exists.
+                if (Staff.Any(s => s.Email == StaffInput.Email))
+                {
+                    //Return an error message.
+                    ModelState.AddModelError(string.Empty, "Email address already used");
+                    ModelState.AddModelError("StaffInput.Email", "Email address already used");
+
+                    //Return the page.
+                    return Page();
                 }
+
+                //    //Loop through all staff and check if the email address already exists.
+                //    foreach (Staff staff in Staff)
+                //{
+                //    //If the email address already exists, return an error message.
+                //    if (staff.Email == StaffInput.Email)
+                //    {
+                //        //Return an error message.
+                //        ModelState.AddModelError(string.Empty, "Email address already used");
+
+                //        //Return the page.
+                //        return Page();
+                //    }
+                //}
 
                 //Create a new Staff object and assign the values from the StaffInputModel.
                 Staff newStaff = new Staff();

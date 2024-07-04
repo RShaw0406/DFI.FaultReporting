@@ -1,0 +1,44 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin.DetailsModel
+
+@{
+    ViewData["Title"] = "Claim status details";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Details of claim status</h2>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimStatus.ClaimStatusDescription)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimStatus.ClaimStatusDescription)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimStatus.InputBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimStatus.InputBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimStatus.InputOn)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimStatus.InputOn)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClaimStatus.Active)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClaimStatus.Active)
+        </dd>
+    </dl>
+    <div class="btn-group">
+        <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+        &nbsp;
+        <a asp-page="./Edit" class="btn btn-outline-primary btn-lg" asp-route-id="@Model.ClaimStatus.ID"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+    </div>
+    <br />
+</div>

@@ -328,7 +328,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
             //Set the pager count to the number of staff.
             Pager.Count = Staff.Count;
 
-            //Get the first page of staff by calling the GetPaginatedStaff method from the _pagerService.
+            //Get the page of staff by calling the GetPaginatedStaff method from the _pagerService.
             PagedStaff = await _pagerService.GetPaginatedStaff(Staff, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
