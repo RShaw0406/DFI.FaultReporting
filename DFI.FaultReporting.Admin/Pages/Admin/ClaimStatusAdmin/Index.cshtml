@@ -23,11 +23,10 @@
                             </th>
                             <th class="text-center">Details</th>
                             <th class="text-center">Edit</th>
-                            <th class="text-center">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var claimStatus in Model.ClaimStatuses)
+                        @foreach (var claimStatus in Model.PagedClaimStatuses)
                         {
                             <tr>
                                 <td>
@@ -57,9 +56,6 @@
                                 </td>
                                 <td class="text-center">
                                     <a asp-page="./Edit" asp-route-id="@claimStatus.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
-                                </td>
-                                <td class="text-center">
-                                    <a asp-page="./Delete" asp-route-id="@claimStatus.ID" class="btn btn-outline-danger btn-lg"><i class="fa-regular fa-trash-can"></i></a>
                                 </td>
                             </tr>
                         }

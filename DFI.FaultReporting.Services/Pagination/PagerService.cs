@@ -41,5 +41,11 @@ namespace DFI.FaultReporting.Services.Pagination
         {
             return claimTypes.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
+
+        //Method to get paginated fault statuses.
+        public async Task<List<FaultStatus>> GetPaginatedFaultStatuses(List<FaultStatus> faultStatuses, int currentPage, int pageSize)
+        {
+            return faultStatuses.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+        }
     }
 }

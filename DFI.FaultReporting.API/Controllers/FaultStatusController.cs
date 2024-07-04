@@ -55,7 +55,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/FaultStatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultStatus>> PostFaultStatus(FaultStatus faultStatus)
         {
             faultStatus = await _faultStatusSQLRepository.CreateFaultStatus(faultStatus);
@@ -66,7 +66,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/FaultStatus
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultStatus>> PutFaultStatus(FaultStatus faultStatus)
         {
             try
@@ -88,23 +88,6 @@ namespace DFI.FaultReporting.API.Controllers
                     return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
-        }
-
-        // DELETE: api/FaultStatus/5
-        [HttpDelete("{ID}")]
-        [Authorize]
-        public async Task<ActionResult<int>> DeleteFaultStatus(int ID)
-        {
-            FaultStatus faultStatus = await _faultStatusSQLRepository.GetFaultStatus(ID);
-
-            if (faultStatus == null)
-            {
-                return NotFound();
-            }
-
-            await _faultStatusSQLRepository.DeleteFaultStatus(ID);
-
-            return ID;
         }
     }
 }

@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.SQL.Repository.Interfaces.Admin
         Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus);
 
         Task<FaultStatus> UpdateFaultStatus(FaultStatus faultStatus);
-
-        Task<int> DeleteFaultStatus(int ID);
     }
 }

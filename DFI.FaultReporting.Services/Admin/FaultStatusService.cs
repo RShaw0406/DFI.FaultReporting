@@ -34,25 +34,18 @@ namespace DFI.FaultReporting.Services.Admin
             return faultStatus;
         }
 
-        public async Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus)
+        public async Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus, string token)
         {
-            faultStatus = await _faultStatusHttp.CreateFaultStatus(faultStatus);
+            faultStatus = await _faultStatusHttp.CreateFaultStatus(faultStatus, token);
 
             return faultStatus;
         }
 
-        public async Task<FaultStatus> UpdateFaultStatus(FaultStatus faultStatus)
+        public async Task<FaultStatus> UpdateFaultStatus(FaultStatus faultStatus, string token)
         {
-            faultStatus = await _faultStatusHttp.UpdateFaultStatus(faultStatus);
+            faultStatus = await _faultStatusHttp.UpdateFaultStatus(faultStatus, token);
 
             return faultStatus;
-        }
-
-        public async Task<int> DeleteFaultStatus(int ID)
-        {
-            await _faultStatusHttp.DeleteFaultStatus(ID);
-
-            return ID;
         }
     }
 }

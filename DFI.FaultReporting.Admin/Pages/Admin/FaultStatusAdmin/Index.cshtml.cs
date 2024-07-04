@@ -7,40 +7,34 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.SQL.Repository.Contexts;
-using DFI.FaultReporting.Services.Interfaces.Emails;
+using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
-using DFI.FaultReporting.Services.Interfaces.Roles;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Users;
-using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Common.Pagination;
-using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System.ComponentModel;
 using System.Security.Claims;
-using DFI.FaultReporting.Services.Settings;
 using DFI.FaultReporting.Common.SessionStorage;
 
-namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
+namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
 {
     public class IndexModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
         private readonly ILogger<IndexModel> _logger;
-        private readonly IClaimStatusService _claimStatusService;
+        private readonly IFaultStatusService _faultStatusService;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public IndexModel(ILogger<IndexModel> logger, IClaimStatusService claimStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor, 
+        public IndexModel(ILogger<IndexModel> logger, IFaultStatusService faultStatusService, IStaffService staffService, IHttpContextAccessor httpContextAccessor,
             IPagerService pagerService, ISettingsService settingsService)
         {
             _logger = logger;
-            _claimStatusService = claimStatusService;
+            _faultStatusService = faultStatusService;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
@@ -52,13 +46,13 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare ClaimStatuses property, this is needed when getting all claim statuses from the DB.
+        //Declare FaultStatuses property, this is needed when getting all fault statuses from the DB.
         [BindProperty]
-        public List<ClaimStatus> ClaimStatuses { get; set; }
+        public List<FaultStatus> FaultStatuses { get; set; }
 
-        //Declare PagedClaimStatuses property, this is needed for displaying claim statuses in the table.
+        //Declare PagedFaultStatuses property, this is needed for displaying fault statuses in the table.
         [BindProperty]
-        public List<ClaimStatus> PagedClaimStatuses { get; set; }
+        public List<FaultStatus> PagedFaultStatuses { get; set; }
 
         //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
@@ -92,11 +86,11 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Set the ClaimStatuses property by calling the GetClaimStatuses method in the _claimStatusService.
-                    ClaimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
+                    //Get all fault statuses from the DB.
+                    FaultStatuses = await _faultStatusService.GetFaultStatuses();
 
-                    //Set the ClaimStatuses in session.
-                    HttpContext.Session.SetInSession("ClaimStatuses", ClaimStatuses);
+                    //Set the FaultStatuses in session.
+                    HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
 
                     //Set the current page to 1.
                     Pager.CurrentPage = 1;
@@ -104,11 +98,11 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                     //Set the page size to the value from the settings.
                     Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
 
-                    //Set the pager to the count of claim statuses.
-                    Pager.Count = ClaimStatuses.Count;
+                    //Set the pager to the count of fault statuses.
+                    Pager.Count = FaultStatuses.Count;
 
-                    //Set the PagedClaimStatuses property by calling the GetPaginatedClaimStatuses method in the _pagerService.
-                    PagedClaimStatuses = await _pagerService.GetPaginatedClaimStatuses(ClaimStatuses, Pager.CurrentPage, Pager.PageSize);
+                    //Set the PagedFaultStatuses property by calling the GetPaginatedFaultStatuses method in the _pagerService.
+                    PagedFaultStatuses = await _pagerService.GetPaginatedFaultStatuses(FaultStatuses, Pager.CurrentPage, Pager.PageSize);
 
                     //Return the page.
                     return Page();
@@ -132,17 +126,17 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         #region Pagination
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
-        //When executed the desired page of claim statuses is displayed.
+        //When executed the desired page of fault statuses is displayed.
         public async void OnGetPaging()
         {
-            //Get the claim statuses from session.
-            ClaimStatuses = HttpContext.Session.GetFromSession<List<ClaimStatus>>("ClaimStatuses");
+            //Get the faults statuses from session.
+            FaultStatuses = HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses");
 
-            //Set the pager count to the number of claim statuses.
-            Pager.Count = ClaimStatuses.Count;
+            //Set the pager to the count of fault statuses.
+            Pager.Count = FaultStatuses.Count;
 
-            //Get the page of claimStatuses by calling the GetPaginatedClaimStatuses method from the _pagerService.
-            PagedClaimStatuses = await _pagerService.GetPaginatedClaimStatuses(ClaimStatuses, Pager.CurrentPage, Pager.PageSize);
+            //Set the PagedFaultStatuses property by calling the GetPaginatedFaultStatuses method in the _pagerService.
+            PagedFaultStatuses = await _pagerService.GetPaginatedFaultStatuses(FaultStatuses, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
     }

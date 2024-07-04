@@ -13,10 +13,8 @@ namespace DFI.FaultReporting.Interfaces.Admin
 
         Task<FaultStatus> GetFaultStatus(int ID, string token);
 
-        Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus);
+        Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus, string token);
 
-        Task<FaultStatus> UpdateFaultStatus(FaultStatus faultStatus);
-
-        Task<int> DeleteFaultStatus(int ID);
+        Task<FaultStatus> UpdateFaultStatus(FaultStatus faultStatus, string token);
     }
 }

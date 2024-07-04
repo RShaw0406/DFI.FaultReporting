@@ -14,6 +14,7 @@ using DFI.FaultReporting.Services.Interfaces.Users;
 using DFI.FaultReporting.Common.Pagination;
 using DFI.FaultReporting.Models.Users;
 using System.Security.Claims;
+using DFI.FaultReporting.Common.SessionStorage;
 
 namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin
 {
@@ -88,6 +89,9 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin
                     //Get all claim types from the DB.
                     ClaimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
 
+                    //Set the ClaimTypes in session.
+                    HttpContext.Session.SetInSession("ClaimTypes", ClaimTypes);
+
                     //Set the current page to 1.
                     Pager.CurrentPage = 1;
 
@@ -126,6 +130,9 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin
         //When executed the desired page of claim types is displayed.
         public async void OnGetPaging()
         {
+            //Get the claim types from session.
+            ClaimTypes = HttpContext.Session.GetFromSession<List<ClaimType>>("ClaimTypes");
+
             //Set the pager count to the number of claim types.
             Pager.Count = ClaimTypes.Count;
 

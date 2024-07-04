@@ -26,5 +26,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Pagination
 
         //Declare GetPaginatedClaimTypes method, this is needed for paginating the claim types.
         Task<List<ClaimType>> GetPaginatedClaimTypes(List<ClaimType> claimTypes, int currentPage, int pageSize);
+
+        //Declare GetPaginatedFaultStatuses method, this is needed for paginating the fault statuses.
+        Task<List<FaultStatus>> GetPaginatedFaultStatuses(List<FaultStatus> faultStatuses, int currentPage, int pageSize);
     }
 }

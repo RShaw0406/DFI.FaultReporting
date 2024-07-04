@@ -49,12 +49,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Fault Statuses data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultStatusHttp",
-                    ExceptionFunction = "GetFaultStatuses",
-                };
+                return null;
             }
         }
 
@@ -84,20 +79,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Fault Status data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultStatusHttp",
-                    ExceptionFunction = "GetFaultStatus",
-                };
+                return null;
             }
         }
 
-        public async Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus)
+        public async Task<FaultStatus> CreateFaultStatus(FaultStatus faultStatus, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultStatusJSON = JsonConvert.SerializeObject(faultStatus);
 
@@ -122,20 +114,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Fault Status data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultStatusHttp",
-                    ExceptionFunction = "CreateFaultStatus",
-                };
+                return null;
             }
         }
 
-        public async Task<FaultStatus> UpdateFaultStatus(FaultStatus faultStatus)
+        public async Task<FaultStatus> UpdateFaultStatus(FaultStatus faultStatus, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultStatusJSON = JsonConvert.SerializeObject(faultStatus);
 
@@ -160,41 +149,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Fault Status data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultStatusHttp",
-                    ExceptionFunction = "UpdateFaultStatus",
-                };
-            }
-        }
-
-        public async Task<int> DeleteFaultStatus(int ID)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.FaultStatus + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Fault Status data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultStatusHttp",
-                    ExceptionFunction = "DeleteFaultStatus",
-                };
+                return null;
             }
         }
     }

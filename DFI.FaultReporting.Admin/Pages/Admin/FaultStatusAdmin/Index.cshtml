@@ -1,13 +1,13 @@
 ﻿@page
-@model DFI.FaultReporting.Admin.Pages.Admin.ClaimTypeAdmin.IndexModel
+@model DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin.IndexModel
 
 @{
-    ViewData["Title"] = "Claim type admin";
+    ViewData["Title"] = "Fault status admin";
 }
 <div class="container">
     <h1>@ViewData["Title"]</h1>
     <br />
-    <h2>View and manage claim types</h2>
+    <h2>View and manage fault statuses</h2>
     <hr />
     <div class="row">
         <div class="col-md-12">
@@ -16,7 +16,7 @@
                     <thead>
                         <tr>
                             <th>
-                                Claim type
+                                Fault status
                             </th>
                             <th>
                                 Input details
@@ -26,36 +26,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var claimType in Model.PagedClaimTypes)
+                        @foreach (var faultStatus in Model.PagedFaultStatuses)
                         {
                             <tr>
                                 <td>
-                                    @Html.DisplayFor(modelItem => claimType.ClaimTypeDescription)
+                                    @Html.DisplayFor(modelItem => faultStatus.FaultStatusDescription)
                                 </td>
                                 <td>
                                     <strong>Active:</strong>
                                     <br />
-                                    @if (claimType.Active)
+                                    @if (faultStatus.Active)
                                     {
-                                        <span class="badge bg-success">@claimType.Active</span>
+                                        <span class="badge bg-success">@faultStatus.Active</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger">@claimType.Active</span>
+                                        <span class="badge bg-danger">@faultStatus.Active</span>
                                     }
                                     <br />
                                     <br />
                                     <strong>Input:</strong>
                                     <br />
-                                    @Html.DisplayFor(modelItem => claimType.InputBy)
+                                    @Html.DisplayFor(modelItem => faultStatus.InputBy)
                                     <br />
-                                    @Html.DisplayFor(modelItem => claimType.InputOn)
+                                    @Html.DisplayFor(modelItem => faultStatus.InputOn)
                                 </td>
                                 <td class="text-center">
-                                    <a asp-page="./Details" asp-route-id="@claimType.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
+                                    <a asp-page="./Details" asp-route-id="@faultStatus.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
                                 </td>
                                 <td class="text-center">
-                                    <a asp-page="./Edit" asp-route-id="@claimType.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    <a asp-page="./Edit" asp-route-id="@faultStatus.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
                                 </td>
                             </tr>
                         }
@@ -108,7 +108,7 @@
     <div class="row">
         <div class="col-md-12 text-center">
             <div class="small-tile">
-                <a class="nav-link" aria-label="New claim type link" title="New claim type" asp-page="./Create"><i class="fa-solid fa-circle-plus"></i> Add new claim type</a>
+                <a class="nav-link" aria-label="New fault status link" title="New fault status" asp-page="./Create"><i class="fa-solid fa-circle-plus"></i> Add new fault status</a>
             </div>
         </div>
     </div>
