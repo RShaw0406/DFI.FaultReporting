@@ -35,8 +35,6 @@
                                     All
                                 </option>
                             </select>
-@*                             <a id="hiddenDropDownLink" asp-route-CurrentPage="1" hidden></a>
-                            <button id="hiddenDropDownButton" type="submit" hidden></button> *@
                             <label asp-for="FaultTypeFilter" class="form-label"></label>
                         </div>
                     </form>
@@ -188,10 +186,6 @@
     </div>
 </body>
 <script type="text/javascript">
-
-    // function resetPage() {
-    //     document.getElementById('hiddenDropDownLink').click();
-    // }
 
     if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);

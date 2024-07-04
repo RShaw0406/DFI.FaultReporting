@@ -2,84 +2,57 @@
 @model DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit staff member";
 }
-
-<h1>Edit</h1>
-
-<h4>Staff</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Staff.ID" />
-            <div class="form-group">
-                <label asp-for="Staff.Email" class="control-label"></label>
-                <input asp-for="Staff.Email" class="form-control" />
-                <span asp-validation-for="Staff.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.Password" class="control-label"></label>
-                <input asp-for="Staff.Password" class="form-control" />
-                <span asp-validation-for="Staff.Password" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.PasswordSalt" class="control-label"></label>
-                <input asp-for="Staff.PasswordSalt" class="form-control" />
-                <span asp-validation-for="Staff.PasswordSalt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.Prefix" class="control-label"></label>
-                <input asp-for="Staff.Prefix" class="form-control" />
-                <span asp-validation-for="Staff.Prefix" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.FirstName" class="control-label"></label>
-                <input asp-for="Staff.FirstName" class="form-control" />
-                <span asp-validation-for="Staff.FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.LastName" class="control-label"></label>
-                <input asp-for="Staff.LastName" class="form-control" />
-                <span asp-validation-for="Staff.LastName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.AccountLocked" class="control-label"></label>
-                <input asp-for="Staff.AccountLocked" class="form-control" />
-                <span asp-validation-for="Staff.AccountLocked" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.AccountLockedEnd" class="control-label"></label>
-                <input asp-for="Staff.AccountLockedEnd" class="form-control" />
-                <span asp-validation-for="Staff.AccountLockedEnd" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.InputBy" class="control-label"></label>
-                <input asp-for="Staff.InputBy" class="form-control" />
-                <span asp-validation-for="Staff.InputBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Staff.InputOn" class="control-label"></label>
-                <input asp-for="Staff.InputOn" class="form-control" />
-                <span asp-validation-for="Staff.InputOn" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Staff.Active" /> @Html.DisplayNameFor(model => model.Staff.Active)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Edit the details of staff member</h2>
+    <hr />
+    @if (Model.UpdateSuccess)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>Success: </strong>
+            <p>Staff members details have been successfully updated.</p>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <input type="hidden" asp-for="StaffInput.ID" />
+                <div class="form-floating mb-3">
+                    <input asp-for="StaffInput.Email" class="form-control" />
+                    <label asp-for="StaffInput.Email" class="control-label"></label>
+                    <span asp-validation-for="StaffInput.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="StaffInput.Prefix" class="form-control" />
+                    <label asp-for="StaffInput.Prefix" class="control-label"></label>
+                    <span asp-validation-for="StaffInput.Prefix" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="StaffInput.FirstName" class="form-control" />
+                    <label asp-for="StaffInput.FirstName" class="control-label"></label>
+                    <span asp-validation-for="StaffInput.FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="StaffInput.LastName" class="form-control" />
+                    <label asp-for="StaffInput.LastName" class="control-label"></label>
+                    <span asp-validation-for="StaffInput.LastName" class="text-danger"></span>
+                </div>
+                <div class="btn-group">
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Updated</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
-
-@section Scripts {
+@* @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+} *@

@@ -59,7 +59,6 @@ namespace DFI.FaultReporting.SQL.Repository.Users
             staff.LastName = null;
             staff.AccountLocked = null;
             staff.AccountLockedEnd = null;
-            staff.InputBy = "Deleted User";
             staff.Active = false;
 
             _context.Entry(staff).State = EntityState.Modified;

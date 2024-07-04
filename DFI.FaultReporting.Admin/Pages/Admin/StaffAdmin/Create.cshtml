@@ -2,12 +2,12 @@
 @model DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin.CreateModel
 
 @{
-    ViewData["Title"] = "Add new staff";
+    ViewData["Title"] = "Add new staff member";
 }
 <div class="container">
     <h1>@ViewData["Title"]</h1>
     <br />
-    <h2>Create new staff members</h2>
+    <h2>Add new staff members</h2>
     <hr />
     <div class="row">
         <div class="col-md-4">
@@ -34,7 +34,7 @@
                     <span asp-validation-for="StaffInput.LastName" class="text-danger"></span>
                 </div>
                 <div class="btn-group">
-                    <a asp-page="Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Cancel</a>
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
                     &nbsp;
                     <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Create</button>
                 </div>
@@ -42,8 +42,8 @@
         </div>
     </div>
 </div>
-@section Scripts {
+@* @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-}
+} *@

@@ -67,6 +67,7 @@
                                     Account details
                                 </th>
                                 <th class="text-center">Roles</th>
+                                <th class="text-center">Details</th>
                                 <th class="text-center">Edit</th>
                                 <th class="text-center">Delete</th>
                             </tr>
@@ -112,6 +113,9 @@
                                     </td>
                                     <td class="text-center">
                                         <a asp-page="./Roles" asp-route-id="@staff.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-key"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./Details" asp-route-id="@staff.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
                                     </td>
                                     <td class="text-center">
                                         <a asp-page="./Edit" asp-route-id="@staff.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>

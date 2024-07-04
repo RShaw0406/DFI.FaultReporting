@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\Admin\ClaimStatusAdmin\" />
     <Folder Include="wwwroot\js\mapping\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>

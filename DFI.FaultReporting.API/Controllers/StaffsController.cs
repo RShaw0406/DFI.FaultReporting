@@ -96,26 +96,6 @@ namespace DFI.FaultReporting.API.Controllers
 
             staff = await _staffSQLRepository.CreateStaff(staff);
 
-            //int roleID = 6;
-
-            //Role role = await _roleSQLRepository.GetRole(roleID);
-
-            //if (role == null)
-            //{
-            //    return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Role not found: StaffReadWrite" });
-            //}
-
-            //StaffRole staffReadRole = new StaffRole
-            //{
-            //    RoleID = role.ID,
-            //    StaffID = staff.ID,
-            //    InputBy = "system admin",
-            //    InputOn = DateTime.Now,
-            //    Active = true
-            //};
-
-            //await _staffRoleSQLRepository.CreateStaffRole(staffReadRole);
-
             return CreatedAtAction("GetStaff", new { staff.ID }, staff);
         }
 

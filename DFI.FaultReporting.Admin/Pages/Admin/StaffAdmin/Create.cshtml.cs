@@ -64,22 +64,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         [BindProperty]
         public List<Staff> Staff { get; set; }
 
-        //Declare Roles property, this is needed when getting all roles from the DB.
-        [BindProperty]
-        public List<Role> Roles { get; set; }
-
-        //Declare RolesInput property, this is needed for assigning roles to staff members.
-        [BindProperty]
-        public RoleInputModel RolesInput { get; set; }
-
-        //Declare RoleInputs property, this is needed for assigning roles to staff members.
-        [BindProperty]
-        public List<RoleInputModel> RoleInputs { get; set; } = new List<RoleInputModel>();
-
-        //Declare StaffRoles property, this is needed for filtering staff by assigned roles.
-        [BindProperty]
-        public List<StaffRole> StaffRoles { get; set; }
-
         //Declare StaffInputModel, this is needed for validating the input when creating a new staff member.
         public class StaffInputModel
         {
@@ -106,21 +90,12 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
             [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
             public string? LastName { get; set; }
         }
-
-        public class RoleInputModel
-        {
-            public int RoleID { get; set; }
-
-            public string? Role { get; set; }
-
-            public bool Selected { get; set; }
-        }
         #endregion Properties
 
         #region Page Load
         //Method Summary:
         //This method is called when the page is loaded.
-        //It checks if the current user is authenticated and if so, it gets the current user and staff roles from the DB.
+        //It checks if the current user is authenticated and if so, it gets the current user and returns the page.
         public async Task<IActionResult> OnGetAsync()
         {
             //The contexts current user exists.
@@ -177,10 +152,28 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         //When executed this method attempts to create a new staff member and returns the user to the roles page.
         public async Task<IActionResult> OnPostAsync()
         {
+            //ModelState is not valid.
             if (!ModelState.IsValid)
             {
+                //Loop through all model state items.
+                foreach (var item in ModelState)
+                {
+                    //If the model state error has errors, add them to the model state.
+                    if (item.Value.Errors.Count > 0)
+                    {
+                        //Loop through all errors and add them to the model state.
+                        foreach (var error in item.Value.Errors)
+                        {
+                            //Add the error to the model state.
+                            ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                        }
+                    }
+                }
+
+                //Return the page.
                 return Page();
             }
+            //ModelState is valid.
             else
             {
                 //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
@@ -269,6 +262,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
             //Call the SendEmail in the _emailService and return the response.
             return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
         }
-        #endregion
+        #endregion Create Staff
     }
 }
