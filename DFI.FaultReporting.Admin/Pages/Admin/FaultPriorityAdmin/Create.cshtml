@@ -1,0 +1,51 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin.CreateModel
+
+@{
+    ViewData["Title"] = "Add new fault priority";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Add details of new fault priority</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="FaultPriority.InputBy" class="form-control" />
+                    <label asp-for="FaultPriority.InputBy" class="control-label"></label>
+                    <span asp-validation-for="FaultPriority.InputBy" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="FaultPriority.InputOn" class="form-control" />
+                    <label asp-for="FaultPriority.InputOn" class="control-label"></label>
+                    <span asp-validation-for="FaultPriority.InputOn" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="FaultPriority.Active" /> @Html.DisplayNameFor(model => model.FaultPriority.Active)
+                    </label>
+                </div>
+                <div class="form-floating mb-3">                 
+                    <input asp-for="FaultPriority.FaultPriorityRating" class="form-control" />
+                    <label asp-for="FaultPriority.FaultPriorityRating" class="control-label"></label>
+                    <span asp-validation-for="FaultPriority.FaultPriorityRating" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="FaultPriority.FaultPriorityDescription" class="form-control" />
+                    <label asp-for="FaultPriority.FaultPriorityDescription" class="control-label"></label>
+                    <span asp-validation-for="FaultPriority.FaultPriorityDescription" class="text-danger"></span>
+                </div>
+                <div class="btn-group">
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

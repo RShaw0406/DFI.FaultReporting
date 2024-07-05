@@ -14,24 +14,24 @@ namespace DFI.FaultReporting.Models.Admin
 
         [DisplayName("Input By")]
         [Required(ErrorMessage = "You must provide an input by")]
-        public required string InputBy { get; set; }
+        public string? InputBy { get; set; }
 
         [DisplayName("Input On")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
-        public required DateTime InputOn { get; set; }
+        public DateTime InputOn { get; set; }
 
         [Required(ErrorMessage = "You must provide an active")]
-        public required bool Active { get; set; }
+        public bool Active { get; set; }
 
-        [DisplayName("Description")]
+        [DisplayName("Fault priority")]
         [Required(ErrorMessage = "You must enter a fault priority description")]
         [StringLength(250, ErrorMessage = "Fault priority description must not be more than 250 characters")]
-        public required string FaultPriorityDescription { get; set; }
+        public string? FaultPriorityDescription { get; set; }
 
         [DisplayName("Rating")]
         [Required(ErrorMessage = "You must enter a fault priority rating")]
         [StringLength(10, ErrorMessage = "Fault priority rating must not be more than 10 characters")]
-        public required string FaultPriorityRating { get; set; }
+        public string? FaultPriorityRating { get; set; }
     }
 }

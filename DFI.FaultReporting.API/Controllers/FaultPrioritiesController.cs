@@ -55,7 +55,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/FaultPriorities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultPriority>> PostFaultPriority(FaultPriority faultPriority)
         {
             faultPriority = await _faultPrioritySQLRepository.CreateFaultPriority(faultPriority);
@@ -66,7 +66,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/FaultPriorities
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultPriority>> PutFaultPriority(FaultPriority faultPriority)
         {
             try
@@ -88,23 +88,6 @@ namespace DFI.FaultReporting.API.Controllers
                     return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
-        }
-
-        // DELETE: api/FaultPriorities/5
-        [HttpDelete("{ID}")]
-        [Authorize]
-        public async Task<ActionResult<int>> DeleteFaultPriority(int ID)
-        {
-            FaultPriority faultPriority = await _faultPrioritySQLRepository.GetFaultPriority(ID);
-
-            if (faultPriority == null)
-            {
-                return NotFound();
-            }
-
-            await _faultPrioritySQLRepository.DeleteFaultPriority(ID);
-
-            return ID;
         }
     }
 }

@@ -34,25 +34,18 @@ namespace DFI.FaultReporting.Services.Admin
             return faultPriority;
         }
 
-        public async Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority)
+        public async Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority, string token)
         {
-            faultPriority = await _faultPriorityHttp.CreateFaultPriority(faultPriority);
+            faultPriority = await _faultPriorityHttp.CreateFaultPriority(faultPriority, token);
 
             return faultPriority;
         }
 
-        public async Task<FaultPriority> UpdateFaultPriority(FaultPriority faultPriority)
+        public async Task<FaultPriority> UpdateFaultPriority(FaultPriority faultPriority, string token)
         {
-            faultPriority = await _faultPriorityHttp.UpdateFaultPriority(faultPriority);
+            faultPriority = await _faultPriorityHttp.UpdateFaultPriority(faultPriority, token);
 
             return faultPriority;
-        }
-
-        public async Task<int> DeleteFaultPriority(int ID)
-        {
-            await _faultPriorityHttp.DeleteFaultPriority(ID);
-
-            return ID;
         }
     }
 }

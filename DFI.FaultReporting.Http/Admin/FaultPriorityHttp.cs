@@ -49,12 +49,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Fault Priorities data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultPriorityHttp",
-                    ExceptionFunction = "GetFaultPriorities",
-                };
+                return null;    
             }
         }
 
@@ -84,20 +79,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Fault Priority data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultPriorityHttp",
-                    ExceptionFunction = "GetFaultPriority",
-                };
+                return null;
             }
         }
 
-        public async Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority)
+        public async Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultPriorityJSON = JsonConvert.SerializeObject(faultPriority);
 
@@ -122,20 +114,17 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Fault Priority data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultPriorityHttp",
-                    ExceptionFunction = "CreateFaultPriority",
-                };
+                return null;
             }
         }
 
-        public async Task<FaultPriority> UpdateFaultPriority(FaultPriority faultPriority)
+        public async Task<FaultPriority> UpdateFaultPriority(FaultPriority faultPriority, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var faultPriorityJSON = JsonConvert.SerializeObject(faultPriority);
 
@@ -147,8 +136,6 @@ namespace DFI.FaultReporting.Http.Admin
                 RequestUri = new Uri(baseURL + APIEndPoints.FaultPriority),
                 Content = content
             };
-
-            //request.Headers.Add("Accept", "application/json");
 
             var result = await client.SendAsync(request);
 
@@ -162,41 +149,7 @@ namespace DFI.FaultReporting.Http.Admin
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Fault Priority data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultPriorityHttp",
-                    ExceptionFunction = "UpdateFaultPriority",
-                };
-            }
-        }
-
-        public async Task<int> DeleteFaultPriority(int ID)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.FaultPriority + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Fault Priority data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "FaultPriorityHttp",
-                    ExceptionFunction = "DeleteFaultPriority",
-                };
+                return null;
             }
         }
     }

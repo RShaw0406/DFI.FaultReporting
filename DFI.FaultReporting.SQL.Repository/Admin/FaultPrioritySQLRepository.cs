@@ -46,13 +46,5 @@ namespace DFI.FaultReporting.SQL.Repository.Admin
             await _context.SaveChangesAsync();
             return faultPriority;
         }
-
-        public async Task<int> DeleteFaultPriority(int ID)
-        {
-            FaultPriority faultPriority = await _context.FaultPriority.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
-            _context.FaultPriority.Remove(faultPriority);
-            await _context.SaveChangesAsync();
-            return ID;
-        }
     }
 }

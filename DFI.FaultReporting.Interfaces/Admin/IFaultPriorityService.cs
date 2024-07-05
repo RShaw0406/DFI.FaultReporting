@@ -13,10 +13,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Admin
 
         Task<FaultPriority> GetFaultPriority(int ID, string token);
 
-        Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority);
+        Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority, string token);
 
-        Task<FaultPriority> UpdateFaultPriority(FaultPriority faultPriority);
-
-        Task<int> DeleteFaultPriority(int ID);
+        Task<FaultPriority> UpdateFaultPriority(FaultPriority faultPriority, string token);
     }
 }

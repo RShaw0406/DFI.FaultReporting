@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.SQL.Repository.Interfaces.Admin
         Task<FaultPriority> CreateFaultPriority(FaultPriority faultPriority);
 
         Task<FaultPriority> UpdateFaultPriority(FaultPriority faultPriority);
-
-        Task<int> DeleteFaultPriority(int ID);
     }
 }
