@@ -258,16 +258,16 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         //When executed this method attempts to send an email to the create staff and returns the response from the _emailService.
         public async Task<SendGrid.Response> SendAccountCreationEmail(string emailAddress, string password)
         {
-            //Set the subject of the email explaining that the user has deleted their account.
+            //Set the subject of the email explaining that an account has been created for the staff member.
             string subject = "DFI Fault Reporting Administration: Account created";
 
-            //Declare a new EmailAddress object and assign the users email address as the value.
+            //Declare a new EmailAddress object and assign the staff email address as the value.
             EmailAddress to = new EmailAddress(emailAddress);
 
             //Set textContent to empty string as it will not be used here.
             string textContent = string.Empty;
 
-            //Set the htmlContent to a message explaining to the user that their account has been successfully deleted.
+            //Set the htmlContent to a message explaining to the staff that their account has been successfully created.
             string htmlContent = "<p>Hello,</p><p>A system administrator has created your account.</p>" +
                 "<p>You can now use your this email address and your temporary password below to login.</p><br/>" +
                 "<p><strong>Temporary password:</strong></p>" +

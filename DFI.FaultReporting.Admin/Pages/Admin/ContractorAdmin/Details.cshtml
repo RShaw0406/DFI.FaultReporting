@@ -1,0 +1,50 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin.DetailsModel
+
+@{
+    ViewData["Title"] = "Contractor details";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Details of contractor</h2>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contractor.Email)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contractor.Email)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contractor.ContractorName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contractor.ContractorName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contractor.InputBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contractor.InputBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contractor.InputOn)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contractor.InputOn)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Contractor.Active)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Contractor.Active)
+        </dd>
+    </dl>
+    <div class="btn-group">
+        <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+        &nbsp;
+        <a asp-page="./Edit" class="btn btn-outline-primary btn-lg" asp-route-id="@Model.Contractor.ID"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+    </div>
+    <br />
+</div>

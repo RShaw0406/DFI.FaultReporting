@@ -1,0 +1,63 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin.EditModel
+
+@{
+    ViewData["Title"] = "Edit contractor";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Edit the details of contractor</h2>
+    <hr />
+    @if (Model.UpdateSuccess)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>Success: </strong>
+            <p>Contractor details have been successfully updated.</p>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <input type="hidden" asp-for="Contractor.ID" />
+                <div class="form-floating mb-3">
+                    <input asp-for="Contractor.Email" class="form-control" />
+                    <label asp-for="Contractor.Email" class="control-label"></label>
+                    <span asp-validation-for="Contractor.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Contractor.ContractorName" class="form-control" />
+                    <label asp-for="Contractor.ContractorName" class="control-label"></label>
+                    <span asp-validation-for="Contractor.ContractorName" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="Contractor.InputBy" class="form-control" />
+                    <label asp-for="Contractor.InputBy" class="control-label"></label>
+                    <span asp-validation-for="Contractor.InputBy" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="Contractor.InputOn" class="form-control" />
+                    <label asp-for="Contractor.InputOn" class="control-label"></label>
+                    <span asp-validation-for="Contractor.InputOn" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <select asp-for="Contractor.Active" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                    <label asp-for="Contractor.Active" class="control-label"></label>
+                    <span asp-validation-for="Contractor.Active" class="text-danger"></span>
+                </div>
+                <div class="btn-group">
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

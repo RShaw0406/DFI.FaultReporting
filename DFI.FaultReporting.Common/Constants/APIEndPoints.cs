@@ -24,5 +24,6 @@ namespace DFI.FaultReporting.Common.Constants
         public const string AuthRegister = "/api/auth/register";
         public const string AuthLogin = "/api/auth/login";
         public const string AuthLock = "/api/auth/lock";
+        public const string Contractor = "/api/contractors";
     }
 }
