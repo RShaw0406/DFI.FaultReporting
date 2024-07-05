@@ -16,61 +16,61 @@ namespace DFI.FaultReporting.Services.Pagination
         //Method to get paginated faults.
         public async Task<List<Fault>> GetPaginatedFaults(List<Fault> faults, int currentPage, int pageSize)
         {
-            return faults.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return faults.OrderBy(f => f.FaultPriorityID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated reports.
         public async Task<List<Report>> GetPaginatedReports(List<Report> reports, int currentPage, int pageSize)
         {
-            return reports.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return reports.OrderByDescending(r => r.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated staff.
         public async Task<List<Staff>> GetPaginatedStaff(List<Staff> staff, int currentPage, int pageSize)
         {
-            return staff.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return staff.OrderByDescending(s => s.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated claim statuses.
         public async Task<List<ClaimStatus>> GetPaginatedClaimStatuses(List<ClaimStatus> claimStatuses, int currentPage, int pageSize)
         {
-            return claimStatuses.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return claimStatuses.OrderByDescending(cs => cs.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated claim types.
         public async Task<List<ClaimType>> GetPaginatedClaimTypes(List<ClaimType> claimTypes, int currentPage, int pageSize)
         {
-            return claimTypes.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return claimTypes.OrderByDescending(ct => ct.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated fault statuses.
         public async Task<List<FaultStatus>> GetPaginatedFaultStatuses(List<FaultStatus> faultStatuses, int currentPage, int pageSize)
         {
-            return faultStatuses.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return faultStatuses.OrderByDescending(fs => fs.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated fault types.
         public async Task<List<FaultType>> GetPaginatedFaultTypes(List<FaultType> faultTypes, int currentPage, int pageSize)
         {
-            return faultTypes.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return faultTypes.OrderByDescending(ft => ft.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated fault priorities.
         public async Task<List<FaultPriority>> GetPaginatedFaultPriorities(List<FaultPriority> faultPriorities, int currentPage, int pageSize)
         {
-            return faultPriorities.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return faultPriorities.OrderByDescending(fp => fp.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated roles.
         public async Task<List<Role>> GetPaginatedRoles(List<Role> roles, int currentPage, int pageSize)
         {
-            return roles.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return roles.OrderByDescending(r => r.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
 
         //Method to get paginated contractors.
         public async Task<List<Contractor>> GetPaginatedContractors(List<Contractor> contractors, int currentPage, int pageSize)
         {
-            return contractors.OrderByDescending(f => f.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+            return contractors.OrderByDescending(c => c.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
     }
 }

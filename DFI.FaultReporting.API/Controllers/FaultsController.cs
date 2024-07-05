@@ -57,7 +57,7 @@ namespace DFI.FaultReporting.API.Controllers
         // POST: api/Faults
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "User, Contractor, StaffReadWrite")]
         public async Task<ActionResult<Fault>> PostFault(Fault fault)
         {          
             fault = await _faultSQLRepository.CreateFault(fault);
@@ -68,7 +68,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/Faults
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        [Authorize]
+        [Authorize(Roles = "StaffReadWrite")]
         public async Task<ActionResult<Fault>> PutFault(Fault fault)
         {
             try

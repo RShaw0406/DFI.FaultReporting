@@ -66,13 +66,7 @@
                                 <thead>
                                     <tr>
                                         <th>
-                                            Type
-                                        </th>
-                                        <th>
-                                            Status
-                                        </th>
-                                        <th>
-                                            Priority
+                                            Fault
                                         </th>
                                         <th>
                                             Location
@@ -87,12 +81,18 @@
                                     {
                                         <tr>
                                             <td>
+                                                <strong>Type:</strong>
+                                                <br />
                                                 @Model.FaultTypes.FirstOrDefault(ft => ft.ID == fault.FaultTypeID).FaultTypeDescription
-                                            </td>
-                                            <td>
+                                                <br />
+                                                <br />
+                                                <strong>Status:</strong>
+                                                <br />
                                                 @Model.FaultStatuses.FirstOrDefault(fs => fs.ID == fault.FaultStatusID).FaultStatusDescription
-                                            </td>
-                                            <td>
+                                                <br />
+                                                <br />
+                                                <strong>Description:</strong>
+                                                <br />
                                                 @Model.FaultPriorities.FirstOrDefault(fp => fp.ID == fault.FaultPriorityID).FaultPriorityDescription
                                             </td>
                                             <td>
