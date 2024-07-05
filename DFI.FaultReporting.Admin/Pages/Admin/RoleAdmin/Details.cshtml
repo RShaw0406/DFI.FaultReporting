@@ -1,0 +1,44 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.RoleAdmin.DetailsModel
+
+@{
+    ViewData["Title"] = "Role details";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Details of role</h2>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Role.RoleDescription)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Role.RoleDescription)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Role.InputBy)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Role.InputBy)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Role.InputOn)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Role.InputOn)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Role.Active)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Role.Active)
+        </dd>
+    </dl>
+    <div class="btn-group">
+        <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+        &nbsp;
+        <a asp-page="./Edit" class="btn btn-outline-primary btn-lg" asp-route-id="@Model.Role.ID"><i class="fa-solid fa-pen-to-square"></i> Edit</a>
+    </div>
+    <br />
+</div>

@@ -92,22 +92,5 @@ namespace DFI.FaultReporting.API.Controllers
                 }
             }
         }
-
-        // DELETE: api/Roles/5
-        [HttpDelete("{ID}")]
-        [Authorize(Roles = "StaffAdmin")]
-        public async Task<ActionResult<int>> DeleteRole(int ID)
-        {
-            Role role = await _roleSQLRepository.GetRole(ID);
-
-            if (role == null)
-            {
-                return NotFound();
-            }
-
-            await _roleSQLRepository.DeleteRole(ID);
-
-            return ID;
-        }
     }
 }

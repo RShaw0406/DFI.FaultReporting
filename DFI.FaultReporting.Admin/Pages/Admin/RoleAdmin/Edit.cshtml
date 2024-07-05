@@ -1,0 +1,58 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.RoleAdmin.EditModel
+
+@{
+    ViewData["Title"] = "Edit role";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Edit the details of role</h2>
+    <hr />
+    @if (Model.UpdateSuccess)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <strong>Success: </strong>
+            <p>Fault type details have been successfully updated.</p>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <input type="hidden" asp-for="Role.ID" />
+                <div class="form-floating mb-3">
+                    <input asp-for="Role.RoleDescription" class="form-control" />
+                    <label asp-for="Role.RoleDescription" class="control-label"></label>
+                    <span asp-validation-for="Role.RoleDescription" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="Role.InputBy" class="form-control" />
+                    <label asp-for="Role.InputBy" class="control-label"></label>
+                    <span asp-validation-for="Role.InputBy" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="Role.InputOn" class="form-control" />
+                    <label asp-for="Role.InputOn" class="control-label"></label>
+                    <span asp-validation-for="Role.InputOn" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <select asp-for="Role.Active" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                    <label asp-for="Role.Active" class="control-label"></label>
+                    <span asp-validation-for="Role.Active" class="text-danger"></span>
+                </div>
+                <div class="btn-group">
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

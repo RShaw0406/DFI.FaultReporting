@@ -156,8 +156,6 @@ namespace DFI.FaultReporting.Http.Roles
                 Content = content
             };
 
-            //request.Headers.Add("Accept", "application/json");
-
             var result = await client.SendAsync(request);
 
             if (result.IsSuccessStatusCode)
@@ -175,37 +173,6 @@ namespace DFI.FaultReporting.Http.Roles
                     ResponseStatus = result.StatusCode,
                     ExceptionClass = "RoleHttp",
                     ExceptionFunction = "UpdateRole",
-                };
-            }
-        }
-
-        public async Task<int> DeleteRole(int ID, string token)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.Role + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Role data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "RoleHttp",
-                    ExceptionFunction = "DeleteRole",
                 };
             }
         }

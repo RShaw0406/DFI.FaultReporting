@@ -1,5 +1,6 @@
 ﻿using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
+using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
 using System;
 using System.Collections.Generic;
@@ -35,5 +36,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Pagination
 
         //Declare GetPaginatedFaultPriorities method, this is needed for paginating the fault priorities.
         Task<List<FaultPriority>> GetPaginatedFaultPriorities(List<FaultPriority> faultPriorities, int currentPage, int pageSize);
+
+        //Declare GetPaginatedRoles method, this is needed for paginating the roles.
+        Task<List<Role>> GetPaginatedRoles(List<Role> roles, int currentPage, int pageSize);
     }
 }

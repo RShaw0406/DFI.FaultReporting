@@ -49,12 +49,5 @@ namespace DFI.FaultReporting.Services.Roles
 
             return role;
         }
-
-        public async Task<int> DeleteRole(int ID, string token)
-        {
-            await _roleHttp.DeleteRole(ID, token);
-
-            return ID;
-        }
     }
 }

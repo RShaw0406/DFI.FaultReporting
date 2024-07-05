@@ -18,7 +18,5 @@ namespace DFI.FaultReporting.Services.Interfaces.Roles
         Task<Role> CreateRole(Role role, string token);
 
         Task<Role> UpdateRole(Role role, string token);
-
-        Task<int> DeleteRole(int ID, string token);
     }
 }

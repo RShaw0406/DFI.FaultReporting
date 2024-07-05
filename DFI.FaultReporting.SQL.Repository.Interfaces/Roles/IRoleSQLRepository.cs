@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.SQL.Repository.Interfaces.Roles
         Task<Role> CreateRole(Role role);
 
         Task<Role> UpdateRole(Role role);
-
-        Task<int> DeleteRole(int ID);
     }
 }

@@ -47,13 +47,5 @@ namespace DFI.FaultReporting.SQL.Repository.Roles
             await _context.SaveChangesAsync();
             return role;
         }
-
-        public async Task<int> DeleteRole(int ID)
-        {
-            Role role = await _context.Role.Where(cs => cs.ID == ID).FirstOrDefaultAsync();
-            _context.Role.Remove(role);
-            await _context.SaveChangesAsync();
-            return ID;
-        }
     }
 }
