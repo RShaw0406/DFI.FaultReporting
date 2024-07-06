@@ -1,13 +1,15 @@
 ﻿@page
-@model DFI.FaultReporting.Public.Pages.Faults.ReportDetailsModel
+@model DFI.FaultReporting.Admin.Pages.Faults.ReportDetailsModel
 @{
-    ViewData["Title"] = "Report details";
+}
+@{
+    ViewData["Title"] = "Fault reports";
 }
 <body onload="initReviewMap()">
     <div class="container">
         <h1>@ViewData["Title"]</h1>
         <br />
-        <h2>Details of your reported fault</h2>
+        <h2>Details of reports related to fault</h2>
         <hr />
         <form id="showFaultDetailsForm" method="get">
             <div class="row">
@@ -131,7 +133,7 @@
                                         @report.InputOn.ToShortDateString()
                                     </td>
                                     <td class="text-center">
-                                            <a  asp-page-handler="ViewImages" asp-route-id="@report.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
+                                        <a asp-page-handler="ViewImages" asp-route-id="@report.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
                                     </td>
                                 </tr>
                             }

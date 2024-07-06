@@ -1,0 +1,39 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Faults.ReportImagesModel
+@{
+    ViewData["Title"] = "Report images";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Images that have been uploaded when the report was submitted</h2>
+    <hr />
+    <div class="col-12">
+        <div class="row">
+            @{
+                if (Model.SelectedReportPhotos != null)
+                {
+                    foreach (var photo in Model.SelectedReportPhotos)
+                    {
+                        <div class="col-sm-6 col-md-4 text-center">
+                            <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                            <br />
+                            <br />
+                            <a asp-page-handler="FullScreenPhoto" asp-route-id="@photo.ID" target="_blank" class="btn btn-lg btn-outline-primary"><i class="fa-solid fa-expand"></i></a>
+                            <br />
+                            <br />
+                        </div>
+                    }
+                }
+
+                if (Model.SelectedReportPhotos == null || Model.SelectedReportPhotos.Count == 0)
+                {
+                    <div class="alert alert-info">
+                        <strong>Info: </strong>
+                        <p>No images uploaded when this report was submitted.</p>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

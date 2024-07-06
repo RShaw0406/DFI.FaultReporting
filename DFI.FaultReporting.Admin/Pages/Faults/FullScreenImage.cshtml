@@ -1,0 +1,15 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Faults.FullScreenImageModel
+@{
+    ViewData["Title"] = "Report image";
+}
+@{
+    <div class="container">
+        <div class="col-md-12">
+            <div class="row text-center">
+                <img src="data:image/@Model.ReportPhoto.Type;base64,@Model.ReportPhoto.Data" style="max-width: 100%; max-height: 100%;" />
+            </div>
+        </div>
+    </div>
+    <br />
+}

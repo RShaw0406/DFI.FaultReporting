@@ -1,37 +1,32 @@
-using DFI.FaultReporting.Common.Pagination;
-using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Interfaces.Files;
-using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Files;
 using DFI.FaultReporting.Models.Users;
-using DFI.FaultReporting.Services.Interfaces.Admin;
-using DFI.FaultReporting.Services.Interfaces.Pagination;
-using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Users;
+using DFI.FaultReporting.Services.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Security.Claims;
 
-namespace DFI.FaultReporting.Public.Pages.Faults
+namespace DFI.FaultReporting.Admin.Pages.Faults
 {
     public class ReportImagesModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
         private readonly ILogger<ReportImagesModel> _logger;
-        private readonly IUserService _userService;
+        private readonly IStaffService _staffService;
         private readonly IReportService _reportService;
         private readonly IReportPhotoService _reportPhotoService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         //Inject dependencies in constructor.
-        public ReportImagesModel(ILogger<ReportImagesModel> logger, IUserService userService, IReportService reportService, IReportPhotoService reportPhotoService,
+        public ReportImagesModel(ILogger<ReportImagesModel> logger, IStaffService staffService, IReportService reportService, IReportPhotoService reportPhotoService,
             IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
-            _userService = userService;
+            _staffService = staffService;
             _reportService = reportService;
             _reportPhotoService = reportPhotoService;
             _httpContextAccessor = httpContextAccessor;
@@ -39,8 +34,8 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentUser property, this is needed when calling the _userService.
-        public User CurrentUser { get; set; }
+        //Declare CurrentStaff property, this is needed when calling the _staffService.
+        public Staff CurrentStaff { get; set; }
 
         //Declare Reports property, this is needed for returning the selected report from the DB.
         [BindProperty]
@@ -65,7 +60,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
             if (_httpContextAccessor.HttpContext.User != null)
             {
                 //The contexts current user has been authenticated.
-                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
+                if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffReadWrite") || HttpContext.User.IsInRole("StaffRead"))
                 {
                     //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
                     string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -76,8 +71,8 @@ namespace DFI.FaultReporting.Public.Pages.Faults
                     //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
                     string? jwtToken = jwtTokenClaim.Value;
 
-                    //Set the CurrentUser property by calling the GetUser method in the _userService.
-                    CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
+                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
+                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
                     //Set the Report property by calling the GetReport method from the _reportService using the ID in TempData.
                     Report = await _reportService.GetReport(Convert.ToInt32(TempData["ReportID"]), jwtToken);

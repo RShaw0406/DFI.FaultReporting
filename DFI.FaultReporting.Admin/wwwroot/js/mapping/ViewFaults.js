@@ -233,8 +233,10 @@ function markerClicked(e) {
         var contentRoad = marker.properties.road;
         var contentReports = marker.properties.reportCount;
 
-        //Create an href value for the "Add report" link and add the ID of the fault as a query parameter. This is needed for linking a report to a fault on the "AddReport" page.
-        var url = "/Faults/AddReport/?ID=" + marker.properties.id;
+        var urlStaff = "/Faults/AssignStaff/?ID=" + marker.properties.id;
+        var urlReports = "/Faults/ReportDetails/?ID=" + marker.properties.id;
+        var urlEdit = "/Faults/EditFault/?ID=" + marker.properties.id;
+        var urlRepair = "/Faults/ScheduleRepair/?ID=" + marker.properties.id;
 
         //Setup popup.
         popup.setOptions({
@@ -244,7 +246,12 @@ function markerClicked(e) {
                               <p><strong>Status:</strong> ${contentStatus}</p>
                               <p><strong>Location:</strong> ${contentRoad}</p>
                               <p><strong>Reports:</strong> ${contentReports}</p>
-                              <a id="linkAddReport" href="${url}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-circle-plus"></i> Add report</button>
+                              <a id="linkAssignStaff" href="${urlStaff}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-user-plus"></i> Assign staff</a>
+                              <a id="linkViewReports" href="${urlReports}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-person-circle-exclamation"></i> View reports</a>
+                              <br />
+                              <br />
+                              <a id="linkEditDetails" href="${urlEdit}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit details</a>
+                              <a id="linkScheduleRepair" href="${urlEdit}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-person-digging"></i> Schedule repair</a>
                            </div>`,
             position: marker.getOptions().position,
             closeButton: true
