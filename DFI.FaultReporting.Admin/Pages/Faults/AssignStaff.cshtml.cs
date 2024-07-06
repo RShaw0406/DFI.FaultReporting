@@ -103,9 +103,6 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                     //Set the CurrentStaff property by calling the GetUser method in the _userService.
                     CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-                    //Clear session to ensure fresh start.
-                    HttpContext.Session.Clear();
-
                     //Get fault from DB.
                     Fault = await _faultService.GetFault((int)ID, jwtToken);
 

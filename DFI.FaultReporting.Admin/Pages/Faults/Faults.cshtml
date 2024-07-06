@@ -1,4 +1,5 @@
 ﻿@page
+@inject IHttpContextAccessor HttpContextAccessor
 @using DFI.FaultReporting.Common.SessionStorage
 @using DFI.FaultReporting.Models.FaultReports
 @using DFI.FaultReporting.Models.Admin
@@ -43,7 +44,7 @@
                             <div class="form-floating mb-3">
                                 <select asp-for="FaultStatusFilter" class="form-select" asp-items="Model.FaultStatusList" onchange="this.form.submit()">
                                     <option value="0">
-                                        All
+                                        All (not repaired)
                                     </option>
                                 </select>
                                 <label asp-for="FaultStatusFilter" class="form-label"></label>
@@ -120,10 +121,13 @@
                                     <th>
                                         Location
                                     </th>
-                                    <th class="text-center">Assign staff</th>
                                     <th class="text-center">View reports</th>
-                                    <th class="text-center">Edit details</th>
-                                    <th class="text-center">Schedule repair</th>
+                                    @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite"))
+                                    {
+                                        <th class="text-center">Assign staff</th>
+                                        <th class="text-center">Edit details</th>
+                                        <th class="text-center">Schedule repair</th>
+                                    }
                                 </tr>
                             </thead>
                             <tbody>
@@ -188,17 +192,20 @@
                                             }
                                         </td>
                                         <td class="text-center">
-                                            <a asp-page="./AssignStaff" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-user-plus"></i></a>
+                                            <a asp-page="./ReportDetails" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
                                         </td>
-                                        <td class="text-center">
-                                            <a asp-page="./ReportDetails" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-person-circle-exclamation"></i></a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a asp-page="./EditFault" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
-                                        </td>
-                                        <td class="text-center">
-                                            <a asp-page="./ScheduleRepair" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-person-digging"></i></a>
-                                        </td>
+                                        @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite"))
+                                        {
+                                            <td class="text-center">
+                                                <a asp-page="./AssignStaff" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-user-plus"></i></a>
+                                            </td>
+                                            <td class="text-center">
+                                                <a asp-page="./EditFault" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
+                                            </td>
+                                            <td class="text-center">
+                                                <a asp-page="./ScheduleRepair" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-person-digging"></i></a>
+                                            </td>
+                                        }
                                     </tr>
                                 }
                             </tbody>
@@ -251,7 +258,7 @@
         <div class="row">
             <div class="col-md-12 text-center">
                 <div class="small-tile">
-                    <a class="nav-link" aria-label="Fault reports link" title="Fault reports" asp-page="./Create"><i class="fa-solid fa-chart-pie"></i> Reports</a>
+                    <a class="nav-link" aria-label="Fault reports link" title="Fault reports" asp-page="/Faults/Reports/FaultReportsMenu"><i class="fa-solid fa-chart-pie"></i> Reports</a>
                 </div>
             </div>
         </div>
@@ -270,6 +277,7 @@
     var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
     var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
     var reports = @Json.Serialize(HttpContext.Session.GetFromSession<List<Report>>("Reports"));
+    var readWrite = @Model.ReadWrite;
 
 </script>
 <script src="~/js/mapping/ViewFaults.js"></script>

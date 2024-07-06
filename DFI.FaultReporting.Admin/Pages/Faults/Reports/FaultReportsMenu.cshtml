@@ -1,0 +1,18 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultReportsMenuModel
+@{
+    ViewData["Title"] = "Fault reports menu";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Select from one of the options below</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Heat map link" title="Heat map report" asp-page="/Faults/Reports/FaultsHeatMapReport"><i class="fa-solid fa-gear"></i> Heat map report</a>
+            </div>
+        </div>
+    </div>
+</div>

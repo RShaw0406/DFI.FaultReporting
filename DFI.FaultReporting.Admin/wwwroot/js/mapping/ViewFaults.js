@@ -239,23 +239,40 @@ function markerClicked(e) {
         var urlRepair = "/Faults/ScheduleRepair/?ID=" + marker.properties.id;
 
         //Setup popup.
-        popup.setOptions({
-            content: `<div style="padding:10px;">
+        if (readWrite == true) {
+            popup.setOptions({
+                content: `<div style="padding:10px;">
                               <p><strong>Type:</strong> ${contentType}</p>
                               <p><strong>Priority:</strong> ${contentPriority}</p>
                               <p><strong>Status:</strong> ${contentStatus}</p>
                               <p><strong>Location:</strong> ${contentRoad}</p>
                               <p><strong>Reports:</strong> ${contentReports}</p>
+                              <a id="linkViewReports" href="${urlReports}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-magnifying-glass-plus"></i> View reports</a>
                               <a id="linkAssignStaff" href="${urlStaff}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-user-plus"></i> Assign staff</a>
-                              <a id="linkViewReports" href="${urlReports}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-person-circle-exclamation"></i> View reports</a>
                               <br />
                               <br />
                               <a id="linkEditDetails" href="${urlEdit}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-pen-to-square"></i> Edit details</a>
                               <a id="linkScheduleRepair" href="${urlEdit}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-person-digging"></i> Schedule repair</a>
                            </div>`,
-            position: marker.getOptions().position,
-            closeButton: true
-        });
+                position: marker.getOptions().position,
+                closeButton: true
+            });
+        }
+        else
+        {
+            popup.setOptions({
+                content: `<div style="padding:10px;">
+                              <p><strong>Type:</strong> ${contentType}</p>
+                              <p><strong>Priority:</strong> ${contentPriority}</p>
+                              <p><strong>Status:</strong> ${contentStatus}</p>
+                              <p><strong>Location:</strong> ${contentRoad}</p>
+                              <p><strong>Reports:</strong> ${contentReports}</p>
+                              <a id="linkViewReports" href="${urlReports}" class="btn btn-outline-primary btn-sm"><i class="fa-solid fa-magnifying-glass-plus"></i> View reports</a>
+                           </div>`,
+                position: marker.getOptions().position,
+                closeButton: true
+            });
+        }
     }
 
     //Show the popup.

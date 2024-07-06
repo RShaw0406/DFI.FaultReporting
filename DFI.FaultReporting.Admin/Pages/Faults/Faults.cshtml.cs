@@ -124,6 +124,9 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //Declare ShowMyFaults property, this is needed for displaying the current staffs faults.
         [BindProperty]
         public bool ShowMyFaults { get; set; }
+
+        [BindProperty]
+        public string? ReadWrite { get; set; }
         #endregion Properties
 
         #region Page Load
@@ -138,6 +141,19 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 //The contexts current user has been authenticated.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffReadWrite") || HttpContext.User.IsInRole("StaffRead"))
                 {
+                    //User is in the StaffReadWrite role.
+                    if (HttpContext.User.IsInRole("StaffReadWrite"))
+                    {
+                        //Set ReadWrite to true, this is needed for showing buttons on map popups.
+                        ReadWrite = "true";
+                    }
+                    //User is in the StaffRead role.
+                    else
+                    {
+                        //Set ReadWrite to true, this is needed for hiding buttons on map popups.
+                        ReadWrite = "false";
+                    }
+
                     //Show the fault map by default.
                     ShowFaultMap = true;
 
@@ -288,6 +304,19 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             TempData["ShowFaultTable"] = ShowFaultTable;
             TempData.Keep();
 
+            //User is in the StaffReadWrite role.
+            if (HttpContext.User.IsInRole("StaffReadWrite"))
+            {
+                //Set ReadWrite to true, this is needed for showing buttons on map popups.
+                ReadWrite = "true";
+            }
+            //User is in the StaffRead role.
+            else
+            {
+                //Set ReadWrite to true, this is needed for hiding buttons on map popups.
+                ReadWrite = "false";
+            }
+
             //Get all required data from session.
             GetSessionData();
 
@@ -344,6 +373,19 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             TempData["ShowFaultMap"] = ShowFaultMap;
             TempData["ShowFaultTable"] = ShowFaultTable;
             TempData.Keep();
+
+            //User is in the StaffReadWrite role.
+            if (HttpContext.User.IsInRole("StaffReadWrite"))
+            {
+                //Set ReadWrite to true, this is needed for showing buttons on map popups.
+                ReadWrite = "true";
+            }
+            //User is in the StaffRead role.
+            else
+            {
+                //Set ReadWrite to true, this is needed for hiding buttons on map popups.
+                ReadWrite = "false";
+            }
 
             //Get all required data from session.
             GetSessionData();
@@ -428,42 +470,43 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 Faults = Faults.Where(f => f.StaffID != CurrentStaff.ID).ToList();
             }
 
-            //User has selected to view faults that have been repaired.
-            if (FaultStatusFilter == 4)
+            //-------------------- TYPE FILTER --------------------
+            //User has selected an type that is not "All".
+            if (FaultTypeFilter != 0)
             {
-                //Show all faults apart from the ones with the status of repaired.
-                Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
+                //Get the faults for the selected type.
+                Faults = Faults.Where(f => f.FaultTypeID == FaultTypeFilter).ToList();
             }
-            //User has not selected to view faults that have been repaired.
+
+            //-------------------- STATUS FILTER --------------------
+            //User has selected a status that is not "All".
+            if (FaultStatusFilter != 0)
+            {
+
+                //User has selected to view faults that have been repaired.
+                if (FaultStatusFilter == 4)
+                {
+                    ////Get all current faults by calling the GetFaults method from the _faultService, this is needed to ensure that faults of repaired status are shown.
+                    //Faults = await _faultService.GetFaults();
+
+                    //Show all faults apart from the ones with the status of repaired.
+                    Faults = Faults.Where(f => f.FaultStatusID == 4).ToList();
+                }
+                //User has selected a status that is not "All" and not "Repaired".
+                else
+                {
+                    //Get the faults for the selected status.
+                    Faults = Faults.Where(f => f.FaultStatusID == FaultStatusFilter).ToList();
+                }
+            }
+            //User has not selected to view faults of all statuses
             else
             {
                 //Show all faults apart from the ones with the status of repaired as default.
                 Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
             }
 
-            //Order the faults by priority.
-            Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
-
-            //User has selected an type that is not "All".
-            if (FaultTypeFilter != 0)
-            {
-                //Get the faults for the selected type.
-                Faults = Faults.Where(f => f.FaultTypeID == FaultTypeFilter).ToList();
-
-                //Order the faults by priority.
-                Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
-            }
-
-            //User has selected a status that is not "All".
-            if (FaultStatusFilter != 0)
-            {
-                //Get the faults for the selected status.
-                Faults = Faults.Where(f => f.FaultStatusID == FaultStatusFilter).ToList();
-
-                //Order the faults by priority.
-                Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
-            }
-
+            //-------------------- PRIORITY FILTER --------------------
             //User has selected a fault priority that is not "All".
             if (FaultPriorityFilter != 0)
             {
@@ -473,6 +516,9 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 //Order the faults by priority.
                 Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
             }
+
+            //Order the faults by priority.
+            Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
 
             //The fault table is displayed.
             if (ShowFaultTable)
@@ -498,6 +544,19 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             TempData["FaultStatusFilter"] = FaultStatusFilter;
             TempData["FaultPriorityFilter"] = FaultPriorityFilter;
             TempData.Keep();
+
+            //User is in the StaffReadWrite role.
+            if (HttpContext.User.IsInRole("StaffReadWrite"))
+            {
+                //Set ReadWrite to true, this is needed for showing buttons on map popups.
+                ReadWrite = "true";
+            }
+            //User is in the StaffRead role.
+            else
+            {
+                //Set ReadWrite to true, this is needed for hiding buttons on map popups.
+                ReadWrite = "false";
+            }
 
             //User has selected the "Map" link.
             if (ShowFaultMap)
@@ -541,6 +600,19 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 FaultPriorityFilter = int.Parse(TempData["FaultPriorityFilter"].ToString());
             }
 
+            //User is in the StaffReadWrite role.
+            if (HttpContext.User.IsInRole("StaffReadWrite"))
+            {
+                //Set ReadWrite to true, this is needed for showing buttons on map popups.
+                ReadWrite = "true";
+            }
+            //User is in the StaffRead role.
+            else
+            {
+                //Set ReadWrite to true, this is needed for hiding buttons on map popups.
+                ReadWrite = "false";
+            }
+
             //Keep the TempData.
             TempData.Keep();
 
@@ -573,8 +645,8 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             //Get the faults from session.
             Faults = HttpContext.Session.GetFromSession<List<Fault>>("Faults");
 
-            //Show all faults apart from the ones with the status of repaired as default.
-            Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
+            ////Show all faults apart from the ones with the status of repaired as default.
+            //Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
 
             //Order the faults by priority.
             Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
@@ -623,6 +695,44 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 Text = fs.FaultStatusDescription,
                 Value = fs.ID.ToString()
             });
+
+            //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
+            string? jwtToken = jwtTokenClaim.Value;
+
+            //Set the CurrentStaff property by calling the GetUser method in the _userService.
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+
+            //User has clicked "My Faults" button.
+            if (TempData["ShowMyFaults"] != null)
+            {
+                //Get the ShowMyFaults value from TempData.
+                ShowMyFaults = Boolean.Parse(TempData["ShowMyFaults"].ToString());
+            }
+
+            //User has clicked the "My Faults" button.
+            if (ShowMyFaults)
+            {
+                //Get all current faults by calling the GetFaults method from the _faultService, this is needed to ensure the selected filter is applied to map and table.
+                Faults = await _faultService.GetFaults();
+
+                //Get the faults assigned to the current staff.
+                Faults = Faults.Where(f => f.StaffID == CurrentStaff.ID).ToList();
+            }
+            //User has not clicked the "My Faults" button.
+            else
+            {
+                //Get all current faults by calling the GetFaults method from the _faultService, this is needed to ensure the selected filter is applied to map and table.
+                Faults = await _faultService.GetFaults();
+
+                //Show all faults apart from the ones assigned to the current staff member.
+                Faults = Faults.Where(f => f.StaffID != CurrentStaff.ID).ToList();
+            }
         }
         #endregion Session Data
 
@@ -652,6 +762,27 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 ShowFaultMap = true;
             }
 
+            //User has selected a fault type.
+            if (TempData["FaultTypeFilter"] != null)
+            {
+                //Get the FaultTypeFilter value from TempData.
+                FaultTypeFilter = int.Parse(TempData["FaultTypeFilter"].ToString());
+            }
+
+            //User has selected a fault status.
+            if (TempData["FaultStatusFilter"] != null)
+            {
+                //Get the FaultStatusFilter value from TempData.
+                FaultStatusFilter = int.Parse(TempData["FaultStatusFilter"].ToString());
+            }
+
+            //User has selected a fault priority.
+            if (TempData["FaultPriorityFilter"] != null)
+            {
+                //Get the FaultPriorityFilter value from TempData.
+                FaultPriorityFilter = int.Parse(TempData["FaultPriorityFilter"].ToString());
+            }
+
             //Get all required data from session.
             GetSessionData();
 
@@ -677,44 +808,103 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             //Get all current faults by calling the GetFaults method from the _faultService.
             Faults = await _faultService.GetFaults();
 
-            //Order the faults by priority.
-            Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
-
-            //Show all faults apart from the ones with the status of repaired as default.
-            Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
-
             //Get faults assigned to the current staff.
             Faults = Faults.Where(f => f.StaffID == CurrentStaff.ID).ToList();
 
-            //Set the current page to 1.
-            Pager.CurrentPage = 1;
+            //-------------------- TYPE FILTER --------------------
+            //User has selected an type that is not "All".
+            if (FaultTypeFilter != 0)
+            {
+                //Get the faults for the selected type.
+                Faults = Faults.Where(f => f.FaultTypeID == FaultTypeFilter).ToList();
+            }
 
-            //Set the page size to the value from the settings.
-            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
+            //-------------------- STATUS FILTER --------------------
+            //User has selected a status that is not "All".
+            if (FaultStatusFilter != 0)
+            {
 
-            //Set the pager count to the number of faults.
-            Pager.Count = Faults.Count;
+                //User has selected to view faults that have been repaired.
+                if (FaultStatusFilter == 4)
+                {
+                    ////Get all current faults by calling the GetFaults method from the _faultService, this is needed to ensure that faults of repaired status are shown.
+                    //Faults = await _faultService.GetFaults();
 
-            //Get the first page of faults by calling the GetPaginatedFaults method from the _pagerService.
-            PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
+                    //Show all faults apart from the ones with the status of repaired.
+                    Faults = Faults.Where(f => f.FaultStatusID == 4).ToList();
+                }
+                //User has selected a status that is not "All" and not "Repaired".
+                else
+                {
+                    //Get the faults for the selected status.
+                    Faults = Faults.Where(f => f.FaultStatusID == FaultStatusFilter).ToList();
+                }
+            }
+            //User has not selected to view faults of all statuses
+            else
+            {
+                //Show all faults apart from the ones with the status of repaired as default.
+                Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
+            }
+
+            //-------------------- PRIORITY FILTER --------------------
+            //User has selected a fault priority that is not "All".
+            if (FaultPriorityFilter != 0)
+            {
+                //Get the faults for the selected priority.
+                Faults = Faults.Where(f => f.FaultPriorityID == FaultPriorityFilter).ToList();
+
+                //Order the faults by priority.
+                Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
+            }
 
             //Order the faults by priority.
-            PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+            Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
+
+            //The fault table is displayed.
+            if (ShowFaultTable)
+            {
+                //Set the current page to 1.
+                Pager.CurrentPage = 1;
+
+                //Set the pager count to the number of faults.
+                Pager.Count = Faults.Count;
+
+                //Get the first page of faults by calling the GetPaginatedFaults method from the _pagerService.
+                PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
+
+                //Order the faults by priority.
+                PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+            }
 
             //Set session data needed for the page.
             HttpContext.Session.SetInSession("Faults", Faults);
 
-            //Reset the FaultTypeFilter.
-            FaultTypeFilter = 0;
+            //User is in the StaffReadWrite role.
+            if (HttpContext.User.IsInRole("StaffReadWrite"))
+            {
+                //Set ReadWrite to true, this is needed for showing buttons on map popups.
+                ReadWrite = "true";
+            }
+            //User is in the StaffRead role.
+            else
+            {
+                //Set ReadWrite to true, this is needed for hiding buttons on map popups.
+                ReadWrite = "false";
+            }
 
-            //Reset the FaultStatusFilter.
-            FaultStatusFilter = 0;
-
-            //Reset the FaultPriorityFilter.
-            FaultPriorityFilter = 0;
-
-            //Return the page.
-            return Page();
+            //User has selected the "Map" link.
+            if (ShowFaultMap)
+            {
+                //Return the page and show the map, this is needed to ensure the correct section is displayed and the paging is reset.
+                return Redirect("/Faults/Faults?handler=ShowMapView");
+            }
+            //User has selected the "Table" link.
+            else
+            {
+                //Return the page and show the table, this is needed to ensure the correct section is displayed and the paging is reset.
+                return Redirect("/Faults/Faults?handler=ShowTableView");
+            }
         }
 
         //Method Summary:
@@ -742,6 +932,27 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 ShowFaultMap = true;
             }
 
+            //User has selected a fault type.
+            if (TempData["FaultTypeFilter"] != null)
+            {
+                //Get the FaultTypeFilter value from TempData.
+                FaultTypeFilter = int.Parse(TempData["FaultTypeFilter"].ToString());
+            }
+
+            //User has selected a fault status.
+            if (TempData["FaultStatusFilter"] != null)
+            {
+                //Get the FaultStatusFilter value from TempData.
+                FaultStatusFilter = int.Parse(TempData["FaultStatusFilter"].ToString());
+            }
+
+            //User has selected a fault priority.
+            if (TempData["FaultPriorityFilter"] != null)
+            {
+                //Get the FaultPriorityFilter value from TempData.
+                FaultPriorityFilter = int.Parse(TempData["FaultPriorityFilter"].ToString());
+            }
+
             //Get all required data from session.
             GetSessionData();
 
@@ -767,44 +978,103 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             //Get all current faults by calling the GetFaults method from the _faultService.
             Faults = await _faultService.GetFaults();
 
+            //Get faults assigned to the current staff.
+            Faults = Faults.Where(f => f.StaffID != CurrentStaff.ID).ToList();
+
+            //-------------------- TYPE FILTER --------------------
+            //User has selected an type that is not "All".
+            if (FaultTypeFilter != 0)
+            {
+                //Get the faults for the selected type.
+                Faults = Faults.Where(f => f.FaultTypeID == FaultTypeFilter).ToList();
+            }
+
+            //-------------------- STATUS FILTER --------------------
+            //User has selected a status that is not "All".
+            if (FaultStatusFilter != 0)
+            {
+
+                //User has selected to view faults that have been repaired.
+                if (FaultStatusFilter == 4)
+                {
+                    ////Get all current faults by calling the GetFaults method from the _faultService, this is needed to ensure that faults of repaired status are shown.
+                    //Faults = await _faultService.GetFaults();
+
+                    //Show all faults apart from the ones with the status of repaired.
+                    Faults = Faults.Where(f => f.FaultStatusID == 4).ToList();
+                }
+                //User has selected a status that is not "All" and not "Repaired".
+                else
+                {
+                    //Get the faults for the selected status.
+                    Faults = Faults.Where(f => f.FaultStatusID == FaultStatusFilter).ToList();
+                }
+            }
+            //User has not selected to view faults of all statuses
+            else
+            {
+                //Show all faults apart from the ones with the status of repaired as default.
+                Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
+            }
+
+            //-------------------- PRIORITY FILTER --------------------
+            //User has selected a fault priority that is not "All".
+            if (FaultPriorityFilter != 0)
+            {
+                //Get the faults for the selected priority.
+                Faults = Faults.Where(f => f.FaultPriorityID == FaultPriorityFilter).ToList();
+
+                //Order the faults by priority.
+                Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
+            }
+
             //Order the faults by priority.
             Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
 
-            //Show all faults apart from the ones with the status of repaired as default.
-            Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
+            //The fault table is displayed.
+            if (ShowFaultTable)
+            {
+                //Set the current page to 1.
+                Pager.CurrentPage = 1;
 
-            //Show all faults apart from the ones assigned to the current staff member.
-            Faults = Faults.Where(f => f.StaffID != CurrentStaff.ID).ToList();
+                //Set the pager count to the number of faults.
+                Pager.Count = Faults.Count;
 
-            //Set the current page to 1.
-            Pager.CurrentPage = 1;
+                //Get the first page of faults by calling the GetPaginatedFaults method from the _pagerService.
+                PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
 
-            //Set the page size to the value from the settings.
-            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
-
-            //Set the pager count to the number of faults.
-            Pager.Count = Faults.Count;
-
-            //Get the first page of faults by calling the GetPaginatedFaults method from the _pagerService.
-            PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
-
-            //Order the faults by priority.
-            PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+                //Order the faults by priority.
+                PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+            }
 
             //Set session data needed for the page.
             HttpContext.Session.SetInSession("Faults", Faults);
 
-            //Reset the FaultTypeFilter.
-            FaultTypeFilter = 0;
+            //User is in the StaffReadWrite role.
+            if (HttpContext.User.IsInRole("StaffReadWrite"))
+            {
+                //Set ReadWrite to true, this is needed for showing buttons on map popups.
+                ReadWrite = "true";
+            }
+            //User is in the StaffRead role.
+            else
+            {
+                //Set ReadWrite to true, this is needed for hiding buttons on map popups.
+                ReadWrite = "false";
+            }
 
-            //Reset the FaultStatusFilter.
-            FaultStatusFilter = 0;
-
-            //Reset the FaultPriorityFilter.
-            FaultPriorityFilter = 0;
-
-            //Return the page.
-            return Page();
+            //User has selected the "Map" link.
+            if (ShowFaultMap)
+            {
+                //Return the page and show the map, this is needed to ensure the correct section is displayed and the paging is reset.
+                return Redirect("/Faults/Faults?handler=ShowMapView");
+            }
+            //User has selected the "Table" link.
+            else
+            {
+                //Return the page and show the table, this is needed to ensure the correct section is displayed and the paging is reset.
+                return Redirect("/Faults/Faults?handler=ShowTableView");
+            }
         }
         #endregion Show My Faults
 
