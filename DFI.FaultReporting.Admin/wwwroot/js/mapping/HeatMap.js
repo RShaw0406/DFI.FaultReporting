@@ -23,7 +23,7 @@ function initHeatMap() {
             subscriptionKey: azureMapsSubscriptionKey
         },
 
-        style: 'road'
+        view: 'Auto'
     });
 
     //Add full screen control to the map.
@@ -142,7 +142,8 @@ function initHeatMap() {
         //Create a heatmap and add it to the map.
         map.layers.add(new atlas.layer.HeatMapLayer(datasource, null, {
             radius: 10,
-            opacity: 0.8
+            opacity: 0.8,
+            weight: 1
         }), 'labels');
     });
 }

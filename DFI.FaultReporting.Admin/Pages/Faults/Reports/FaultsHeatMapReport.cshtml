@@ -10,8 +10,103 @@
     <div class="container">
         <h1>@ViewData["Title"]</h1>
         <br />
-        <h2>Select from one of the options below to render the heat map</h2>
+        <h2>Select from the options below to filter the results shown on the heat map</h2>
         <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <form name="filterForm" id="typeFilterForm" asp-page-handler="Filter" method="post">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="FaultTypeFilter" class="form-select" asp-items="Model.FaultTypesList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                </select>
+                                <label asp-for="FaultTypeFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="FaultStatusFilter" class="form-select" asp-items="Model.FaultStatusList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                </select>
+                                <label asp-for="FaultStatusFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="FaultPriorityFilter" class="form-select" asp-items="Model.FaultPriorityList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                </select>
+                                <label asp-for="FaultPriorityFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span class="form-label">From</span>
+                            <div class="form-floating mb-3 input-group">
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="DayFrom" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="DayFrom" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="MonthFrom" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="MonthFrom" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-5">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="YearFrom" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="YearFrom" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="form-label">To</span>
+                            <div class="form-floating mb-3 input-group">
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="DayTo" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="DayTo" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="MonthTo" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="MonthTo" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-5">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="YearTo" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="YearTo" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @if (!Model.ValidFromDate || !Model.ValidToDate)
+                        {
+                            <span class="text-danger">@Model.InvalidDateMessage</span>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>       
+        <br />
         <div class="row">
             <div class="col-md-12">
                 <div class="d-flex justify-content-center">
