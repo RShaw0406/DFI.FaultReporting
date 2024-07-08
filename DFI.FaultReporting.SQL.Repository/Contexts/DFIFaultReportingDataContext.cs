@@ -57,5 +57,7 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         public DbSet<Repair> Repair { get; set; } = null!;
 
         public DbSet<RepairPhoto> RepairPhoto { get; set; } = null!;
+
+        public DbSet<RepairStatus> RepairStatus { get; set; } = null!;
     }
 }

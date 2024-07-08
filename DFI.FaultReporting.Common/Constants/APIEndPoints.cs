@@ -27,5 +27,6 @@ namespace DFI.FaultReporting.Common.Constants
         public const string Contractor = "/api/contractors";
         public const string Repair = "/api/repairs";
         public const string RepairPhoto = "/api/repairphotos";
+        public const string RepairStatus = "/api/repairstatus";
     }
 }
