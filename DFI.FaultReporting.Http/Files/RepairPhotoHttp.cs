@@ -1,6 +1,4 @@
 ﻿using DFI.FaultReporting.Common.Constants;
-using DFI.FaultReporting.Common.Exceptions;
-using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Files;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using Newtonsoft.Json;
@@ -12,21 +10,21 @@ using System.Threading.Tasks;
 
 namespace DFI.FaultReporting.Http.Files
 {
-    public class ReportPhotoHttp
+    public class RepairPhotoHttp
     {
         public IHttpClientFactory _client { get; }
 
         public ISettingsService _settings { get; }
 
-        public ReportPhotoHttp(IHttpClientFactory client, ISettingsService settings)
+        public RepairPhotoHttp(IHttpClientFactory client, ISettingsService settings)
         {
             _client = client;
             _settings = settings;
         }
 
-        public List<ReportPhoto>? ReportPhotos { get; set; }
+        public List<RepairPhoto>? RepairPhotos { get; set; }
 
-        public async Task<List<ReportPhoto>> GetReportPhotos(string token)
+        public async Task<List<RepairPhoto>> GetRepairPhotos(string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
@@ -37,7 +35,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto)
+                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto)
             };
 
             var result = await client.SendAsync(request);
@@ -46,9 +44,9 @@ namespace DFI.FaultReporting.Http.Files
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                ReportPhotos = JsonConvert.DeserializeObject<List<ReportPhoto>>(response);
+                RepairPhotos = JsonConvert.DeserializeObject<List<RepairPhoto>>(response);
 
-                return ReportPhotos;
+                return RepairPhotos;
             }
             else
             {
@@ -56,7 +54,7 @@ namespace DFI.FaultReporting.Http.Files
             }
         }
 
-        public async Task<ReportPhoto> GetReportPhoto(int ID, string token)
+        public async Task<RepairPhoto> GetRepairPhoto(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
@@ -67,7 +65,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto + "/" + ID.ToString())
+                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto + ID)
             };
 
             var result = await client.SendAsync(request);
@@ -76,9 +74,9 @@ namespace DFI.FaultReporting.Http.Files
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                ReportPhoto reportPhoto = JsonConvert.DeserializeObject<ReportPhoto>(response);
+                RepairPhoto repairPhoto = JsonConvert.DeserializeObject<RepairPhoto>(response);
 
-                return reportPhoto;
+                return repairPhoto;
             }
             else
             {
@@ -86,23 +84,19 @@ namespace DFI.FaultReporting.Http.Files
             }
         }
 
-        public async Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto, string token)
+        public async Task<RepairPhoto> CreateRepairPhoto(RepairPhoto repairPhoto, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var reportPhotoJSON = JsonConvert.SerializeObject(reportPhoto);
-
-            var content = new StringContent(reportPhotoJSON, Encoding.UTF8, "application/json");
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto),
-                Content = content
+                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto),
+                Content = new StringContent(JsonConvert.SerializeObject(repairPhoto), Encoding.UTF8, "application/json")
             };
 
             var result = await client.SendAsync(request);
@@ -111,9 +105,9 @@ namespace DFI.FaultReporting.Http.Files
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                reportPhoto = JsonConvert.DeserializeObject<ReportPhoto>(response);
+                repairPhoto = JsonConvert.DeserializeObject<RepairPhoto>(response);
 
-                return reportPhoto;
+                return repairPhoto;
             }
             else
             {
@@ -121,23 +115,19 @@ namespace DFI.FaultReporting.Http.Files
             }
         }
 
-        public async Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto, string token)
+        public async Task<RepairPhoto> UpdateRepairPhoto(RepairPhoto repairPhoto, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var reportPhotoJSON = JsonConvert.SerializeObject(reportPhoto);
-
-            var content = new StringContent(reportPhotoJSON, Encoding.UTF8, "application/json");
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto),
-                Content = content
+                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto),
+                Content = new StringContent(JsonConvert.SerializeObject(repairPhoto), Encoding.UTF8, "application/json")
             };
 
             var result = await client.SendAsync(request);
@@ -146,44 +136,13 @@ namespace DFI.FaultReporting.Http.Files
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                reportPhoto = JsonConvert.DeserializeObject<ReportPhoto>(response);
+                repairPhoto = JsonConvert.DeserializeObject<RepairPhoto>(response);
 
-                return reportPhoto;
+                return repairPhoto;
             }
             else
             {
                 return null;
-            }
-        }
-
-        public async Task<int> DeleteReportPhoto(int ID, string token)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Report Photo data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ReportPhotoHttp",
-                    ExceptionFunction = "DeleteReportPhoto",
-                };
             }
         }
     }

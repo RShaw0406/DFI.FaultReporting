@@ -5,17 +5,16 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DFI.FaultReporting.Models.FaultReports;
 
 namespace DFI.FaultReporting.Models.Files
 {
-    public class ReportPhoto
+    public class RepairPhoto
     {
         public int ID { get; set; }
 
-        [DisplayName("Report")]
-        [Required(ErrorMessage = "You must enter a report")]
-        public int ReportID { get; set; }
+        [DisplayName("Repair")]
+        [Required(ErrorMessage = "You must enter a repair")]
+        public int RepairID { get; set; }
 
         [Required(ErrorMessage = "You must enter a description")]
         [StringLength(200, ErrorMessage = "Description must not be more than 200 characters")]
