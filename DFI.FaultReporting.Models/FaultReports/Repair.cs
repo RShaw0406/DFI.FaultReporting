@@ -18,12 +18,12 @@ namespace DFI.FaultReporting.Models.FaultReports
         [Required(ErrorMessage = "You must enter a fault")]
         public int FaultID { get; set; }
 
-        [DisplayName("Repair Target Date")]
+        [DisplayName("Repair target date")]
         [Required(ErrorMessage = "You must enter a repair target date")]
         [DataType(DataType.Date)]
         public DateTime RepairTargetDate { get; set; }
 
-        [DisplayName("Date Repaired")]
+        [DisplayName("Date repaired")]
         [Required(ErrorMessage = "You must enter a date of repair")]
         [DataType(DataType.Date)]
         public DateTime ActualRepairDate { get; set; }
@@ -32,15 +32,15 @@ namespace DFI.FaultReporting.Models.FaultReports
         [StringLength(1000, ErrorMessage = "Notes must not be more than 1000 characters")]
         public string? RepairNotes { get; set; }
 
-        [DisplayName("Assigned Contractor")]
+        [DisplayName("Assigned contractor")]
         [Required(ErrorMessage = "You must provide a contractor")]
         public int ContractorID { get; set; }
 
-        [DisplayName("Input By")]
+        [DisplayName("Input by")]
         [Required(ErrorMessage = "You must provide an input by")]
         public string? InputBy { get; set; }
 
-        [DisplayName("Input On")]
+        [DisplayName("Input on")]
         [Required(ErrorMessage = "You must provide an input on")]
         [DataType(DataType.Date)]
         public DateTime InputOn { get; set; }

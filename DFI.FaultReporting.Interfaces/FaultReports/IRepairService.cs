@@ -9,14 +9,12 @@ namespace DFI.FaultReporting.Interfaces.FaultReports
 {
     public interface IRepairService
     {
-        Task<List<Repair>> GetRepairs();
+        Task<List<Repair>> GetRepairs(string token);
 
-        Task<Repair> GetRepair(int ID);
+        Task<Repair> GetRepair(int ID, string token);
 
-        Task<Repair> CreateRepair(Repair repair);
+        Task<Repair> CreateRepair(Repair repair, string token);
 
-        Task<Repair> UpdateRepair(Repair repair);
-
-        Task<Repair> DeleteRepair(int ID);
+        Task<Repair> UpdateRepair(Repair repair, string token);
     }
 }

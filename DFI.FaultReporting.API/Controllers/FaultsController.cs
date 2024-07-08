@@ -81,7 +81,7 @@ namespace DFI.FaultReporting.API.Controllers
             {
                 Faults = await _faultSQLRepository.GetFaults();
 
-                if (!Faults.Any(cs => cs.ID == fault.ID))
+                if (!Faults.Any(f => f.ID == fault.ID))
                 {
                     return NotFound();
                 }

@@ -1,6 +1,4 @@
 ﻿using DFI.FaultReporting.Common.Constants;
-using DFI.FaultReporting.Common.Exceptions;
-using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using Newtonsoft.Json;
@@ -12,49 +10,21 @@ using System.Threading.Tasks;
 
 namespace DFI.FaultReporting.Http.FaultReports
 {
-    public class FaultHttp
+    public class RepairHttp
     {
         public IHttpClientFactory _client { get; }
 
         public ISettingsService _settings { get; }
 
-        public FaultHttp(IHttpClientFactory client, ISettingsService settings)
+        public RepairHttp(IHttpClientFactory client, ISettingsService settings)
         {
             _client = client;
             _settings = settings;
         }
 
-        public List<Fault>? Faults { get; set; }
+        public List<Repair>? Repairs { get; set; }
 
-        public async Task<List<Fault>> GetFaults()
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault)
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                var response = await result.Content.ReadAsStringAsync();
-
-                Faults = JsonConvert.DeserializeObject<List<Fault>>(response);
-
-                return Faults;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public async Task<Fault> GetFault(int ID, string token)
+        public async Task<List<Repair>> GetRepairs(string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
@@ -65,7 +35,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault + "/" + ID.ToString())
+                RequestUri = new Uri(baseURL + APIEndPoints.Repair)
             };
 
             var result = await client.SendAsync(request);
@@ -74,9 +44,9 @@ namespace DFI.FaultReporting.Http.FaultReports
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                Fault fault = JsonConvert.DeserializeObject<Fault>(response);
+                Repairs = JsonConvert.DeserializeObject<List<Repair>>(response);
 
-                return fault;
+                return Repairs;
             }
             else
             {
@@ -84,7 +54,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
         }
 
-        public async Task<Fault> CreateFault(Fault fault, string token)
+        public async Task<Repair> GetRepair(int ID, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
@@ -92,15 +62,41 @@ namespace DFI.FaultReporting.Http.FaultReports
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-            var faultJSON = JsonConvert.SerializeObject(fault);
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(baseURL + APIEndPoints.Repair + ID)
+            };
 
-            var content = new StringContent(faultJSON, Encoding.UTF8, "application/json");
+            var result = await client.SendAsync(request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+
+                var repair = JsonConvert.DeserializeObject<Repair>(response);
+
+                return repair;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public async Task<Repair> CreateRepair(Repair repair, string token)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault),
-                Content = content
+                RequestUri = new Uri(baseURL + APIEndPoints.Repair),
+                Content = new StringContent(JsonConvert.SerializeObject(repair), Encoding.UTF8, "application/json")
             };
 
             var result = await client.SendAsync(request);
@@ -109,9 +105,9 @@ namespace DFI.FaultReporting.Http.FaultReports
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                fault = JsonConvert.DeserializeObject<Fault>(response);
+                repair = JsonConvert.DeserializeObject<Repair>(response);
 
-                return fault;
+                return repair;
             }
             else
             {
@@ -119,23 +115,19 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
         }
 
-        public async Task<Fault> UpdateFault(Fault fault, string token)
+        public async Task<Repair> UpdateRepair(Repair repair, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);
 
             var client = _client.CreateClient();
 
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var faultJSON = JsonConvert.SerializeObject(fault);
-
-            var content = new StringContent(faultJSON, Encoding.UTF8, "application/json");
 
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault),
-                Content = content
+                RequestUri = new Uri(baseURL + APIEndPoints.Repair),
+                Content = new StringContent(JsonConvert.SerializeObject(repair), Encoding.UTF8, "application/json")
             };
 
             var result = await client.SendAsync(request);
@@ -144,39 +136,13 @@ namespace DFI.FaultReporting.Http.FaultReports
             {
                 var response = await result.Content.ReadAsStringAsync();
 
-                fault = JsonConvert.DeserializeObject<Fault>(response);
+                repair = JsonConvert.DeserializeObject<Repair>(response);
 
-                return fault;
+                return repair;
             }
             else
             {
                 return null;
-            }
-        }
-
-        public async Task<int> DeleteFault(int ID, string token)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                return 0;
             }
         }
     }
