@@ -57,6 +57,9 @@ builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IContractorService, ContractorService>();
+builder.Services.AddScoped<IRepairService, RepairService>();
+builder.Services.AddScoped<IRepairPhotoService, RepairPhotoService>();
+builder.Services.AddScoped<IRepairStatusService, RepairStatusService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -70,6 +73,9 @@ builder.Services.AddScoped<RoleHttp, RoleHttp>();
 builder.Services.AddScoped<UserHttp, UserHttp>();
 builder.Services.AddScoped<UserRoleHttp, UserRoleHttp>();
 builder.Services.AddScoped<ContractorHttp, ContractorHttp>();
+builder.Services.AddScoped<RepairHttp, RepairHttp>();
+builder.Services.AddScoped<RepairPhotoHttp, RepairPhotoHttp>();
+builder.Services.AddScoped<RepairStatusHttp, RepairStatusHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();

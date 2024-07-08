@@ -42,5 +42,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Pagination
 
         //Declare GetPaginatedContractors method, this is needed for paginating the contractors.
         Task<List<Contractor>> GetPaginatedContractors(List<Contractor> contractors, int currentPage, int pageSize);
+
+        //Declare GetPaginatedRepairStatuses method, this is needed for paginating the repair statuses.
+        Task<List<RepairStatus>> GetPaginatedRepairStatuses(List<RepairStatus> repairStatuses, int currentPage, int pageSize);
     }
 }

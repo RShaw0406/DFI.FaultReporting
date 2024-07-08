@@ -1,0 +1,58 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Admin.RepairStatusAdmin.CreateModel
+
+@{
+    ViewData["Title"] = "Add new repair status";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Add details of new repair status</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="RepairStatus.RepairStatusDescription" class="form-control" />
+                    <label asp-for="RepairStatus.RepairStatusDescription" class="control-label"></label>
+                    <span asp-validation-for="RepairStatus.RepairStatusDescription" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="RepairStatus.InputBy" class="form-control" />
+                    <label asp-for="RepairStatus.InputBy" class="control-label"></label>
+                    <span asp-validation-for="RepairStatus.InputBy" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <input asp-for="RepairStatus.InputOn" class="form-control" />
+                    <label asp-for="RepairStatus.InputOn" class="control-label"></label>
+                    <span asp-validation-for="RepairStatus.InputOn" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3" hidden>
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="RepairStatus.Active" /> @Html.DisplayNameFor(model => model.RepairStatus.Active)
+                    </label>
+                </div>
+                <div class="btn-group">
+                    <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                    &nbsp;
+                    <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+@* @section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} *@

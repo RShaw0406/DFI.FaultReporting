@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Repair + ID)
+                RequestUri = new Uri(baseURL + APIEndPoints.Repair + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);

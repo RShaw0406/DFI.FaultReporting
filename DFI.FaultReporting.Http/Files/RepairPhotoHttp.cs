@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto + ID)
+                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
