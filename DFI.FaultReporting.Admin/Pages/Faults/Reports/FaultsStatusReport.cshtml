@@ -2,15 +2,15 @@
 @using DFI.FaultReporting.Common.SessionStorage
 @using DFI.FaultReporting.Models.FaultReports
 @using DFI.FaultReporting.Models.Admin
-@model DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultsHeatMapReportModel
+@model DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultsStatusReportModel
 @{
-    ViewData["Title"] = "Faults heat map report";
+    ViewData["Title"] = "Faults charts report";
 }
-<body onload="initHeatMap()">
+<body onload="initCharts()">
     <div class="container">
         <h1>@ViewData["Title"]</h1>
         <br />
-        <h2>Select from the options below to filter the results shown on the heat map</h2>
+        <h2>Select from the options below to filter the results shown in the charts</h2>
         <hr />
         <div class="row">
             <div class="col-md-12">
@@ -24,16 +24,6 @@
                                     </option>
                                 </select>
                                 <label asp-for="FaultTypeFilter" class="form-label"></label>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="form-floating mb-3">
-                                <select asp-for="FaultStatusFilter" class="form-select" asp-items="Model.FaultStatusList" onchange="this.form.submit()">
-                                    <option value="0">
-                                        All
-                                    </option>
-                                </select>
-                                <label asp-for="FaultStatusFilter" class="form-label"></label>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -105,22 +95,17 @@
                     </div>
                 </form>
             </div>
-        </div>       
+        </div>
         <br />
         <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex justify-content-center">
-                    <div id="heatMap" style="height: 1000px; width: 100%;">
-                        <div class="autocomplete">
-                            <label for="searchBox" class="form-label" hidden></label>
-                            <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
-                        </div>
-                    </div>
-                </div>
+            <div class="col-md-6">
+                <canvas id="barChart" class="chart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="lineChart" class="chart"></canvas>
             </div>
         </div>
     </div>
-    <br />
 </body>
 
 <script type="text/javascript">
@@ -137,5 +122,5 @@
     var reports = @Json.Serialize(HttpContext.Session.GetFromSession<List<Report>>("Reports"));
 
 </script>
-<script src="~/js/mapping/HeatMap.js"></script>
-<script src="~/js/mapping/AutoCompleteSearch.js"></script>
+<script src="~/lib/Chart.js/dist/chart.umd.js"></script>
+<script src="~/js/charts/FaultStatusReportCharts.js"></script>

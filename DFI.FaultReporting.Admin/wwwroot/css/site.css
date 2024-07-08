@@ -362,7 +362,6 @@ body {
     padding: 1rem;
 }
 
-/*.form-control:focus, .form-select:focus {
-    border-color: #FEBA35;
-    box-shadow: inset 0 1px 1px rgba(254, 186, 53, 1), 0 0 8px rgba(254, 186, 53, 1);
-}*/
+.chart {
+    height: 500px;
+}
