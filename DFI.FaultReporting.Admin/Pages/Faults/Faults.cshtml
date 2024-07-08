@@ -197,13 +197,21 @@
                                         @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite"))
                                         {
                                             <td class="text-center">
-                                                <a asp-page="./AssignStaff" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-user-plus"></i></a>
+                                                @if (fault.StaffID == 0 || fault.StaffID == null)
+                                                {
+                                                    <a asp-page="./AssignStaff" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-user-plus"></i></a>
+                                                }
+
                                             </td>
                                             <td class="text-center">
                                                 <a asp-page="./EditFault" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
                                             </td>
+                                            Repair? repair = Model.Repairs.Where(r => r.FaultID == fault.ID).FirstOrDefault();
                                             <td class="text-center">
-                                                <a asp-page="./ScheduleRepair" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-person-digging"></i></a>
+                                                @if (repair == null)
+                                                {
+                                                    <a asp-page="./ScheduleRepair" asp-route-id="@fault.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-person-digging"></i></a>
+                                                }
                                             </td>
                                         }
                                     </tr>
@@ -258,7 +266,7 @@
         <div class="row">
             <div class="col-md-12 text-center">
                 <div class="small-tile">
-                    <a class="nav-link" aria-label="Fault reports link" title="Fault reports" asp-page="/Faults/Reports/FaultReportsMenu"><i class="fa-solid fa-magnifying-glass-chart"></i> Reports</a>
+                    <a class="nav-link" aria-label="Fault reporting link" title="Fault reporting" asp-page="/Faults/Reports/FaultReportsMenu"><i class="fa-solid fa-magnifying-glass-chart"></i> Reporting</a>
                 </div>
             </div>
         </div>

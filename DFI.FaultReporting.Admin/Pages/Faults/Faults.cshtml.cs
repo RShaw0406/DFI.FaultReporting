@@ -31,11 +31,12 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
+        private readonly IRepairService _repairService;
 
         //Inject dependencies in constructor.
         public FaultsModel(ILogger<FaultsModel> logger, IStaffService staffService, IFaultService faultService, IFaultTypeService faultTypeService,
             IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService, IReportService reportService,
-            IHttpContextAccessor httpContextAccessor, IPagerService pagerService, ISettingsService settingsService)
+            IHttpContextAccessor httpContextAccessor, IPagerService pagerService, ISettingsService settingsService, IRepairService repairService)
         {
             _logger = logger;
             _staffService = staffService;
@@ -47,6 +48,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
             _settingsService = settingsService;
+            _repairService = repairService;
         }
         #endregion Dependency Injection
 
@@ -69,6 +71,14 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //Declare Reports property, this is needed for displaying the number of reports for each fault.
         [BindProperty]
         public List<Report> Reports { get; set; }
+
+        //Declare Repairs property, this is needed for getting repairs for each fault.
+        [BindProperty]
+        public List<Repair> Repairs { get; set; }
+
+        //Declare Repair property, this is needed for getting the repair for each fault.
+        [BindProperty]
+        public Repair Repair { get; set; }
 
         //Declare FaultPriorities property, this is needed for displaying on map.
         [BindProperty]
@@ -232,6 +242,10 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                     //Set the CurrentStaff property by calling the GetAllStaff method in the _staffService.
                     Staff = await _staffService.GetAllStaff(jwtToken);
 
+                    //Get all repairs by calling the GetRepairs method from the _repairService.
+                    Repairs = await _repairService.GetRepairs(jwtToken);
+
+
                     //Set session data needed for the page.
                     HttpContext.Session.SetInSession("Faults", Faults);
                     HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
@@ -239,6 +253,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                     HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
                     HttpContext.Session.SetInSession("Reports", Reports);
                     HttpContext.Session.SetInSession("Staff", Staff);
+                    HttpContext.Session.SetInSession("Repairs", Repairs);
 
                     //Return the page.
                     return Page();
@@ -674,6 +689,9 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
 
             //Get the staff from session.
             Staff = HttpContext.Session.GetFromSession<List<Staff>>("Staff");
+
+            //Get the repairs from session.
+            Repairs = HttpContext.Session.GetFromSession<List<Repair>>("Repairs");
 
             //Populate fault types dropdown.
             FaultTypesList = FaultTypes.Select(ft => new SelectListItem()

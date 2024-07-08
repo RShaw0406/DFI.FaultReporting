@@ -24,13 +24,16 @@ namespace DFI.FaultReporting.Models.FaultReports
         public DateTime RepairTargetDate { get; set; }
 
         [DisplayName("Date repaired")]
-        [Required(ErrorMessage = "You must enter a date of repair")]
         [DataType(DataType.Date)]
-        public DateTime ActualRepairDate { get; set; }
+        public DateTime? ActualRepairDate { get; set; }
 
         [DisplayName("Notes")]
         [StringLength(1000, ErrorMessage = "Notes must not be more than 1000 characters")]
         public string? RepairNotes { get; set; }
+
+        [DisplayName("Status")]
+        [Required(ErrorMessage = "You must provide a status")]
+        public int RepairStatusID { get; set; }
 
         [DisplayName("Assigned contractor")]
         [Required(ErrorMessage = "You must provide a contractor")]
