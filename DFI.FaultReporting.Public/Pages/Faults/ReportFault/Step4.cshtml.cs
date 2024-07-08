@@ -217,6 +217,21 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
         //When executed this method attempts to send an email to the user and returns the response from the _emailService.
         public async Task<Response> SendSubmittedReportEmail(string emailAddress)
         {
+            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
+            string? jwtToken = jwtTokenClaim.Value;
+
+            //Get the fault from "Fault" object stored in session.
+            Fault? sessionFault = HttpContext.Session.GetFromSession<Fault>("Fault");
+
+            //Get the report from "Report" object stored in session.
+            Report? sessionReport = HttpContext.Session.GetFromSession<Report>("Report");
+
+            //Get the FaultType from the sessionFault.
+            FaultType = await _faultTypeService.GetFaultType(sessionFault.FaultTypeID, jwtToken);
+
             //Set the subject of the email explaining that the user has deleted their account.
             string subject = "DFI Fault Reporting: Fault Report Submitted";
 
@@ -232,8 +247,8 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
                 "<br/>" +
                 "<p><strong>Report details:</strong></p>" +
                 "<p>"+ FaultType.FaultTypeDescription +"</p>" +
-                "<p>"+ Fault.RoadNumber + ", " + Fault.RoadName + ", " + Fault.RoadTown + ", " + Fault.RoadCounty +"</p>" +
-                "<p>"+ Report.AdditionalInfo + "</p>";
+                "<p>"+ sessionFault.RoadNumber + ", " + sessionFault.RoadName + ", " + sessionFault.RoadTown + ", " + sessionFault.RoadCounty +"</p>" +
+                "<p>"+ sessionReport.AdditionalInfo + "</p>";
 
             //Set the attachment to null as it will not be used here.
             SendGrid.Helpers.Mail.Attachment? attachment = null;

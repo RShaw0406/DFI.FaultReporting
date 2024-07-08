@@ -4,19 +4,20 @@
 @using DFI.FaultReporting.Models.Admin
 @model DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultsStatusReportModel
 @{
-    ViewData["Title"] = "Faults charts report";
+    ViewData["Title"] = "Faults status report";
 }
 <body onload="initCharts()">
     <div class="container">
         <h1>@ViewData["Title"]</h1>
         <br />
-        <h2>Select from the options below to filter the results shown in the charts</h2>
+        <h2>Select from the options below to filter the results shown in the charts and table</h2>
         <hr />
         <div class="row">
             <div class="col-md-12">
                 <form name="filterForm" id="filterForm" asp-page-handler="Filter" method="post">
                     <div class="row">
                         <div class="col-md-4">
+                            <span>Fault type:</span>
                             <div class="form-floating mb-3">
                                 <select asp-for="FaultTypeFilter" class="form-select" asp-items="Model.FaultTypesList" onchange="this.form.submit()">
                                     <option value="0">
@@ -27,19 +28,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="form-floating mb-3">
-                                <select asp-for="FaultPriorityFilter" class="form-select" asp-items="Model.FaultPriorityList" onchange="this.form.submit()">
-                                    <option value="0">
-                                        All
-                                    </option>
-                                </select>
-                                <label asp-for="FaultPriorityFilter" class="form-label"></label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <span class="form-label">From</span>
+                            <span class="form-label">From:</span>
                             <div class="form-floating mb-3 input-group">
                                 <div class="col-3">
                                     <div class="form-floating mb-3 input-group">
@@ -64,7 +53,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <span class="form-label">To</span>
+                            <span class="form-label">To:</span>
                             <div class="form-floating mb-3 input-group">
                                 <div class="col-3">
                                     <div class="form-floating mb-3 input-group">
@@ -87,25 +76,157 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                    </div>
                         @if (!Model.ValidFromDate || !Model.ValidToDate)
                         {
                             <span class="text-danger">@Model.InvalidDateMessage</span>
                         }
-                    </div>
+
                 </form>
             </div>
         </div>
         <br />
+        <hr />
         <div class="row">
             <div class="col-md-6">
                 <canvas id="barChart" class="chart"></canvas>
             </div>
             <div class="col-md-6">
-                <canvas id="lineChart" class="chart"></canvas>
+                <canvas id="radarChart" class="chart"></canvas>
             </div>
         </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Fault
+                                </th>
+                                <th>
+                                    Location
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var fault in Model.PagedFaults)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>Assigned staff:</strong>
+                                        <br />
+                                        @foreach (var staff in Model.Staff)
+                                        {
+                                            if (staff.ID == fault.StaffID)
+                                            {
+                                                @staff.FirstName
+                                                <br />
+                                                @staff.LastName
+                                            }
+                                        }
+                                        <br />
+                                        <br />
+                                        <strong>Type:</strong>
+                                        <br />
+                                        @Model.FaultTypes.FirstOrDefault(ft => ft.ID == fault.FaultTypeID).FaultTypeDescription
+                                        <br />
+                                        <br />
+                                        <strong>Status:</strong>
+                                        <br />
+                                        @Model.FaultStatuses.FirstOrDefault(fs => fs.ID == fault.FaultStatusID).FaultStatusDescription
+                                        <br />
+                                        <br />
+                                        <strong>Priority:</strong>
+                                        <br />
+                                        @foreach (var faultPriority in Model.FaultPriorities)
+                                        {
+                                            if (fault.FaultPriorityID == faultPriority.ID)
+                                            {
+                                                @faultPriority.FaultPriorityRating
+                                            }
+                                        }
+                                        <br />
+                                        @Model.FaultPriorities.FirstOrDefault(fp => fp.ID == fault.FaultPriorityID).FaultPriorityDescription
+                                    </td>
+                                    <td>
+                                        @if (fault.RoadNumber != "undefined" && fault.RoadNumber != null)
+                                        {
+                                            @fault.RoadNumber
+                                            <br />
+                                        }
+                                        @if (fault.RoadName != "undefined" && fault.RoadName != null)
+                                        {
+                                            @fault.RoadName
+                                            <br />
+                                        }
+                                        @if (fault.RoadTown != "undefined" && fault.RoadTown != null)
+                                        {
+                                            @fault.RoadTown
+                                            <br />
+                                        }
+                                        @if (fault.RoadCounty != "undefined" && fault.RoadCounty != null)
+                                        {
+                                            @fault.RoadCounty
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @{
+                    var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+                }
+                <div>
+                    <ul class="pagination text-center">
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="First page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="Previous page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span> Prev
+                            </a>
+                        </li>
+                        <li>
+                            &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                               class="btn btn-outline-primary btn-sm @nextDisabled"
+                               aria-label="Next page button"
+                               style="font-size: 1em !important;">
+                                Next <span class="fa fa-chevron-right"></span>
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                               class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                               style="font-size: 1em !important;">
+                                Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="btn-group">
+            <form method="post">
+                <button id="btnExport" type="submit" asp-page-handler="ExportData" class="btn btn-outline-success btn-lg"><i class="fa-solid fa-file-excel"></i> Export</button>
+            </form>
+        </div>
+        <br />
     </div>
+    <br />
 </body>
 
 <script type="text/javascript">
@@ -120,6 +241,7 @@
     var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
     var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
     var reports = @Json.Serialize(HttpContext.Session.GetFromSession<List<Report>>("Reports"));
+    var chartColors = @Json.Serialize(HttpContext.Session.GetFromSession<List<string>>("ChartColors"));
 
 </script>
 <script src="~/lib/Chart.js/dist/chart.umd.js"></script>

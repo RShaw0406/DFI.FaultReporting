@@ -14,6 +14,11 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
 using DFI.FaultReporting.Common.SessionStorage;
 using System.Security.Claims;
+using System.Drawing;
+using DFI.FaultReporting.Common.Pagination;
+using DocumentFormat.OpenXml.Wordprocessing;
+using System.Text;
+using OfficeOpenXml;
 
 namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 {
@@ -57,6 +62,14 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         //Declare Faults property, this is needed for displaying faults on the map.
         [BindProperty]
         public List<Fault> Faults { get; set; }
+
+        //Declare PagedFaults property, this is needed for displaying faults in the table.
+        [BindProperty]
+        public List<Fault> PagedFaults { get; set; }
+
+        //Declare Staff property, this is needed for getting the staff assigned to each fault.
+        [BindProperty]
+        public List<Staff> Staff { get; set; }
 
         //Declare Reports property, this is needed for displaying the number of reports for each fault.
         [BindProperty]
@@ -135,7 +148,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         public int? YearFrom { get; set; }
 
         //Declare DateFrom property, this is needed for storing the from date filter.
-        [DataType(DataType.Date)]
+        [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
         [BindProperty]
         public DateTime? DateFrom { get; set; }
 
@@ -155,11 +168,47 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         public int? YearTo { get; set; }
 
         //Declare DateTo property, this is needed for storing the to date filter.
-        [DataType(DataType.Date)]
+        [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
         [BindProperty]
         public DateTime? DateTo { get; set; }
-        #endregion Properties
 
+        //Declare Pager property, this is needed for pagination.
+        [BindProperty(SupportsGet = true)]
+        public Pager Pager { get; set; } = new Pager();
+
+        //Declare ExportFaultDataList property, this is needed for exporting the data to excel.
+        [BindProperty]
+        public List<ExportFaultDataModel> ExportFaultDataList { get; set; }
+
+        //Declare ExportFaultData property, this is needed for exporting the data to excel.
+        [BindProperty]
+        public ExportFaultDataModel ExportFaultData { get; set; }
+
+        //Declare ExportFaultDataModel class, this is needed for exporting the data to excel as we need the type, priority, status, road number,
+        //road name, road town, road county, input on, and staff.
+        public class ExportFaultDataModel
+        {
+            public int ID { get; set; }
+            public string? Type { get; set; }
+
+            public string? PriorityRating { get; set; }
+
+            public string? Priority { get; set; }
+
+            public string? Status { get; set; }
+
+            public string? RoadNumber { get; set; }
+
+            public string? RoadName { get; set; }
+
+            public string? RoadTown { get; set; }
+
+            public string? RoadCounty { get; set; }
+
+            public string? InputOn { get; set; }
+            public string? Staff { get; set; }
+        }
+        #endregion Properties
 
         #region Page Load
         //Method Summary:
@@ -213,9 +262,6 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
                     //Order the faults by status.
                     Faults = Faults.OrderBy(f => f.FaultStatusID).ToList();
 
-                    ////Order the faults by priority.
-                    //Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
-
                     //Get all fault priorities by calling the GetFaultPriorities method from the _faultPriorityService.
                     FaultPriorities = await _faultPriorityService.GetFaultPriorities();
 
@@ -237,15 +283,30 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 
                     FaultStatuses = FaultStatuses.OrderBy(fs => fs.ID).ToList();
 
-                    ////Populate fault statuses dropdown.
-                    //FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
-                    //{
-                    //    Text = fs.FaultStatusDescription,
-                    //    Value = fs.ID.ToString()
-                    //});
+                    //Populate fault statuses dropdown.
+                    FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
+                    {
+                        Text = fs.FaultStatusDescription,
+                        Value = fs.ID.ToString()
+                    });
+
+                    //Set the CurrentStaff property by calling the GetAllStaff method in the _staffService.
+                    Staff = await _staffService.GetAllStaff(jwtToken);
 
                     //Get all Reports by calling the GetReports method from the _reportService.
                     Reports = await _reportService.GetReports();
+
+                    //Set the current page to 1.
+                    Pager.CurrentPage = 1;
+
+                    //Set the pager count to the number of faults.
+                    Pager.Count = Faults.Count;
+
+                    //Get the first page of faults by calling the GetPaginatedFaults method from the _pagerService.
+                    PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
+
+                    //Order the faults by priority.
+                    PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
 
                     //Set session data needed for the page.
                     HttpContext.Session.SetInSession("Faults", Faults);
@@ -253,10 +314,47 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
                     HttpContext.Session.SetInSession("FaultPriorities", FaultPriorities);
                     HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
                     HttpContext.Session.SetInSession("Reports", Reports);
+                    HttpContext.Session.SetInSession("Staff", Staff);
 
-                    //Chart barChart = await GenerateBarChart();
+                    //Check if the ChartColors session exists.
+                    if (HttpContext.Session.GetFromSession<List<string>>("ChartColors") == null || HttpContext.Session.GetFromSession<List<string>>("ChartColors").Count == 0)
+                    {
+                        //Create a list to store the chart colors.
+                        List<string> chartColors = new List<string>();
 
-                    //ViewData["BarChart"] = barChart;
+                        //Create a random object.
+                        Random random = new Random();
+
+                        //Loop through each fault type, this is needed to ensure that all fault types are assigned a color with any colors being reused.
+                        foreach (FaultType faultType in FaultTypes)
+                        {
+                            //Create a random color.
+                            System.Drawing.Color color = System.Drawing.Color.FromArgb(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256));
+
+                            //Create a string with the rgb values.
+                            string rgb = "rgba(" + color.R + ", " + color.G + ", " + color.B + ", " + 0.2 + ")";
+
+                            //Check if the color is already in the list.
+                            if (chartColors.Contains(rgb))
+                            {
+                                //Create a new color.
+                                while (chartColors.Contains(rgb))
+                                {
+                                    //Create a new random color.
+                                    color = System.Drawing.Color.FromArgb(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256));
+
+                                    //Create a new string with the rgb values.
+                                    rgb = "rgba(" + color.R + ", " + color.G + ", " + color.B + ", " + 0.2 + ")";
+                                }
+                            }
+
+                            //Add the color to the list.
+                            chartColors.Add(rgb);
+                        }
+
+                        //Set the ChartColors in session, this is needed for retrieval by the javascript for displying the charts.
+                        HttpContext.Session.SetInSession("ChartColors", chartColors);
+                    }
 
                     //Return the page.
                     return Page();
@@ -313,11 +411,11 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 
             //-------------------- STATUS FILTER --------------------
             //User has selected a status that is not "All".
-            //if (FaultStatusFilter != 0)
-            //{
-            //    //Get the faults for the selected status.
-            //    Faults = Faults.Where(f => f.FaultStatusID == FaultStatusFilter).ToList();
-            //}
+            if (FaultStatusFilter != 0)
+            {
+                //Get the faults for the selected status.
+                Faults = Faults.Where(f => f.FaultStatusID == FaultStatusFilter).ToList();
+            }
 
             //-------------------- PRIORITY FILTER --------------------
             //User has selected a fault priority that is not "All".
@@ -440,6 +538,18 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
                 }
             }
 
+            //Set the current page to 1.
+            Pager.CurrentPage = 1;
+
+            //Set the pager count to the number of faults.
+            Pager.Count = Faults.Count;
+
+            //Get the first page of faults by calling the GetPaginatedFaults method from the _pagerService.
+            PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
+
+            //Order the faults by priority.
+            PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+
             //Set the Faults in session, needed for displaying on map.
             HttpContext.Session.SetInSession("Faults", Faults);
 
@@ -487,6 +597,9 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
             //Get the reports from session.
             Reports = HttpContext.Session.GetFromSession<List<Report>>("Reports");
 
+            //Get the staff from session.
+            Staff = HttpContext.Session.GetFromSession<List<Staff>>("Staff");
+
             //Populate fault types dropdown.
             FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
             {
@@ -501,13 +614,137 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
                 Value = fp.ID.ToString()
             });
 
-            ////Populate fault statuses dropdown.
-            //FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
-            //{
-            //    Text = fs.FaultStatusDescription,
-            //    Value = fs.ID.ToString()
-            //});
+            //Populate fault statuses dropdown.
+            FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
+            {
+                Text = fs.FaultStatusDescription,
+                Value = fs.ID.ToString()
+            });
         }
         #endregion Session Data
+
+        #region Pagination
+        //Method Summary:
+        //This method is excuted when the pagination buttons are clicked.
+        //When executed the desired page of faults is displayed.
+        public async void OnGetPaging()
+        {
+            //User has selected a fault type.
+            if (TempData["FaultTypeFilter"] != null)
+            {
+                //Get the FaultTypeFilter value from TempData.
+                FaultTypeFilter = int.Parse(TempData["FaultTypeFilter"].ToString());
+            }
+
+            //User has selected a fault status.
+            if (TempData["FaultStatusFilter"] != null)
+            {
+                //Get the FaultStatusFilter value from TempData.
+                FaultStatusFilter = int.Parse(TempData["FaultStatusFilter"].ToString());
+            }
+
+            //User has selected a fault priority.
+            if (TempData["FaultPriorityFilter"] != null)
+            {
+                //Get the FaultPriorityFilter value from TempData.
+                FaultPriorityFilter = int.Parse(TempData["FaultPriorityFilter"].ToString());
+            }
+
+            //Keep the TempData.
+            TempData.Keep();
+
+            //Get all required data from session.
+            GetSessionData();
+
+            //Set the pager count to the number of faults.
+            Pager.Count = Faults.Count;
+
+            //Get the first page of faults by calling the GetPaginatedFaults method from the _pagerService.
+            PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
+
+            //Order the faults by priority.
+            PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+        }
+        #endregion Pagination
+
+        #region Export Data
+        //Method Summary:
+        //This method is executed when the export button is clicked.
+        //When executed the data is exported to an excel file.
+        public FileResult OnPostExportData()
+        {
+            //Get all required data from session.
+            GetSessionData();
+
+            //Loop over each of the faults.
+            foreach (Fault fault in Faults)
+            {
+                //Get the fault type for the fault.
+                FaultType faultType = FaultTypes.Where(ft => ft.ID == fault.FaultTypeID).FirstOrDefault();
+                string Type = faultType.FaultTypeDescription;
+
+                //Get the fault priority for the fault.
+                FaultPriority faultPriority = FaultPriorities.Where(fp => fp.ID == fault.FaultPriorityID).FirstOrDefault();
+                string PriorityRating = faultPriority.FaultPriorityRating;
+                string Priority = faultPriority.FaultPriorityDescription;
+
+                //Get the fault status for the fault.
+                FaultStatus faultStatus = FaultStatuses.Where(fs => fs.ID == fault.FaultStatusID).FirstOrDefault();
+                string Status = faultStatus.FaultStatusDescription;
+
+                //Declare staff name as string.
+                string staffName = "";
+
+                //Check if the fault has been assigned to a staff member.
+                if (fault.StaffID != null && fault.StaffID != 0)
+                {
+                    //Get the staff member assigned to the fault.
+                    Staff staff = Staff.Where(s => s.ID == fault.StaffID).FirstOrDefault();
+                    staffName = staff.FirstName + " " + staff.LastName;
+                }
+
+                //Create a new ExportFaultDataModel object.
+                ExportFaultData = new ExportFaultDataModel
+                {
+                    ID = fault.ID,
+                    Type = Type,
+                    PriorityRating = PriorityRating,
+                    Priority = Priority,
+                    Status = Status,
+                    RoadNumber = fault.RoadNumber,
+                    RoadName = fault.RoadName,
+                    RoadTown = fault.RoadTown,
+                    RoadCounty = fault.RoadCounty,
+                    InputOn = fault.InputOn.ToString("dd/MM/yyyy"),
+                    Staff = staffName
+                };
+
+                //Add the ExportFaultData to the ExportFaultDataList.
+                ExportFaultDataList.Add(ExportFaultData);
+            }
+
+            //Create a new memory stream.
+            MemoryStream memoryStream = new MemoryStream();
+
+            //Set the license context to non commercial.
+            ExcelPackage.LicenseContext = OfficeOpenXml.LicenseContext.NonCommercial;
+
+            //Create a new excel package.
+            using (ExcelPackage excelPackage = new ExcelPackage(memoryStream))
+            {
+                //Create a new worksheet.
+                var sheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
+                sheet.Cells.LoadFromCollection(ExportFaultDataList, true);
+                excelPackage.Save();
+            }
+
+            //Set the position of the memory stream to 0.
+            memoryStream.Position = 0;
+            string excelName = "Fault Status Report.xlsx";
+
+            //Return the file.
+            return File(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName);     
+        }
+        #endregion
     }
 }
