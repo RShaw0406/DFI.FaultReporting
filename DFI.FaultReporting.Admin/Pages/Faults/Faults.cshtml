@@ -3,6 +3,7 @@
 @using DFI.FaultReporting.Common.SessionStorage
 @using DFI.FaultReporting.Models.FaultReports
 @using DFI.FaultReporting.Models.Admin
+@using DFI.FaultReporting.Models.Users
 @model DFI.FaultReporting.Admin.Pages.Faults.FaultsModel
 @{
     ViewData["Title"] = "Faults";
@@ -285,6 +286,8 @@
     var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
     var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
     var reports = @Json.Serialize(HttpContext.Session.GetFromSession<List<Report>>("Reports"));
+    var repairs = @Json.Serialize(HttpContext.Session.GetFromSession<List<Repair>>("Repairs"));
+    var staff = @Json.Serialize(HttpContext.Session.GetFromSession<List<Staff>>("Staff"));
     var readWrite = @Model.ReadWrite;
 
 </script>

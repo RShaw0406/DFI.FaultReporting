@@ -135,8 +135,17 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         [BindProperty]
         public bool ShowMyFaults { get; set; }
 
+        //Declare ReadWrite property, this is needed for showing/hiding buttons on map popups.
         [BindProperty]
         public string? ReadWrite { get; set; }
+
+        //Declare FaultHasStaff property, this is needed for showing/hiding buttons on map popups.
+        [BindProperty]
+        public string? FaultHasStaff { get; set; }
+
+        //Declare FaultHasRepair property, this is needed for showing/hiding buttons on map popups.
+        [BindProperty]
+        public string? FaultHasRepair { get; set; }
         #endregion Properties
 
         #region Page Load
