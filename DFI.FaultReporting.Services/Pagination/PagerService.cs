@@ -78,5 +78,11 @@ namespace DFI.FaultReporting.Services.Pagination
         {
             return repairStatuses.OrderByDescending(rs => rs.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
+
+        //Method to get paginated repairs.
+        public async Task<List<Repair>> GetPaginatedRepairs(List<Repair> repairs, int currentPage, int pageSize)
+        {
+            return repairs.OrderBy(r => r.RepairTargetDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+        }
     }
 }

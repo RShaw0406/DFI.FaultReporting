@@ -138,20 +138,12 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //Declare ReadWrite property, this is needed for showing/hiding buttons on map popups.
         [BindProperty]
         public string? ReadWrite { get; set; }
-
-        //Declare FaultHasStaff property, this is needed for showing/hiding buttons on map popups.
-        [BindProperty]
-        public string? FaultHasStaff { get; set; }
-
-        //Declare FaultHasRepair property, this is needed for showing/hiding buttons on map popups.
-        [BindProperty]
-        public string? FaultHasRepair { get; set; }
         #endregion Properties
 
         #region Page Load
         //Method Summary:
         //This method is executed when the page loads.
-        //When executed the FaultTypes, Faults, FaultPriorities, and FaultStatuses properties are populated.
+        //When executed the user is checked for authentication and role, the required data is retrieved from the DB and session.
         public async Task<IActionResult> OnGetAsync()
         {
             //The contexts current user exists.
@@ -253,7 +245,6 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
 
                     //Get all repairs by calling the GetRepairs method from the _repairService.
                     Repairs = await _repairService.GetRepairs(jwtToken);
-
 
                     //Set session data needed for the page.
                     HttpContext.Session.SetInSession("Faults", Faults);
@@ -854,10 +845,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 //User has selected to view faults that have been repaired.
                 if (FaultStatusFilter == 4)
                 {
-                    ////Get all current faults by calling the GetFaults method from the _faultService, this is needed to ensure that faults of repaired status are shown.
-                    //Faults = await _faultService.GetFaults();
-
-                    //Show all faults apart from the ones with the status of repaired.
+                    //Show all faults which have been repaired.
                     Faults = Faults.Where(f => f.FaultStatusID == 4).ToList();
                 }
                 //User has selected a status that is not "All" and not "Repaired".

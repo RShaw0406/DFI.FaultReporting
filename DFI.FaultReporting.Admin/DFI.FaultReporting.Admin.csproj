@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\Repairs\Reports\" />
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
