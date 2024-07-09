@@ -1,0 +1,55 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Account.Register.Step3Model
+@{
+    ViewData["Title"] = "Step 3";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:60%"></div>
+    </div>
+    <br />
+    <h2>Address details</h2>
+    <hr />
+    <div class="alert alert-info">
+        <strong>Info: </strong>
+        <p>These details will be used when you submit compensation claims.</p>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <form id="step3Form" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Step3Input.Postcode" class="form-control" autocomplete="postal-code" placeholder="Enter postcode" />
+                    <label asp-for="Step3Input.Postcode" class="form-label"></label>
+                    <span asp-validation-for="Step3Input.Postcode" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Step3Input.AddressLine1" class="form-control" autocomplete="address-line1" placeholder="Enter address line 1" />
+                    <label asp-for="Step3Input.AddressLine1" class="form-label"></label>
+                    <span asp-validation-for="Step3Input.AddressLine1" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Step3Input.AddressLine2" class="form-control" autocomplete="address-line2" placeholder="Enter address line 2" />
+                    <label asp-for="Step3Input.AddressLine2" class="form-label"></label>
+                    <span asp-validation-for="Step3Input.AddressLine2" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Step3Input.AddressLine3" class="form-control" autocomplete="address-line3" placeholder="Enter address line 3" />
+                    <label asp-for="Step3Input.AddressLine3" class="form-label"></label>
+                    <span asp-validation-for="Step3Input.AddressLine3" class="text-danger"></span>
+                </div>
+                <div class="btn-group">
+                    <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                    &nbsp;
+                    <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <br />
+</div>

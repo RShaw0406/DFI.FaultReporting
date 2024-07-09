@@ -58,6 +58,19 @@
                                     <p>When updating any of your account details Two-Factor Authentication (2FA) is implemented.</p>
                                     <p>Update your account details and click the "Request verification code" button to recieve an email containing your code.</p>
                                 </div>
+                                <br />
+                                <div class="alert alert-info">
+                                    <strong>Info: </strong>
+                                    <p>Your password must meet the following requirements:</p>
+                                    <ul>
+                                        <li>At least 1 number</li>
+                                        <li>At least 1 special character</li>
+                                        <li>At least 1 uppercase letter</li>
+                                        <li>At least 1 lowercase letter</li>
+                                        <li>At least 8 characters in total</li>
+                                    </ul>
+                                </div>
+                                <br />
                                 @if (Model.UpdateSuccess)
                                 {
                                     <div class="alert alert-success alert-dismissible">

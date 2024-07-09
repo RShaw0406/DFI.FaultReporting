@@ -84,6 +84,41 @@ namespace DFI.FaultReporting.Http.Admin
             }
         }
 
+        public async Task<bool> CheckForContractor(string email)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(baseURL + APIEndPoints.Contractor + "/" + "check" + "/" + email)
+            };
+
+            var result = await client.SendAsync(request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+
+                bool contractorExists = JsonConvert.DeserializeObject<bool>(response);
+
+                if (contractorExists)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public async Task<Contractor> CreateContractor(Contractor contractor, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);

@@ -4,8 +4,10 @@ using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Tokens;
+using DFI.FaultReporting.SQL.Repository.Interfaces.Admin;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Roles;
 using DFI.FaultReporting.SQL.Repository.Interfaces.Users;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
@@ -38,8 +40,11 @@ namespace DFI.FaultReporting.API.Controllers
         private IJWTTokenService _tokenService;
         public ILogger<AuthController> _logger;
         public ISettingsService _settingsService;
+        public IContractorSQLRepository _contractorSQLRepository;
 
-        public AuthController(IUserSQLRepository userSQLRepository, IStaffSQLRepository staffSQLRepository, IRoleSQLRepository roleSQLRepository, IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, IJWTTokenService tokenService, ISettingsService settingsService)
+        public AuthController(IUserSQLRepository userSQLRepository, IStaffSQLRepository staffSQLRepository, IRoleSQLRepository roleSQLRepository, 
+            IUserRoleSQLRepository userRoleSQLRepository, ILogger<AuthController> logger, IJWTTokenService tokenService, 
+            ISettingsService settingsService, IContractorSQLRepository contractorSQLRepository)
         {
             _userSQLRepository = userSQLRepository;
             _staffSQLRepository = staffSQLRepository;
@@ -48,11 +53,14 @@ namespace DFI.FaultReporting.API.Controllers
             _logger = logger;
             _tokenService = tokenService;
             _settingsService = settingsService;
+            _contractorSQLRepository = contractorSQLRepository;
         }
 
         public List<User>? Users { get; set; }
 
         public List<Staff>? Staff { get; set; }
+
+        public List<Contractor>? Contractors { get; set; }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegistrationRequest request)
@@ -76,11 +84,20 @@ namespace DFI.FaultReporting.API.Controllers
                 iterationCount: 100000,
                 numBytesRequested: 256 / 8));
 
-            //Create a string DOB by combining all the input DOB values.
-            string inputDOB = request.YearDOB.ToString() + "-" + request.MonthDOB.ToString() + "-" + request.DayDOB.ToString();
+            DateTime? DOB = null;
 
-            //Declare a DOB datetime.
-            DateTime DOB = DateTime.Parse(inputDOB);
+            Contractors = await _contractorSQLRepository.GetContractors(); 
+
+            Contractor? contractor = Contractors.Where(c => c.Email == request.Email && c.Email != null).FirstOrDefault();
+
+            if (contractor == null)
+            {
+                //Create a string DOB by combining all the input DOB values.
+                string inputDOB = request.YearDOB.ToString() + "-" + request.MonthDOB.ToString() + "-" + request.DayDOB.ToString();
+
+                //Create a DOB datetime.
+                DOB = DateTime.Parse(inputDOB);
+            }
 
             User requestUser = new User
             {
@@ -103,14 +120,23 @@ namespace DFI.FaultReporting.API.Controllers
                 Active = true
             };
 
-            int roleID = 1;
+            int roleID = 0;
+
+            if (contractor != null)
+            {
+                roleID = 3;
+            }
+            else
+            {
+                roleID = 1;
+            }
 
             Role role = await _roleSQLRepository.GetRole(roleID);
 
             if (role == null)
             {
                 //return NotFound("Role not found: User");
-                return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Role not found: User" });
+                return NotFound(new AuthResponse { ReturnStatusCodeMessage = "Role not found" });
             }
 
             User createdUser = await _userSQLRepository.CreateUser(requestUser);

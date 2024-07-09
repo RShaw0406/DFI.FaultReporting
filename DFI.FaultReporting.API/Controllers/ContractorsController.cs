@@ -53,6 +53,22 @@ namespace DFI.FaultReporting.API.Controllers
             return contractor;
         }
 
+        // GET: api/Contractors/check/{email}
+        [HttpGet("check/{email}")]
+        public async Task<ActionResult<bool>> CheckForContractor(string email)
+        {
+            Contractors = await _contractorSQLRepository.GetContractors();
+
+            Contractor contractor = Contractors.FirstOrDefault(c => c.Email == email);
+
+            if (contractor == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         // POST: api/Contractors
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]

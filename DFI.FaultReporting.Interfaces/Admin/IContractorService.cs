@@ -13,6 +13,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Admin
 
         Task<Contractor> GetContractor(int ID, string token);
 
+        Task<bool> CheckForContractor(string email);
+
         Task<Contractor> CreateContractor(Contractor claimStatus, string token);
 
         Task<Contractor> UpdateContractor(Contractor claimStatus, string token);

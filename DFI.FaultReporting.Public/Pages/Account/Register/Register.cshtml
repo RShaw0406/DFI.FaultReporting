@@ -1,0 +1,32 @@
+﻿@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Register your details and create your account</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form id="beginForm" method="post">
+                <div class="alert alert-info">
+                    <strong>Info: </strong>
+                    <p>You will be required to complete 5 steps to register:</p>
+                    <ul>
+                        <li>Step 1: Account and contact details</li>
+                        <li>Step 2: Personal details</li>
+                        <li>Step 3: Address details</li>
+                        <li>Step 4: Verification code</li>
+                        <li>Step 5: Register</li>
+                    </ul>
+                </div>
+                <br />
+                <div>
+                    <button id="btnBegin" asp-page-handler="Begin" type="submit" class="btn btn-lg btn-outline-primary">Begin <i class="fa-regular fa-circle-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

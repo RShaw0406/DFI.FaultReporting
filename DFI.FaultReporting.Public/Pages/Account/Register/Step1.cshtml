@@ -1,0 +1,64 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Account.Register.Step1Model
+@{
+    ViewData["Title"] = "Step 1";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:20%"></div>
+    </div>
+    <br />
+    <h2>Account and contact details</h2>
+    <hr />
+    <div class="alert alert-info">
+        <strong>Info: </strong>
+        <p>You will use these details for logging into your account.</p>
+        <p>DFI staff may use these details to contact you.</p>
+    </div>
+    <br />
+    <div class="alert alert-info">
+        <strong>Info: </strong>
+        <p>Your password must meet the following requirements:</p>
+        <ul>
+            <li>At least 1 number</li>
+            <li>At least 1 special character</li>
+            <li>At least 1 uppercase letter</li>
+            <li>At least 1 lowercase letter</li>
+            <li>At least 8 characters in total</li>
+        </ul>
+    </div>
+    <br />
+    <form id="step1Form" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+            <span><strong>Please review and correct the following errors:</strong></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="Step1Input.Email" class="form-control" autocomplete="email" placeholder="Enter email" />
+            <label asp-for="Step1Input.Email" class="form-label"></label>
+            <span asp-validation-for="Step1Input.Email" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="Step1Input.Password" class="form-control" autocomplete="password" placeholder="Enter password" />
+            <label asp-for="Step1Input.Password" class="form-label"></label>
+            <span asp-validation-for="Step1Input.Password" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="Step1Input.ConfirmPassword" class="form-control" autocomplete="password" placeholder="Confirm password" />
+            <label asp-for="Step1Input.ConfirmPassword" class="form-label"></label>
+            <span asp-validation-for="Step1Input.ConfirmPassword" class="text-danger"></span>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="Step1Input.ContactNumber" class="form-control" autocomplete="phone" placeholder="Enter contact number" />
+            <label asp-for="Step1Input.ContactNumber" class="form-label"></label>
+            <span asp-validation-for="Step1Input.ContactNumber" class="text-danger"></span>
+        </div>
+        <div class="btn-group">
+            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+            &nbsp;
+            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+        </div>
+    </form>
+    <br />
+</div>

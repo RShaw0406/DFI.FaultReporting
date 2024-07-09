@@ -60,6 +60,13 @@ namespace DFI.FaultReporting.Services.Users
             return user;
         }
 
+        public async Task<bool> CheckEmail(string email)
+        {
+            bool emailExists = await _userHttp.CheckEmail(email);
+
+            return emailExists;
+        }
+
         public async Task<User> CreateUser(User user)
         {
             user = await _userHttp.CreateUser(user);

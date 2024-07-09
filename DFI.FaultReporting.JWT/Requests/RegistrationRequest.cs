@@ -50,17 +50,14 @@ namespace DFI.FaultReporting.JWT.Requests
         [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
         public string? LastName { get; set; }
 
-        [Required]
         [DisplayName("Day")]
         [Range(1, 31, ErrorMessage = "New date of birth day must be between {1} and {2}")]
         public int? DayDOB { get; set; }
 
-        [Required]
         [DisplayName("Month")]
         [Range(1, 12, ErrorMessage = "New date of birth month must be between {1} and {2}")]
         public int? MonthDOB { get; set; }
 
-        [Required]
         [DisplayName("Year")]
         public int? YearDOB { get; set; }
 

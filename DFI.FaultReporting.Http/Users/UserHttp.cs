@@ -177,6 +177,41 @@ namespace DFI.FaultReporting.Http.Users
             }
         }
 
+        public async Task<bool> CheckEmail(string email)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(baseURL + APIEndPoints.User + "/" + "check" + "/" + email)
+            };
+
+            var result = await client.SendAsync(request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+
+                bool emailExists = JsonConvert.DeserializeObject<bool>(response);
+
+                if (emailExists)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public async Task<User> CreateUser(User user)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);

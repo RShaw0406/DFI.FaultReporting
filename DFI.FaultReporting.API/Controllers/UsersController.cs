@@ -15,6 +15,7 @@ using System.Data;
 using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
+using DFI.FaultReporting.Models.Admin;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -55,6 +56,22 @@ namespace DFI.FaultReporting.API.Controllers
             }
 
             return Ok(user);
+        }
+
+        // GET: api/Users/5
+        [HttpGet("check/{email}")]
+        public async Task<ActionResult<bool>> CheckEmail(string email)
+        {
+            Users = await _userSQLRepository.GetUsers();
+
+            User user = Users.FirstOrDefault(u => u.Email == email);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         // POST: api/Users

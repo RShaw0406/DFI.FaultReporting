@@ -1,0 +1,38 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Account.Register.Step4Model
+@{
+    ViewData["Title"] = "Step 4";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:80%"></div>
+    </div>
+    <br />
+    <h2>Request verification code</h2>
+    <hr />
+    <div class="alert alert-info">
+        <strong>Info: </strong>
+        <p>This application implements Two-Factor Authentication (2FA).</p>
+        <p>
+            Click the "Request verification code" button below to send a verification code to the email address you entered in step 1.
+        </p>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <form id="verificationCodeForm" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div>
+                    <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                    &nbsp;
+                    <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-outline-primary"><i class="fa-regular fa-envelope"></i> Request verification code</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<br />
+</div>

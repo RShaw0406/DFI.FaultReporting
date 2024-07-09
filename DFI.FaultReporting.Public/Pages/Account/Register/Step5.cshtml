@@ -1,0 +1,44 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Account.Register.Step5Model
+@{
+    ViewData["Title"] = "Step 5";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div>
+    </div>
+    <br />
+    <h2>Enter verification code and register</h2>
+    <hr />
+    <div class="alert alert-info">
+        <strong>Info: </strong>
+        <p>You should receive an email containing your verification code within the next few minutes.</p>
+        <p>
+            Please check your spam/junk folder.
+            Enter the code below and click the "Register" button to complete your registration.
+        </p>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <form id="verificationCodeForm" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="VerificationCodeInput.VerificationCode" class="form-control" autocomplete="off" aria-required="true" placeholder="verification code" />
+                    <label asp-for="VerificationCodeInput.VerificationCode" class="form-label">Verification Code</label>
+                    <span asp-validation-for="VerificationCodeInput.VerificationCode" class="text-danger"></span>
+                </div>
+                <div>
+                    <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                    &nbsp;
+                    <button id="btnRegister" asp-page-handler="Register" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Register</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <br />
+</div>

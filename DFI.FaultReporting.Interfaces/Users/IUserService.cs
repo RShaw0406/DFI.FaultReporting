@@ -12,11 +12,16 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
     public interface IUserService
     {
         Task<AuthResponse> Register(RegistrationRequest registrationRequest);
+
         Task<AuthResponse> Login(JWT.Requests.LoginRequest loginRequest);
+
         Task<AuthResponse> Lock(string emailAddress);
+
         Task<List<User>> GetUsers(string token);
 
         Task<User> GetUser(int ID, string token);
+
+        Task<bool> CheckEmail(string email);
 
         Task<User> CreateUser(User user);
 

@@ -1,0 +1,86 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Account.Register.Step2Model
+@{
+    ViewData["Title"] = "Step 2";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:40%"></div>
+    </div>
+    <br />
+    <h2>Personal details</h2>
+    <hr />
+    <div class="alert alert-info">
+        <strong>Info: </strong>
+        <p>These details will be used when you submit compensation claims.</p>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-4">
+            <form id="step2Form" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Step2Input.Prefix" class="form-control" autocomplete="title" placeholder="Enter title" />
+                    <label asp-for="Step2Input.Prefix" class="form-label"></label>
+                    <span asp-validation-for="Step2Input.Prefix" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Step2Input.FirstName" class="form-control" autocomplete="firstName" placeholder="Enter first name" />
+                    <label asp-for="Step2Input.FirstName" class="form-label"></label>
+                    <span asp-validation-for="Step2Input.FirstName" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Step2Input.LastName" class="form-control" autocomplete="lastName" placeholder="Enter last name" />
+                    <label asp-for="Step2Input.LastName" class="form-label"></label>
+                    <span asp-validation-for="Step2Input.LastName" class="text-danger"></span>
+                </div>
+                @if (!Model.isContractorEmail)
+                {
+                    <span class="form-label">Date of birth</span>
+                    <div class="form-floating mb-3 input-group">
+                        <div class="col-2">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="Step2Input.DayDOB" class="form-control" autocomplete="day" placeholder="Enter new day" type="text" />
+                                <label asp-for="Step2Input.DayDOB" class="form-label"></label>
+                            </div>
+                        </div>
+                        &nbsp;
+                        <div class="col-2">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="Step2Input.MonthDOB" class="form-control" autocomplete="month" placeholder="Enter month" type="text" required />
+                                <label asp-for="Step2Input.MonthDOB" class="form-label"></label>
+                            </div>
+                        </div>
+                        &nbsp;
+                        <div class="col-4">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="Step2Input.YearDOB" class="form-control" autocomplete="year" placeholder="Enter year" type="text" required />
+                                <label asp-for="Step2Input.YearDOB" class="form-label"></label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Step2Input.DayDOB" class="text-danger"></span>
+                        <span asp-validation-for="Step2Input.MonthDOB" class="text-danger"></span>
+                        @if (Model.InValidYearDOB)
+                        {
+                            <span asp-validation-for="Step2Input.YearDOB" class="text-danger">@Model.InValidYearDOBMessage</span>
+                        }
+                        @if (!Model.ValidDOB)
+                        {
+                            <span class="text-danger">New date of birth must contain day, month, and year</span>
+                        }
+                    </div>
+                }
+                <div class="btn-group">
+                    <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                    &nbsp;
+                    <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div> 
+    <br />
+</div>

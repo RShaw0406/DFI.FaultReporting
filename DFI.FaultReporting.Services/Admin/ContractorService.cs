@@ -34,6 +34,13 @@ namespace DFI.FaultReporting.Services.Admin
             return contractor;
         }
 
+        public async Task<bool> CheckForContractor(string email)
+        {
+            bool exists = await _contractorHttp.CheckForContractor(email);
+
+            return exists;
+        }
+
         public async Task<Contractor> CreateContractor(Contractor contractor, string token)
         {
             contractor = await _contractorHttp.CreateContractor(contractor, token);
