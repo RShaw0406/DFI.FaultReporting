@@ -1,0 +1,25 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Jobs.JobsMenuModel
+@{
+    ViewData["Title"] = "Jobs menu";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Select from one of the options below</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="View jobs link" title="View jobs" asp-page="/Jobs/ViewJobs"><i class="fa-solid fa-map-location-dot"></i> View jobs</a>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Todays jobs link" title="Todays jobs" asp-page="/Jobs/TodaysJobs"><i class="fa-solid fa-route"></i> Todays jobs</a>
+            </div>
+        </div>
+    </div>
+</div>

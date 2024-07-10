@@ -1,0 +1,95 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Jobs.EditJobModel
+@{
+    ViewData["Title"] = "Edit job";
+}
+
+<body onload="initReviewMap()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>Edit the details of job</h2>
+        <hr />
+        <input type="hidden" id="lat" asp-for="Fault.Latitude" />
+        <input type="hidden" id="long" asp-for="Fault.Longitude" />
+        <form id="jobDetailsForm" method="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-center">
+                        <div id="reviewMap" style="height: 500px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @if (Model.UpdateSuccess)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong>Success: </strong>
+                    <p>Job details have been successfully updated.</p>
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger">
+                        <span><strong>Please review and correct the following errors:</strong></span>
+                    </div>
+                    <input type="hidden" asp-for="Repair.ID" />
+                    <input type="hidden" asp-for="Repair.FaultID" />
+                    <input type="hidden" asp-for="Repair.ContractorID" />
+                    <input type="hidden" asp-for="Repair.InputBy" />
+                    <input type="hidden" asp-for="Repair.InputOn" />
+                    <input type="hidden" asp-for="Repair.Active" />
+                    <input type="hidden" asp-for="Repair.RepairTargetDate" />
+                    <div class="form-floating mb-3">
+                        <select asp-for="Repair.RepairStatusID" class="form-select" asp-items="Model.RepairStatusList">
+                        </select>
+                        <label asp-for="Repair.RepairStatusID" class="form-label"></label>
+                        <span asp-validation-for="Repair.RepairStatusID" class="text-danger"></span>
+                    </div>
+                    <span class="form-label">Repair target date</span>
+                    <div class="form-floating mb-3 input-group">
+                        <div class="col-2">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="TargetDateDay" class="form-control" disabled />
+                                <label asp-for="TargetDateDay" class="form-label"></label>
+                            </div>
+                        </div>
+                        &nbsp;
+                        <div class="col-2">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="TargetDateMonth" class="form-control" disabled />
+                                <label asp-for="TargetDateMonth" class="form-label"></label>
+                            </div>
+                        </div>
+                        &nbsp;
+                        <div class="col-4">
+                            <div class="form-floating mb-3 input-group">
+                                <input asp-for="TargetDateYear" class="form-control" disabled />
+                                <label asp-for="TargetDateYear" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea asp-for="Repair.RepairNotes" style="height: auto!important" class="form-control" autocomplete="notes" placeholder="Enter repair nots" rows="10"></textarea>
+                                <label asp-for="Repair.RepairNotes" class="form-label"></label>
+                                <span asp-validation-for="Repair.RepairNotes" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <a asp-page="./ViewJobs" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                        &nbsp;
+                        <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br />
+</body>
+
+<script src="~/js/mapping/ReviewMap.js"></script>

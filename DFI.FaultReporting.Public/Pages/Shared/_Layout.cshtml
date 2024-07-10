@@ -63,8 +63,12 @@
                         }
                         @if (User.Identity.IsAuthenticated == true && User.IsInRole("Contractor"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-page="/Index"><i class="fa-solid fa-screwdriver-wrench"></i> Jobs</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><i class="fa-solid fa-screwdriver-wrench"></i> Jobs</a>
+                                <ul class="dropdown-menu bg-light">
+                                    <li><a class="dropdown-item" asp-page="/Jobs/ViewJobs"><i class="fa-solid fa-map-location-dot"></i> View jobs</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Jobs/TodaysJobs"><i class="fa-solid fa-route"></i> Todays jobs</a></li>
+                                </ul>
                             </li>
                         }
                         @{

@@ -15,7 +15,7 @@ const mapBounds = [-8.3, 53.9, -5.3, 55.4]
 
 //FUNCTION SUMMARY:
 //This method is used for setting up the map control and adding event listeners to the map - uses the Azure Maps Web SDK.
-//In this instance a data source for displaying faults is creates and added to the map also.
+//In this instance a data source for displaying faults is created and added to the map also.
 function initViewMap() {
 
     //Find map on page
@@ -65,11 +65,6 @@ function initViewMap() {
 
         //Wait until map is ready to ensure data source is successully added..
         map.events.add('ready', function () {
-            console.log(faults);
-            console.log(faultTypes);
-            console.log(faultPriorities);
-            console.log(faultStatuses);
-
             //Create a new dictionary to store the geo json representations of faults.
             const geoJsonFaults = [];
 

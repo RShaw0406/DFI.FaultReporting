@@ -68,7 +68,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/Faults
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
-        [Authorize(Roles = "StaffReadWrite")]
+        [Authorize(Roles = "Contractor, StaffReadWrite")]
         public async Task<ActionResult<Fault>> PutFault(Fault fault)
         {
             try

@@ -288,7 +288,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                             if (report.FaultID == updatedFault.ID)
                             {
                                 //Send email to user who reported the fault.
-                                SendGrid.Response response = await SendAccountCreationEmail(report.InputBy);
+                                SendGrid.Response response = await SendFaultUpdateEmail(report.InputBy);
 
                                 //Email was sent.
                                 if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
@@ -327,7 +327,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //Method Summary:
         //This method is executed when the fault status has changed "Update" button is clicked.
         //When executed this method attempts to send an email to user who reported the fault and returns the response from the _emailService.
-        public async Task<SendGrid.Response> SendAccountCreationEmail(string emailAddress)
+        public async Task<SendGrid.Response> SendFaultUpdateEmail(string emailAddress)
         {
             //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
             string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;

@@ -15,7 +15,7 @@ const mapBounds = [-8.3, 53.9, -5.3, 55.4]
 
 //FUNCTION SUMMARY:
 //This method is used for setting up the map control and adding event listeners to the map - uses the Azure Maps Web SDK.
-//In this instance a data source for displaying faults is creates and added to the map also.
+//In this instance a data source for displaying faults is created and added to the map also.
 function initViewMap() {
 
     //Create new map control
