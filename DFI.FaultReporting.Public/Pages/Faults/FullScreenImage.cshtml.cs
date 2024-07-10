@@ -42,7 +42,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         #region Page Load
         //Method Summary:
         //This method is executed when the page loads.
-        //When executed the images related to a reported fault are displayed on screen.
+        //When executed the selected report photo is displayed on screen.
         public async Task<IActionResult> OnGetAsync()
         {
             //The contexts current user exists.

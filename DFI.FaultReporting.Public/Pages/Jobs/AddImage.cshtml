@@ -1,16 +1,12 @@
 ﻿@page
-@model DFI.FaultReporting.Public.Pages.Faults.ReportFault.Step3Model
+@model DFI.FaultReporting.Public.Pages.Jobs.AddImageModel
 @{
-    ViewData["Title"] = "Step 3";
+    ViewData["Title"] = "Add images";
 }
 <div class="container">
     <h1>@ViewData["Title"]</h1>
     <br />
-    <div class="progress">
-        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:75%"></div>
-    </div>
-    <br />
-    <h2>Upload photos of fault</h2>
+    <h2>Upload photos of job</h2>
     <hr />
     <div class="alert alert-info">
         <strong>Info: </strong>
@@ -36,9 +32,9 @@
         </div>
         <div class="row">
             @{
-                if (Model.ReportPhotos != null)
+                if (Model.RepairPhotos != null)
                 {
-                    foreach (var photo in Model.ReportPhotos)
+                    foreach (var photo in Model.RepairPhotos)
                     {
                         <div class="col-md-2 text-center">
                             <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
@@ -56,8 +52,7 @@
         <div class="btn-group">
             <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
             &nbsp;
-            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+            <button id="btnSubmit" asp-page-handler="SubmitPhotos" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Submit</button>
         </div>
     </form>
 </div>
-<br />

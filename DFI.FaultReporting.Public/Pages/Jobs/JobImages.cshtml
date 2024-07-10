@@ -1,0 +1,48 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Jobs.JobImagesModel
+@{
+    ViewData["Title"] = "Job images";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Images that you uploaded for this job</h2>
+    <hr />
+    <div class="col-12">
+        <div class="row">
+            @{
+                if (Model.SelectedRepairPhotos != null)
+                {
+                    foreach (var photo in Model.SelectedRepairPhotos)
+                    {
+                        <div class="col-sm-6 col-md-4 text-center">
+                            <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                            <br />
+                            <br />
+                            <a asp-page="/Jobs/FullScreenImage" asp-route-id="@photo.ID" target="_blank" class="btn btn-lg btn-outline-primary"><i class="fa-solid fa-expand"></i></a>
+                            <br />
+                            <br />
+                        </div>
+                    }
+                }
+
+                if (Model.SelectedRepairPhotos == null || Model.SelectedRepairPhotos.Count == 0)
+                {
+                    <div class="alert alert-info">
+                        <strong>Info: </strong>
+                        <p>You have not uploaded any photos for this job.</p>
+                        <p>Click the "Add job photos" tile below to upload a new photo.</p>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Add job photo link" title="Add job photo" asp-page="/Jobs/AddImage" asp-route-id="@Model.Repair.ID"><i class="fa-solid fa-circle-plus"></i> Add job photos</a>
+            </div>
+        </div>
+    </div>
+</div>
