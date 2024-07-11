@@ -14,6 +14,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -93,6 +94,13 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs.Reports
         [BindProperty]
         [DisplayName("Target met")]
         public int? TargetMetFilter { get; set; }
+
+        [DisplayName("Search for contractor")]
+        [BindProperty]
+        public string? SearchString { get; set; }
+
+        [BindProperty]
+        public int SearchID { get; set; }
 
         [BindProperty]
         public List<FaultPriority> FaultPriorities { get; set; }
@@ -201,6 +209,12 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs.Reports
         public async Task<IActionResult> OnPostFilter()
         {
             await PopulateProperties();
+
+            //-------------------- SEARCH FILTER --------------------
+            if (SearchString != null && SearchString != string.Empty)
+            {
+                Repairs = Repairs.Where(r => r.ContractorID == SearchID).ToList();
+            }
 
             //-------------------- STATUS FILTER --------------------
             //User has selected a status that is not "All".

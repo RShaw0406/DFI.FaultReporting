@@ -17,6 +17,18 @@
                 <form name="filterForm" id="filterForm" asp-page-handler="Filter" method="post">
                     <div class="row">
                         <div class="col-md-4">
+                            <div class="form-floating mb-3" hidden>
+                                <input asp-for="SearchID" id="searchID" name="searchID" class="form-control" />
+                                <label asp-for="SearchID" for="searchID" class="control-label"></label>
+                            </div>
+                            <div class="autocomplete-page">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="SearchString" id="searchBox" autocomplete="off" class="form-control" />
+                                    <label asp-for="SearchString" for="searchBox" class="form-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
                             <div class="form-floating mb-3">
                                 <select asp-for="RepairStatusFilter" class="form-select" asp-items="Model.RepairStatusList" onchange="this.form.submit()">
                                     <option value="0">
@@ -260,6 +272,7 @@
         window.history.replaceState(null, null, window.location.href);
     }
 
+    var contractors = @Json.Serialize(HttpContext.Session.GetFromSession<List<Contractor>>("Contractors"));
     var repairs = @Json.Serialize(HttpContext.Session.GetFromSession<List<Repair>>("Repairs"));
     var repairStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<RepairStatus>>("RepairStatuses"));
     var chartColors = @Json.Serialize(HttpContext.Session.GetFromSession<List<string>>("ChartColors"));

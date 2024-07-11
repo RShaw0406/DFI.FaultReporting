@@ -78,7 +78,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         public Repair? Repair { get; set; }
 
         //Declare SearchString property, this is needed for searching staff.
-        [DisplayName("Search for staff")]
+        [DisplayName("Search for contractor")]
         [BindProperty]
         public string? SearchString { get; set; }
 
