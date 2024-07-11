@@ -2,7 +2,7 @@
 @using DFI.FaultReporting.Common.SessionStorage
 @using DFI.FaultReporting.Models.FaultReports
 @using DFI.FaultReporting.Models.Admin
-@model DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultsStatusReportModel
+@model DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultsDataReportModel
 @{
     ViewData["Title"] = "Faults status report";
 }
@@ -17,7 +17,6 @@
                 <form name="filterForm" id="filterForm" asp-page-handler="Filter" method="post">
                     <div class="row">
                         <div class="col-md-4">
-                            <span>Fault type:</span>
                             <div class="form-floating mb-3">
                                 <select asp-for="FaultTypeFilter" class="form-select" asp-items="Model.FaultTypesList" onchange="this.form.submit()">
                                     <option value="0">
@@ -27,6 +26,28 @@
                                 <label asp-for="FaultTypeFilter" class="form-label"></label>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="FaultStatusFilter" class="form-select" asp-items="Model.FaultStatusList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All (not repaired)
+                                    </option>
+                                </select>
+                                <label asp-for="FaultStatusFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="FaultPriorityFilter" class="form-select" asp-items="Model.FaultPriorityList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                </select>
+                                <label asp-for="FaultPriorityFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col-md-4">
                             <span class="form-label">From:</span>
                             <div class="form-floating mb-3 input-group">
@@ -76,26 +97,37 @@
                                     </div>
                                 </div>
                             </div>
-                    </div>
+
+                        </div>
                         @if (!Model.ValidFromDate || !Model.ValidToDate)
                         {
                             <span class="text-danger">@Model.InvalidDateMessage</span>
                         }
-
+                    </div>
                 </form>
             </div>
         </div>
         <br />
-        <hr />
         <div class="row">
-            <div class="col-md-6">
-                <canvas id="barChart" class="chart"></canvas>
-            </div>
-            <div class="col-md-6">
-                <canvas id="radarChart" class="chart"></canvas>
+            <div class="col-md-12">
+                <h3>Fault type data</h3>
+                <hr />
+                <canvas id="typeBarChart" class="chart"></canvas>
             </div>
         </div>
         <br />
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Fault status data</h3>
+                <hr />
+                <canvas id="statusBarChart" class="chart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h3>Fault priority data</h3>
+                <hr />
+                <canvas id="priorityBarChart" class="chart"></canvas>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-12">
                 <div class="table-responsive">
@@ -245,4 +277,4 @@
 
 </script>
 <script src="~/lib/Chart.js/dist/chart.umd.js"></script>
-<script src="~/js/charts/FaultStatusReportCharts.js"></script>
+<script src="~/js/charts/FaultsDataReportCharts.js"></script>

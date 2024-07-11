@@ -22,11 +22,11 @@ using OfficeOpenXml;
 
 namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 {
-    public class FaultsStatusReportModel : PageModel
+    public class FaultsDataReportModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
-        private readonly ILogger<FaultsStatusReportModel> _logger;
+        private readonly ILogger<FaultsDataReportModel> _logger;
         private readonly IStaffService _staffService;
         private readonly IFaultService _faultService;
         private readonly IFaultPriorityService _faultPriorityService;
@@ -38,7 +38,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         private readonly ISettingsService _settingsService;
 
         //Inject dependencies in constructor.
-        public FaultsStatusReportModel(ILogger<FaultsStatusReportModel> logger, IStaffService staffService, IFaultService faultService, IFaultTypeService faultTypeService,
+        public FaultsDataReportModel(ILogger<FaultsDataReportModel> logger, IStaffService staffService, IFaultService faultService, IFaultTypeService faultTypeService,
             IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService, IReportService reportService,
             IHttpContextAccessor httpContextAccessor, IPagerService pagerService, ISettingsService settingsService)
         {
@@ -740,7 +740,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 
             //Set the position of the memory stream to 0.
             memoryStream.Position = 0;
-            string excelName = "Fault Status Report.xlsx";
+            string excelName = "Faults Data Report.xlsx";
 
             //Return the file.
             return File(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName);     

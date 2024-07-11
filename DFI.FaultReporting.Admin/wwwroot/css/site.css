@@ -363,5 +363,5 @@ body {
 }
 
 .chart {
-    height: 500px;
+    height: 500px!important;
 }
