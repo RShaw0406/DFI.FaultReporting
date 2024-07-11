@@ -4,7 +4,7 @@
 @using DFI.FaultReporting.Models.Admin
 @model DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultsDataReportModel
 @{
-    ViewData["Title"] = "Faults status report";
+    ViewData["Title"] = "Faults data report";
 }
 <body onload="initCharts()">
     <div class="container">
@@ -30,7 +30,7 @@
                             <div class="form-floating mb-3">
                                 <select asp-for="FaultStatusFilter" class="form-select" asp-items="Model.FaultStatusList" onchange="this.form.submit()">
                                     <option value="0">
-                                        All (not repaired)
+                                        All
                                     </option>
                                 </select>
                                 <label asp-for="FaultStatusFilter" class="form-label"></label>
@@ -128,6 +128,7 @@
                 <canvas id="priorityBarChart" class="chart"></canvas>
             </div>
         </div>
+        <br />
         <div class="row">
             <div class="col-md-12">
                 <div class="table-responsive">
