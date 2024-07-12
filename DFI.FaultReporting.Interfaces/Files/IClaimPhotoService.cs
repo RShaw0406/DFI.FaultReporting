@@ -9,14 +9,12 @@ namespace DFI.FaultReporting.Interfaces.Files
 {
     public interface IClaimPhotoService
     {
-        Task<List<ClaimPhoto>> GetClaimPhotos();
+        Task<List<ClaimPhoto>> GetClaimPhotos(string token);
 
-        Task<ClaimPhoto> GetClaimPhoto(int ID);
+        Task<ClaimPhoto> GetClaimPhoto(int ID, string token);
 
-        Task<ClaimPhoto> CreateClaimPhoto(ClaimPhoto claimPhoto);
+        Task<ClaimPhoto> CreateClaimPhoto(ClaimPhoto claimPhoto, string token);
 
-        Task<ClaimPhoto> UpdateClaimPhoto(ClaimPhoto claimPhoto);
-
-        Task<ClaimPhoto> DeleteClaimPhoto(int ID);
+        Task<ClaimPhoto> UpdateClaimPhoto(ClaimPhoto claimPhoto, string token);
     }
 }
