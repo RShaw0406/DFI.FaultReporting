@@ -185,6 +185,7 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs.Reports
 
                     //Setup pager for table.
                     Pager.CurrentPage = 1;
+                    Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
                     Pager.Count = Repairs.Count;
                     PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
                     PagedRepairs = PagedRepairs.OrderBy(r => r.RepairStatusID).ToList();
@@ -245,14 +246,16 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs.Reports
 
             //Setup pager for table.
             Pager.Count = Repairs.Count;
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
             PagedRepairs = PagedRepairs.OrderBy(r => r.RepairStatusID).ToList();
 
             await SetSessionData();
 
-            //Set the selected repair status and taregt met in TempData.
+            //Set the search string, selected repair status and taregt met in TempData.
             TempData["RepairStatusFilter"] = RepairStatusFilter;
             TempData["TargetMetFilter"] = TargetMetFilter;
+            TempData["SearchString"] = SearchString;
             TempData.Keep();
 
             return Page();
@@ -279,10 +282,17 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs.Reports
                 TargetMetFilter = int.Parse(TempData["TargetMetFilter"].ToString());
             }
 
+            //User has entered a search string.
+            if (TempData["SearchString"] != null && TempData["SearchString"].ToString() != string.Empty)
+            {
+                SearchString = TempData["SearchString"].ToString();
+            }
+
             TempData.Keep();
 
             //Setup pager for table.
             Pager.Count = Repairs.Count;
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
             PagedRepairs = PagedRepairs.OrderBy(r => r.RepairStatusID).ToList();
         }
@@ -328,7 +338,7 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs.Reports
 
         #region Data
         //Method Summary:
-        //This method is excuted when the page loads or when the user changes the filter options.
+        //This method is excuted when the a post occurs.
         //When excuted, it populates the page properties.
         public async Task PopulateProperties()
         {

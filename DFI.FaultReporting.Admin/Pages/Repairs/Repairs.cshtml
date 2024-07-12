@@ -1,229 +1,262 @@
 ﻿@page
+@using DFI.FaultReporting.Common.SessionStorage
+@using DFI.FaultReporting.Models.FaultReports
+@using DFI.FaultReporting.Models.Admin
 @model DFI.FaultReporting.Admin.Pages.Repairs.RepairsModel
 @{
     ViewData["Title"] = "Repairs";
 }
-<div class="container">
-    <h1>@ViewData["Title"]</h1>
-    <br />
-    <h2>View scheduled faults</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-12">
-            <form name="filterForm" id="filterForm" asp-page-handler="Filter" method="post">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-floating mb-3">
-                            <select asp-for="RepairStatusFilter" class="form-select" asp-items="Model.RepairStatusList" onchange="this.form.submit()">
-                                <option value="0">
-                                    All (not repaired)
-                                </option>
-                            </select>
-                            <label asp-for="RepairStatusFilter" class="form-label"></label>
+<body onload="initSearch()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>View scheduled faults</h2>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <form name="filterForm" id="filterForm" asp-page-handler="Filter" method="post">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3" hidden>
+                                <input asp-for="SearchID" id="searchID" name="searchID" class="form-control" />
+                                <label asp-for="SearchID" for="searchID" class="control-label"></label>
+                            </div>
+                            <div class="autocomplete-page">
+                                <div class="form-floating mb-3">
+                                    <input asp-for="SearchString" id="searchBox" autocomplete="off" class="form-control" />
+                                    <label asp-for="SearchString" for="searchBox" class="form-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="RepairStatusFilter" class="form-select" asp-items="Model.RepairStatusList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All (not repaired)
+                                    </option>
+                                </select>
+                                <label asp-for="RepairStatusFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="TargetMetFilter" class="form-select" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                    <option value="1">
+                                        Target met
+                                    </option>
+                                    <option value="2">
+                                        Target not met
+                                    </option>
+                                </select>
+                                <label asp-for="TargetMetFilter" class="form-label"></label>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>
-                                Repair details
-                            </th>
-                            <th>
-                                Fault details
-                            </th>
-                            <th>
-                                Input details
-                            </th>
-                            <th>
-                                View photos
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var repair in Model.PagedRepairs)
-                        {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
                             <tr>
-                                <td>
-                                    <strong>Assigned contractor:</strong>
-                                    <br />
-                                    @Model.Contractors.FirstOrDefault(c => c.ID == repair.ContractorID).ContractorName
-                                    <br />
-                                    @Model.Contractors.FirstOrDefault(c => c.ID == repair.ContractorID).Email
-                                    <br />
-                                    <br />
-                                    <strong>Status:</strong>
-                                    <br />
-                                    @Model.RepairStatuses.FirstOrDefault(rs => rs.ID == repair.RepairStatusID).RepairStatusDescription                                      
-                                    <br />
-                                    <br />
-                                    <strong>Target date</strong>
-                                    <br />
-                                    @repair.RepairTargetDate.ToShortDateString()
-                                    <br />
-                                    <br />
-                                    @if (repair.RepairStatusID == 3)
-                                    {
-                                        <strong>Date repaired:</strong>
-                                        <br />
-                                        @Convert.ToDateTime(repair.ActualRepairDate).ToShortDateString()
-                                        <br />
-                                        <br />
-                                        @if (repair.ActualRepairDate <= repair.RepairTargetDate)
-                                        {
-                                            <span class="badge bg-success">Target met</span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-danger">Target not met</span>
-                                        }
-                                        <br />
-                                        <br />
-
-                                    }
-                                    @if (repair.RepairNotes != null && repair.RepairNotes != string.Empty)
-                                    {
-                                        <strong>Notes:</strong>
-                                        <br />
-                                        @repair.RepairNotes
-                                    }                                
-                                </td>
-                                <td>
-                                    @foreach (var fault in Model.Faults)
-                                    {
-                                        @if (fault.ID == repair.FaultID)
-                                        {
-                                            <strong>Type:</strong>
-                                            <br />
-                                            @foreach (var faultType in Model.FaultTypes)
-                                            {
-                                                if (fault.FaultTypeID == faultType.ID)
-                                                {
-                                                    @faultType.FaultTypeDescription
-                                                }
-                                            }
-                                            <br />
-                                            <br />
-                                            <strong>Status:</strong>
-                                            <br />
-                                            @foreach (var faultStatus in Model.FaultStatuses)
-                                            {
-                                                if (fault.FaultStatusID == faultStatus.ID)
-                                                {
-                                                    @faultStatus.FaultStatusDescription
-                                                }
-                                            }
-                                            <br />
-                                            <br />
-                                            <strong>Priority:</strong>
-                                            <br />
-                                            @foreach (var faultPriority in Model.FaultPriorities)
-                                            {
-                                                if (fault.FaultPriorityID == faultPriority.ID)
-                                                {
-                                                    @faultPriority.FaultPriorityRating
-                                                }
-                                            }
-                                            <br />
-                                            @Model.FaultPriorities.FirstOrDefault(fp => fp.ID == fault.FaultPriorityID).FaultPriorityDescription
-                                            <br />
-                                            <br />
-                                            <strong>Location:</strong>
-                                            <br />
-                                            @if (fault.RoadNumber != "undefined" && fault.RoadNumber != null)
-                                            {
-                                                @fault.RoadNumber
-                                                <br />
-                                            }
-                                            @if (fault.RoadName != "undefined" && fault.RoadName != null)
-                                            {
-                                                @fault.RoadName
-                                                <br />
-                                            }
-                                            @if (fault.RoadTown != "undefined" && fault.RoadTown != null)
-                                            {
-                                                @fault.RoadTown
-                                                <br />
-                                            }
-                                            @if (fault.RoadCounty != "undefined" && fault.RoadCounty != null)
-                                            {
-                                                @fault.RoadCounty
-                                            }
-                                        }
-                                    }
-                                </td>
-                                <td>
-                                    <strong>Input:</strong>
-                                    <br />
-                                    @Html.DisplayFor(modelItem => repair.InputBy)
-                                    <br />
-                                    @Html.DisplayFor(modelItem => repair.InputOn)
-                                </td>
-                                <td>
-                                    <a asp-page="./RepairImages" asp-route-id="@repair.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
-                                </td>
+                                <th>
+                                    Repair details
+                                </th>
+                                <th>
+                                    Fault details
+                                </th>
+                                <th>
+                                    Input details
+                                </th>
+                                <th class="text-center">
+                                    View photos
+                                </th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach (var repair in Model.PagedRepairs)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>Assigned contractor:</strong>
+                                        <br />
+                                        @Model.Contractors.FirstOrDefault(c => c.ID == repair.ContractorID).ContractorName
+                                        <br />
+                                        @Model.Contractors.FirstOrDefault(c => c.ID == repair.ContractorID).Email
+                                        <br />
+                                        <br />
+                                        <strong>Status:</strong>
+                                        <br />
+                                        @Model.RepairStatuses.FirstOrDefault(rs => rs.ID == repair.RepairStatusID).RepairStatusDescription
+                                        <br />
+                                        <br />
+                                        <strong>Target date</strong>
+                                        <br />
+                                        @repair.RepairTargetDate.ToShortDateString()
+                                        <br />
+                                        <br />
+                                        @if (repair.RepairStatusID == 3)
+                                        {
+                                            <strong>Date repaired:</strong>
+                                            <br />
+                                            @Convert.ToDateTime(repair.ActualRepairDate).ToShortDateString()
+                                            <br />
+                                            <br />
+                                            @if (repair.ActualRepairDate <= repair.RepairTargetDate)
+                                            {
+                                                <span class="badge bg-success">Target met</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Target not met</span>
+                                            }
+                                            <br />
+                                            <br />
+
+                                        }
+                                        @if (repair.RepairNotes != null && repair.RepairNotes != string.Empty)
+                                        {
+                                            <strong>Notes:</strong>
+                                            <br />
+                                            @repair.RepairNotes
+                                        }
+                                    </td>
+                                    <td>
+                                        @foreach (var fault in Model.Faults)
+                                        {
+                                            @if (fault.ID == repair.FaultID)
+                                            {
+                                                <strong>Type:</strong>
+                                                <br />
+                                                @foreach (var faultType in Model.FaultTypes)
+                                                {
+                                                    if (fault.FaultTypeID == faultType.ID)
+                                                    {
+                                                        @faultType.FaultTypeDescription
+                                                    }
+                                                }
+                                                <br />
+                                                <br />
+                                                <strong>Status:</strong>
+                                                <br />
+                                                @foreach (var faultStatus in Model.FaultStatuses)
+                                                {
+                                                    if (fault.FaultStatusID == faultStatus.ID)
+                                                    {
+                                                        @faultStatus.FaultStatusDescription
+                                                    }
+                                                }
+                                                <br />
+                                                <br />
+                                                <strong>Priority:</strong>
+                                                <br />
+                                                @foreach (var faultPriority in Model.FaultPriorities)
+                                                {
+                                                    if (fault.FaultPriorityID == faultPriority.ID)
+                                                    {
+                                                        @faultPriority.FaultPriorityRating
+                                                    }
+                                                }
+                                                <br />
+                                                @Model.FaultPriorities.FirstOrDefault(fp => fp.ID == fault.FaultPriorityID).FaultPriorityDescription
+                                                <br />
+                                                <br />
+                                                <strong>Location:</strong>
+                                                <br />
+                                                @if (fault.RoadNumber != "undefined" && fault.RoadNumber != null)
+                                                {
+                                                    @fault.RoadNumber
+                                                    <br />
+                                                }
+                                                @if (fault.RoadName != "undefined" && fault.RoadName != null)
+                                                {
+                                                    @fault.RoadName
+                                                    <br />
+                                                }
+                                                @if (fault.RoadTown != "undefined" && fault.RoadTown != null)
+                                                {
+                                                    @fault.RoadTown
+                                                    <br />
+                                                }
+                                                @if (fault.RoadCounty != "undefined" && fault.RoadCounty != null)
+                                                {
+                                                    @fault.RoadCounty
+                                                }
+                                            }
+                                        }
+                                    </td>
+                                    <td>
+                                        <strong>Input:</strong>
+                                        <br />
+                                        @Html.DisplayFor(modelItem => repair.InputBy)
+                                        <br />
+                                        @Html.DisplayFor(modelItem => repair.InputOn)
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./RepairImages" asp-route-id="@repair.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-magnifying-glass-plus"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @{
+                    var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+                }
+                <div>
+                    <ul class="pagination text-center">
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="First page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="Previous page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span> Prev
+                            </a>
+                        </li>
+                        <li>
+                            &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                               class="btn btn-outline-primary btn-sm @nextDisabled"
+                               aria-label="Next page button"
+                               style="font-size: 1em !important;">
+                                Next <span class="fa fa-chevron-right"></span>
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                               class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                               style="font-size: 1em !important;">
+                                Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            @{
-                var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
-                var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
-            }
-            <div>
-                <ul class="pagination text-center">
-                    <li>
-                        <a asp-page-handler="Paging" asp-route-CurrentPage="1"
-                           class="btn btn-outline-primary btn-sm @prevDisabled"
-                           aria-label="First page button" style="font-size: 1em !important;">
-                            <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
-                        </a>&nbsp;
-                    </li>
-                    <li>
-                        <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
-                           class="btn btn-outline-primary btn-sm @prevDisabled"
-                           aria-label="Previous page button" style="font-size: 1em !important;">
-                            <span class="fa fa-chevron-left"></span> Prev
-                        </a>
-                    </li>
-                    <li>
-                        &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
-                    </li>
-                    <li>
-                        <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
-                           class="btn btn-outline-primary btn-sm @nextDisabled"
-                           aria-label="Next page button"
-                           style="font-size: 1em !important;">
-                            Next <span class="fa fa-chevron-right"></span>
-                        </a>&nbsp;
-                    </li>
-                    <li>
-                        <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
-                           class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
-                           style="font-size: 1em !important;">
-                            Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
-                        </a>
-                    </li>
-                </ul>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="small-tile">
+                    <a class="nav-link" aria-label="Repairs reporting link" title="Repairs reporting" asp-page="/Repairs/Reports/RepairsDataReport"><i class="fa-solid fa-magnifying-glass-chart"></i> Reporting</a>
+                </div>
             </div>
         </div>
     </div>
-    <br />
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <div class="small-tile">
-                <a class="nav-link" aria-label="Repairs reporting link" title="Repairs reporting" asp-page="/Repairs/Reports/RepairsDataReport"><i class="fa-solid fa-magnifying-glass-chart"></i> Reporting</a>
-            </div>
-        </div>
-    </div>
-</div>
+</body>
 
 <script type="text/javascript">
 
@@ -231,4 +264,131 @@
         window.history.replaceState(null, null, window.location.href);
     }
 
+    function initSearch() {
+        // Find search box on page
+        var searchBox = document.getElementById('searchBox');
+
+        if (searchBox != null) {
+            // Add event for when user begins to input text
+            searchBox.addEventListener('input', search);
+        }
+    }
+
+
+    function search() {
+        var query = document.getElementById('searchBox').value;
+
+        var contractors = @Json.Serialize(HttpContext.Session.GetFromSession<List<Contractor>>("Contractors"));
+
+        if (!query) {
+            document.getElementById("filterForm").submit();
+        }
+        else {
+            autocomplete(document.getElementById("searchBox"), contractors);
+        }
+    }
+
+    function autocomplete(inp, contractors) {
+        /*the autocomplete function takes two arguments,
+        the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("input", function (e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) { return false; }
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            contractors.forEach(function (contractor) {
+                if (contractor.contractorName.substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+
+                    /*create a DIV element for each matching element:*/
+                    b = document.createElement("DIV");
+
+                    /*make the matching letters bold:*/
+                    b.innerHTML = "<strong>" + contractor.contractorName.substr(0, val.length) + "</strong>";
+                    b.innerHTML += contractor.contractorName.substr(val.length);
+                    /*insert a input field that will hold the current array item's value:*/
+                    b.innerHTML += "<input type='hidden' value='" + contractor.contractorName + "'>";
+
+
+                    /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function (e) {
+                        /*insert the value for the autocomplete text field:*/
+                        inp.value = this.getElementsByTagName("input")[0].value;
+                        /*close the list of autocompleted values,
+                        (or any other open lists of autocompleted values:*/
+                        closeAllLists();
+
+                        document.getElementById("searchID").value = contractor.id;
+
+                        document.getElementById("filterForm").submit();
+                    });
+                    a.appendChild(b);
+                }
+            });
+        });
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function (e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                    /*and simulate a click on the "active" item:*/
+                    if (x) x[currentFocus].click();
+                }
+            }
+        });
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+                x[i].classList.remove("autocomplete-active");
+            }
+        }
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+                if (elmnt != x[i] && elmnt != inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+        /*execute a function when someone clicks in the document:*/
+        document.addEventListener("click", function (e) {
+            closeAllLists(e.target);
+        });
+    }
 </script>
