@@ -60,6 +60,7 @@ builder.Services.AddScoped<IRepairStatusSQLRepository, RepairStatusSQLRepository
 builder.Services.AddScoped<IClaimSQLRepository, ClaimSQLRepository>();
 builder.Services.AddScoped<IClaimFileSQLRepository, ClaimFileSQLRepository>();
 builder.Services.AddScoped<IClaimPhotoSQLRepository, ClaimPhotoSQLRepository>();
+builder.Services.AddScoped<ILegalRepSQLRepository, LegalRepSQLRepository>();
 
 builder.Services.AddScoped<DFI.FaultReporting.JWT.Requests.LoginRequest, DFI.FaultReporting.JWT.Requests.LoginRequest>();
 builder.Services.AddScoped<RegistrationRequest, RegistrationRequest>();

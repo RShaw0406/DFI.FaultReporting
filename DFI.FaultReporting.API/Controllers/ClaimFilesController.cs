@@ -66,7 +66,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         // PUT: api/ClaimFiles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{ID}")]
+        [HttpPut]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<ClaimFile>> PutClaimFile(ClaimFile claimFile)
         {
@@ -80,7 +80,7 @@ namespace DFI.FaultReporting.API.Controllers
             {
                 ClaimFiles = await _claimFileSQLRepository.GetClaimFiles();
 
-                if (!ClaimFiles.Any(cs => cs.ID == claimFile.ID))
+                if (!ClaimFiles.Any(cf => cf.ID == claimFile.ID))
                 {
                     return NotFound();
                 }

@@ -14,6 +14,7 @@ using DFI.FaultReporting.Services.Emails;
 using DFI.FaultReporting.Services.FaultReports;
 using DFI.FaultReporting.Services.Files;
 using DFI.FaultReporting.Services.Interfaces.Admin;
+using DFI.FaultReporting.Services.Interfaces.Claims;
 using DFI.FaultReporting.Services.Interfaces.Emails;
 using DFI.FaultReporting.Services.Interfaces.Files;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IRepairStatusService, RepairStatusService>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IClaimFileService, ClaimFileService>();
 builder.Services.AddScoped<IClaimPhotoService, ClaimPhotoService>();
+builder.Services.AddScoped<ILegalRepService, LegalRepService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -81,6 +83,7 @@ builder.Services.AddScoped<RepairStatusHttp, RepairStatusHttp>();
 builder.Services.AddScoped<ClaimHttp, ClaimHttp>();
 builder.Services.AddScoped<ClaimFileHttp, ClaimFileHttp>();
 builder.Services.AddScoped<ClaimPhotoHttp, ClaimPhotoHttp>();
+builder.Services.AddScoped<LegalRepHttp, LegalRepHttp>();
 
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
