@@ -68,6 +68,7 @@ builder.Services.AddScoped<IClaimService, ClaimService>();
 builder.Services.AddScoped<IClaimFileService, ClaimFileService>();
 builder.Services.AddScoped<IClaimPhotoService, ClaimPhotoService>();
 builder.Services.AddScoped<ILegalRepService, LegalRepService>();
+builder.Services.AddScoped<IWitnessService, WitnessService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -88,6 +89,7 @@ builder.Services.AddScoped<ClaimHttp, ClaimHttp>();
 builder.Services.AddScoped<ClaimFileHttp, ClaimFileHttp>();
 builder.Services.AddScoped<ClaimPhotoHttp, ClaimPhotoHttp>();
 builder.Services.AddScoped<LegalRepHttp, LegalRepHttp>();
+builder.Services.AddScoped<WitnessHttp, WitnessHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();

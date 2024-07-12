@@ -32,5 +32,6 @@ namespace DFI.FaultReporting.Common.Constants
         public const string ClaimFile = "/api/claimfiles";
         public const string ClaimPhoto = "/api/claimphotos";
         public const string LegalRep = "/api/legalreps";
+        public const string Witness = "/api/witnesses";
     }
 }
