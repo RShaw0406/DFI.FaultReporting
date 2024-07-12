@@ -25,6 +25,8 @@ using DFI.FaultReporting.JWT.Requests;
 using DFI.FaultReporting.JWT.Response;
 using DFI.FaultReporting.Services.Interfaces.Passwords;
 using DFI.FaultReporting.Services.Passwords;
+using DFI.FaultReporting.SQL.Repository.Interfaces.Claims;
+using DFI.FaultReporting.SQL.Repository.Claims;
 //using DFI.FaultReporting.Services.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +57,7 @@ builder.Services.AddScoped<IContractorSQLRepository, ContractorSQLRepository>();
 builder.Services.AddScoped<IRepairSQLRepository, RepairSQLRepository>();
 builder.Services.AddScoped<IRepairPhotoSQLRepository, RepairPhotoSQLRepository>();
 builder.Services.AddScoped<IRepairStatusSQLRepository, RepairStatusSQLRepository>();
+builder.Services.AddScoped<IClaimSQLRepository, ClaimSQLRepository>();
 
 builder.Services.AddScoped<DFI.FaultReporting.JWT.Requests.LoginRequest, DFI.FaultReporting.JWT.Requests.LoginRequest>();
 builder.Services.AddScoped<RegistrationRequest, RegistrationRequest>();

@@ -1,12 +1,15 @@
 using DFI.FaultReporting.Http.Admin;
+using DFI.FaultReporting.Http.Claims;
 using DFI.FaultReporting.Http.FaultReports;
 using DFI.FaultReporting.Http.Files;
 using DFI.FaultReporting.Http.Roles;
 using DFI.FaultReporting.Http.Users;
 using DFI.FaultReporting.Interfaces.Admin;
+using DFI.FaultReporting.Interfaces.Claims;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Interfaces.Files;
 using DFI.FaultReporting.Services.Admin;
+using DFI.FaultReporting.Services.Claims;
 using DFI.FaultReporting.Services.Emails;
 using DFI.FaultReporting.Services.FaultReports;
 using DFI.FaultReporting.Services.Files;
@@ -60,6 +63,7 @@ builder.Services.AddScoped<IContractorService, ContractorService>();
 builder.Services.AddScoped<IRepairService, RepairService>();
 builder.Services.AddScoped<IRepairPhotoService, RepairPhotoService>();
 builder.Services.AddScoped<IRepairStatusService, RepairStatusService>();
+builder.Services.AddScoped<IClaimService, ClaimService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -76,6 +80,7 @@ builder.Services.AddScoped<ContractorHttp, ContractorHttp>();
 builder.Services.AddScoped<RepairHttp, RepairHttp>();
 builder.Services.AddScoped<RepairPhotoHttp, RepairPhotoHttp>();
 builder.Services.AddScoped<RepairStatusHttp, RepairStatusHttp>();
+builder.Services.AddScoped<ClaimHttp, ClaimHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();

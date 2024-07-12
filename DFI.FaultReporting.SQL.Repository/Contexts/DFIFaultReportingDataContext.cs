@@ -1,4 +1,5 @@
 ﻿using DFI.FaultReporting.Models.Admin;
+using DFI.FaultReporting.Models.Claims;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Files;
 using DFI.FaultReporting.Models.Roles;
@@ -59,5 +60,7 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         public DbSet<RepairPhoto> RepairPhoto { get; set; } = null!;
 
         public DbSet<RepairStatus> RepairStatus { get; set; } = null!;
+
+        public DbSet<Claim> Claim { get; set; } = null!;
     }
 }

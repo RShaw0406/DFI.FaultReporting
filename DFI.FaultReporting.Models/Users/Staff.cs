@@ -24,8 +24,8 @@ namespace DFI.FaultReporting.Models.Users
         public string? PasswordSalt { get; set; }
 
         [DisplayName("Title")]
-        [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "Prefix must not contain special characters or numbers")]
-        [StringLength(8, ErrorMessage = "Prefix name must not be more than 8 characters")]
+        [RegularExpression(@"^[a-zA-Z''-'\s]{1,8}$", ErrorMessage = "Title must not contain special characters or numbers")]
+        [StringLength(8, ErrorMessage = "Title must not be more than 8 characters")]
         public string? Prefix { get; set; }
 
         [DisplayName("First name")]

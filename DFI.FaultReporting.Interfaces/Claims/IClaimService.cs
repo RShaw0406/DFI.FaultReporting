@@ -9,14 +9,12 @@ namespace DFI.FaultReporting.Interfaces.Claims
 {
     public interface IClaimService
     {
-        Task<List<Claim>> GetClaims();
+        Task<List<Claim>> GetClaims(string token);
 
-        Task<Claim> GetClaim(int ID);
+        Task<Claim> GetClaim(int ID, string token);
 
-        Task<Claim> CreateClaim(Claim claim);
+        Task<Claim> CreateClaim(Claim claim, string token);
 
-        Task<Claim> UpdateClaim(Claim claim);
-
-        Task<Claim> DeleteClaim(int ID);
+        Task<Claim> UpdateClaim(Claim claim, string token);
     }
 }
