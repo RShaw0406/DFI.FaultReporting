@@ -9,14 +9,12 @@ namespace DFI.FaultReporting.Interfaces.Files
 {
     public interface IClaimFileService
     {
-        Task<List<ClaimFile>> GetClaimFiles();
+        Task<List<ClaimFile>> GetClaimFiles(string token);
 
-        Task<ClaimFile> GetClaimFile(int ID);
+        Task<ClaimFile> GetClaimFile(int ID, string token);
 
-        Task<ClaimFile> CreateClaimFile(ClaimFile claimFile);
+        Task<ClaimFile> CreateClaimFile(ClaimFile claimFile, string token);
 
-        Task<ClaimFile> UpdateClaimFile(ClaimFile claimFile);
-
-        Task<ClaimFile> DeleteClaimFile(int ID);
+        Task<ClaimFile> UpdateClaimFile(ClaimFile claimFile, string token);
     }
 }

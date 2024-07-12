@@ -64,6 +64,7 @@ builder.Services.AddScoped<IRepairService, RepairService>();
 builder.Services.AddScoped<IRepairPhotoService, RepairPhotoService>();
 builder.Services.AddScoped<IRepairStatusService, RepairStatusService>();
 builder.Services.AddScoped<IClaimService, ClaimService>();
+builder.Services.AddScoped<IClaimFileService, ClaimFileService>();
 
 builder.Services.AddScoped<ClaimStatusHttp, ClaimStatusHttp>();
 builder.Services.AddScoped<ClaimTypeHttp, ClaimTypeHttp>();
@@ -81,6 +82,7 @@ builder.Services.AddScoped<RepairHttp, RepairHttp>();
 builder.Services.AddScoped<RepairPhotoHttp, RepairPhotoHttp>();
 builder.Services.AddScoped<RepairStatusHttp, RepairStatusHttp>();
 builder.Services.AddScoped<ClaimHttp, ClaimHttp>();
+builder.Services.AddScoped<ClaimFileHttp, ClaimFileHttp>();
 
 builder.Services.AddScoped<ISettingsService, SettingsService>();
 builder.Services.AddScoped<IEmailService, EmailService>();

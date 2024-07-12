@@ -65,9 +65,9 @@ namespace DFI.FaultReporting.API.Controllers
 
         // PUT: api/RepairPhotos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{ID}")]
+        [HttpPut]
         [Authorize(Roles = "Contractor")]
-        public async Task<ActionResult<RepairPhoto>> PutRepairPhoto(int ID, RepairPhoto repairPhoto)
+        public async Task<ActionResult<RepairPhoto>> PutRepairPhoto(RepairPhoto repairPhoto)
         {
             try
             {

@@ -29,5 +29,6 @@ namespace DFI.FaultReporting.Common.Constants
         public const string RepairPhoto = "/api/repairphotos";
         public const string RepairStatus = "/api/repairstatus";
         public const string Claim = "/api/claims";
+        public const string ClaimFile = "/api/claimfiles";
     }
 }

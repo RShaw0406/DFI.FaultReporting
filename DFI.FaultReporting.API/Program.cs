@@ -58,6 +58,7 @@ builder.Services.AddScoped<IRepairSQLRepository, RepairSQLRepository>();
 builder.Services.AddScoped<IRepairPhotoSQLRepository, RepairPhotoSQLRepository>();
 builder.Services.AddScoped<IRepairStatusSQLRepository, RepairStatusSQLRepository>();
 builder.Services.AddScoped<IClaimSQLRepository, ClaimSQLRepository>();
+builder.Services.AddScoped<IClaimFileSQLRepository, ClaimFileSQLRepository>();
 
 builder.Services.AddScoped<DFI.FaultReporting.JWT.Requests.LoginRequest, DFI.FaultReporting.JWT.Requests.LoginRequest>();
 builder.Services.AddScoped<RegistrationRequest, RegistrationRequest>();

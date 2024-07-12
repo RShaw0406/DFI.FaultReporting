@@ -62,5 +62,13 @@ namespace DFI.FaultReporting.SQL.Repository.Contexts
         public DbSet<RepairStatus> RepairStatus { get; set; } = null!;
 
         public DbSet<Claim> Claim { get; set; } = null!;
+
+        public DbSet<ClaimPhoto> ClaimPhoto { get; set; } = null!;
+
+        public DbSet<ClaimFile> ClaimFile { get; set; } = null!;
+
+        public DbSet<LegalRep> LegalRep { get; set; } = null!;
+
+        public DbSet<Witness> Witness { get; set; } = null!;
     }
 }
