@@ -36,7 +36,6 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs
         [BindProperty]
         public List<RepairPhoto> RepairPhotos { get; set; }
 
-        //Declare SelectedRepairPhotos property, this is needed to store the photos for the selected repair.
         [BindProperty]
         public List<RepairPhoto>? SelectedRepairPhotos { get; set; }
         #endregion Properties

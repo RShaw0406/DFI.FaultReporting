@@ -5,6 +5,7 @@ using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.FaultReports;
 using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
 using DFI.FaultReporting.Services.Interfaces.Settings;
@@ -57,63 +58,52 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentUser property, this is needed when calling the _userService.
         public User CurrentUser { get; set; }
 
-        //Declare Contractor property, this is needed for getting contractor details.
         [BindProperty]
         public Contractor Contractor { get; set; }
 
-        //Declare Contractors property, this is needed for getting all contractors.
         [BindProperty]
         public List<Contractor> Contractors { get; set; }
 
-        //Declare Faults property, this is needed for getting all faults.
         [BindProperty]
         public List<Fault> Faults { get; set; }
 
-        //Declare Repairs property, this is needed for getting repairs assigned to contractor.
         [BindProperty]
         public List<Repair> Repairs { get; set; }
 
-        //Declare PagedRepairs property, this is needed for displaying repairs in the table.
         [BindProperty]
         public List<Repair> PagedRepairs { get; set; }
 
-        //Declare RepairStatuses property, this is needed for populating the dropdown filter.
         [BindProperty]
         public List<RepairStatus> RepairStatuses { get; set; }
 
-        //Declare RepairStatusList property, this is needed for populating the dropdown filter.
         [BindProperty]
         public IEnumerable<SelectListItem> RepairStatusList { get; set; }
 
-        //Declare RepairStatusFilter, this is needed for filtering the repairs.
         [DisplayName("Repair status")]
         [BindProperty]
         public int RepairStatusFilter { get; set; }
 
-        //Declare FaultPriorities property, this is needed for getting fault priorities from the DB.
+        [BindProperty]
+        [DisplayName("Target met")]
+        public int? TargetMetFilter { get; set; }
+
         [BindProperty]
         public List<FaultPriority> FaultPriorities { get; set; }
 
-        //Declare FaultStatuses property, this is needed for getting fault statuses from the DB.
         [BindProperty]
         public List<FaultStatus> FaultStatuses { get; set; }
 
-        //Declare FaultTypes property, this is needed for getting fault types from the DB.
         [BindProperty]
         public List<FaultType> FaultTypes { get; set; }
 
-        //Declare ShowRepairMap property, this is needed for displaying the repairs map.
         [BindProperty]
         public bool ShowRepairMap { get; set; }
 
-        //Declare ShowFaultTable property, this is needed for displaying the repairs table.
         [BindProperty]
         public bool ShowRepairTable { get; set; }
 
-        //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
         public Pager Pager { get; set; } = new Pager();
         #endregion Properties
@@ -133,96 +123,92 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                     //Show the repair map by default.
                     ShowRepairMap = true;
 
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentUser property by calling the GetUser method in the _userService.
-                    CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
-
-                    //Clear session to ensure fresh start.
+                    //Clear session and tempdata to ensure fresh start.
                     HttpContext.Session.Clear();
-
-                    //Clear TempData to ensure fresh start.
                     TempData.Clear();
 
-                    //Get all contractors from the DB and set in Contractors property.
-                    Contractors = await _contractorService.GetContractors(jwtToken);
-                    if (Contractors != null)
-                    {
-                        //Get the contractor details from the Contractors property by filtering on the CurrentUser property.
-                        Contractor = Contractors.Where(c => c.Email == CurrentUser.Email).FirstOrDefault();
-                    }
+                    await PopulateProperties();
 
-                    //Get all repairs from the DB and set in Repairs property.
-                    Repairs = await _repairService.GetRepairs(jwtToken);
+                    await SetSessionData();
 
-                    //Filter out repairs that are not assigned to the current contractor.
-                    Repairs = Repairs.Where(r => r.ContractorID == Contractor.ID).ToList();
-
-                    //Filter out repairs that have been repaired.
-                    Repairs = Repairs.Where(r => r.RepairStatusID != 3).ToList();
-
-                    //Order the repairs by RepairTargetDate.
-                    Repairs = Repairs.OrderBy(r => r.RepairTargetDate).ToList();
-
-                    //Get all repair statuses from the DB and set in RepairStatuses property.
-                    RepairStatuses = await _repairStatusService.GetRepairStatuses(jwtToken);
-
-                    //Filter out inactive repair statuses.
-                    RepairStatuses = RepairStatuses.Where(rs => rs.Active == true).ToList();
-
-                    //Populate repair status dropdown.
-                    RepairStatusList = RepairStatuses.Select(rs => new SelectListItem()
-                    {
-                        Text = rs.RepairStatusDescription,
-                        Value = rs.ID.ToString()
-                    });
-
-                    //Get all faults from the DB and set in Faults property.
-                    Faults = await _faultService.GetFaults();
-
-                    //Get all fault priorities from the DB and set in FaultPriorities property.
-                    FaultPriorities = await _faultPriorityService.GetFaultPriorities();
-
-                    //Get all fault statuses from the DB and set in FaultStatuses property.
-                    FaultStatuses = await _faultStatusService.GetFaultStatuses();
-
-                    //Get all fault types from the DB and set in FaultTypes property.
-                    FaultTypes = await _faultTypeService.GetFaultTypes();
-
-                    //Set session data needed for the page.
-                    HttpContext.Session.SetInSession("Faults", Faults);
-                    HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
-                    HttpContext.Session.SetInSession("FaultPriorities", FaultPriorities);
-                    HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
-                    HttpContext.Session.SetInSession("Repairs", Repairs);
-                    HttpContext.Session.SetInSession("RepairStatuses", RepairStatuses);
-                    HttpContext.Session.SetInSession("Contractor", Contractor);
-
-                    //Return the page.
                     return Page();
                 }
-                //The contexts current user has not been authenticated.
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user does not exist.
             else
             {
-                //Redirect user to no permission
                 return Redirect("/NoPermission");
             }
         }
         #endregion Page Load
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
+
+            //Get all contractors from the DB and set in Contractors property.
+            Contractors = await _contractorService.GetContractors(jwtToken);
+            if (Contractors != null)
+            {
+                //Get the contractor details from the Contractors property by filtering on the CurrentUser property.
+                Contractor = Contractors.Where(c => c.Email == CurrentUser.Email).FirstOrDefault();
+            }
+
+            Repairs = await _repairService.GetRepairs(jwtToken);
+            Repairs = Repairs.OrderBy(r => r.RepairTargetDate).ToList();
+
+            //Filter out repairs that have been repaired.
+            Repairs = Repairs.Where(r => r.RepairStatusID != 3).ToList();
+
+            //Filter out repairs that are not assigned to the current contractor.
+            Repairs = Repairs.Where(r => r.ContractorID == Contractor.ID).ToList();
+
+            RepairStatuses = await _repairStatusService.GetRepairStatuses(jwtToken);
+            RepairStatuses = RepairStatuses.Where(rs => rs.Active == true).ToList();
+
+            RepairStatusList = RepairStatuses.Select(rs => new SelectListItem()
+            {
+                Text = rs.RepairStatusDescription,
+                Value = rs.ID.ToString()
+            });
+
+            Faults = await _faultService.GetFaults();
+
+            FaultPriorities = await _faultPriorityService.GetFaultPriorities();
+            FaultPriorities = FaultPriorities.Where(fp => fp.Active == true).ToList();
+
+            FaultStatuses = await _faultStatusService.GetFaultStatuses();
+            FaultStatuses = FaultStatuses.Where(fs => fs.Active == true).ToList();
+
+            FaultTypes = await _faultTypeService.GetFaultTypes();
+            FaultTypes = FaultTypes.Where(ft => ft.Active == true).ToList();
+        }
+
+        //Method Summary:
+        //This method is executed when a post occurs.
+        //When executed, the page properties required in the charts javascript are set in session storage.
+        public async Task SetSessionData()
+        {
+            HttpContext.Session.SetInSession("Faults", Faults);
+            HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
+            HttpContext.Session.SetInSession("FaultPriorities", FaultPriorities);
+            HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
+            HttpContext.Session.SetInSession("Repairs", Repairs);
+            HttpContext.Session.SetInSession("RepairStatuses", RepairStatuses);
+            HttpContext.Session.SetInSession("Contractor", Contractor);
+        }
+        #endregion Data
 
         #region Map/Table Tile Controls
         //Method Summary:
@@ -230,17 +216,50 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
         //When executed the "Map" section is displayed.
         public async Task<IActionResult> OnGetShowMapView()
         {
+            await PopulateProperties();
+
             //Hide the repair table.
             ShowRepairTable = false;
 
             //Show the repair map.
             ShowRepairMap = true;
 
-            //User has selected a repair status
-            if (TempData["RepairStatusFilter"] != null)
+            //Get repairs again as need to refresh the list for filtering in this case.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            Repairs = await _repairService.GetRepairs(jwtToken);
+            Repairs = Repairs.OrderBy(r => r.RepairTargetDate).ToList();
+
+            //Filter out repairs that are not assigned to the current contractor.
+            Repairs = Repairs.Where(r => r.ContractorID == Contractor.ID).ToList();
+
+            //User has selected a repair status.
+            if (TempData["RepairStatusFilter"] != null && (int)TempData["RepairStatusFilter"] != 0)
             {
-                //Get the RepairStatusFilter value from TempData.
                 RepairStatusFilter = int.Parse(TempData["RepairStatusFilter"].ToString());
+
+                Repairs = Repairs.Where(r => r.RepairStatusID == RepairStatusFilter).ToList();
+            }
+
+            //User has selected a target met status.
+            if (TempData["TargetMetFilter"] != null && (int)TempData["TargetMetFilter"] != 0)
+            {
+                TargetMetFilter = int.Parse(TempData["TargetMetFilter"].ToString());
+
+                //Target met.
+                if (TargetMetFilter == 1)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate <= r.RepairTargetDate).ToList();
+                }
+                //Target not met.
+                else if (TargetMetFilter == 2)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate > r.RepairTargetDate).ToList();
+                }
             }
 
             //Store the ShowRepairMap and ShowRepairTable values in TempData.
@@ -248,10 +267,6 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
             TempData["ShowRepairTable"] = ShowRepairTable;
             TempData.Keep();
 
-            //Get all required data from session.
-            GetSessionData();
-
-            //Return the page.
             return Page();
         }
 
@@ -260,11 +275,7 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
         //When executed the "Table" section is displayed.
         public async Task<IActionResult> OnGetShowTableView()
         {
-            //Set the current page to 1.
-            Pager.CurrentPage = 1;
-
-            //Set the page size to the value from the settings.
-            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
+            await PopulateProperties();
 
             //Hide the repair map.
             ShowRepairMap = false;
@@ -272,11 +283,42 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
             //Show the repair table.
             ShowRepairTable = true;
 
-            //User has selected a repair status
-            if (TempData["RepairStatusFilter"] != null)
+            //Get repairs again as need to refresh the list for filtering in this case.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            Repairs = await _repairService.GetRepairs(jwtToken);
+            Repairs = Repairs.OrderBy(r => r.RepairTargetDate).ToList();
+
+            //Filter out repairs that are not assigned to the current contractor.
+            Repairs = Repairs.Where(r => r.ContractorID == Contractor.ID).ToList();
+
+            //User has selected a repair status.
+            if (TempData["RepairStatusFilter"] != null && (int)TempData["RepairStatusFilter"] != 0)
             {
-                //Get the RepairStatusFilter value from TempData.
                 RepairStatusFilter = int.Parse(TempData["RepairStatusFilter"].ToString());
+
+                Repairs = Repairs.Where(r => r.RepairStatusID == RepairStatusFilter).ToList();
+            }
+
+            //User has selected a target met status.
+            if (TempData["TargetMetFilter"] != null && (int)TempData["TargetMetFilter"] != 0)
+            {
+                TargetMetFilter = int.Parse(TempData["TargetMetFilter"].ToString());
+
+                //Target met.
+                if (TargetMetFilter == 1)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate <= r.RepairTargetDate).ToList();
+                }
+                //Target not met.
+                else if (TargetMetFilter == 2)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate > r.RepairTargetDate).ToList();
+                }
             }
 
             //Store the ShowRepairMap and ShowRepairTable values in TempData.
@@ -284,19 +326,13 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
             TempData["ShowRepairTable"] = ShowRepairTable;
             TempData.Keep();
 
-            //Get all required data from session.
-            GetSessionData();
-
-            //Set the pager count to the number of repairs.
+            //Setup Pager.
+            Pager.CurrentPage = 1;
             Pager.Count = Repairs.Count;
-
-            //Get the paginated repairs by calling the GetPaginatedRepairs method from the _pagerService.
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
-
-            //Order the repairs by target date.
             PagedRepairs = PagedRepairs.OrderBy(r => r.RepairTargetDate).ToList();
 
-            //Return the page.
             return Page();
         }
         #endregion Map/Table Tile Controls
@@ -306,20 +342,7 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
         //When executed the Faults property is filtered based on the selected filter.
         public async Task<IActionResult> OnPostFilter()
         {
-            //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-            string? jwtToken = jwtTokenClaim.Value;
-
-            //Set the CurrentUser property by calling the GetUser method in the _userService.
-            CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
-
-            //Get all required data from session.
-            GetSessionData();
+            await PopulateProperties();
 
             //User has clicked the "Table" link.
             if (TempData["ShowRepairTable"] != null)
@@ -341,46 +364,70 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 ShowRepairMap = true;
             }
 
-
-            //Get all repairs from the DB and set in Repairs property.
+            //Get repairs again as need to refresh the list for filtering in this case.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
             Repairs = await _repairService.GetRepairs(jwtToken);
-
-            //Filter out repairs that are not assigned to the current contractor.
-            Repairs = Repairs.Where(r => r.ContractorID == Contractor.ID).ToList();
 
             //-------------------- STATUS FILTER --------------------
             //User has selected a status that is not "All".
             if (RepairStatusFilter != 0)
             {
-
                 //User has selected to view repairs that have been repaired.
                 if (RepairStatusFilter == 3)
                 {
-                    //Show all repairs which have been repaired.
                     Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
                 }
-                //User has selected a status that is not "All" and not "Repaired".
                 else
                 {
-                    //Get the repairs for the selected status.
                     Repairs = Repairs.Where(r => r.RepairStatusID == RepairStatusFilter).ToList();
                 }
             }
-            //User has not selected to view repairs of all statuses
             else
             {
-                //Filter out repairs that have been repaired.
                 Repairs = Repairs.Where(r => r.RepairStatusID != 3).ToList();
+            }
+
+
+            //-------------------- TARGET MET FILTER --------------------
+            //User has selected a target met status that is not "All".
+            if (TargetMetFilter != 0)
+            {
+                //Target met.
+                if (TargetMetFilter == 1)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate <= r.RepairTargetDate).ToList();
+                }
+                //Target not met.
+                else if (TargetMetFilter == 2)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate > r.RepairTargetDate).ToList();
+                }
             }
 
             //Order the repairs by RepairTargetDate.
             Repairs = Repairs.OrderBy(r => r.RepairTargetDate).ToList();
 
-            //Set the Repairs in session, needed for displaying on map.
-            HttpContext.Session.SetInSession("Repairs", Repairs);
+            //The repair table is displayed.
+            if (ShowRepairTable)
+            {
+                //Setup Pager.
+                Pager.CurrentPage = 1;
+                Pager.Count = Repairs.Count;
+                Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
+                PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
+                PagedRepairs = PagedRepairs.OrderBy(r => r.RepairTargetDate).ToList();
+            }
+
+            await SetSessionData();
 
             //Set the selected repair status in TempData.
             TempData["RepairStatusFilter"] = RepairStatusFilter;
+            TempData["TargetMetFilter"] = TargetMetFilter;
             TempData.Keep();
 
             //User has selected the "Map" link.
@@ -402,13 +449,46 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
         //When executed the desired page of faults is displayed.
-        public async void OnGetPaging()
+        public async Task OnGetPaging()
         {
+            await PopulateProperties();
+
+            //Get repairs again as need to refresh the list for filtering in this case.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            Repairs = await _repairService.GetRepairs(jwtToken);
+            Repairs = Repairs.OrderBy(r => r.RepairTargetDate).ToList();
+
+            //Filter out repairs that are not assigned to the current contractor.
+            Repairs = Repairs.Where(r => r.ContractorID == Contractor.ID).ToList();
+
             //User has selected a repair status.
-            if (TempData["RepairStatusFilter"] != null)
+            if (TempData["RepairStatusFilter"] != null && (int)TempData["RepairStatusFilter"] != 0)
             {
-                //Get the RepairStatusFilter value from TempData.
                 RepairStatusFilter = int.Parse(TempData["RepairStatusFilter"].ToString());
+
+                Repairs = Repairs.Where(r => r.RepairStatusID == RepairStatusFilter).ToList();
+            }
+
+            //User has selected a target met status.
+            if (TempData["TargetMetFilter"] != null && (int)TempData["TargetMetFilter"] != 0)
+            {
+                TargetMetFilter = int.Parse(TempData["TargetMetFilter"].ToString());
+
+                //Target met.
+                if (TargetMetFilter == 1)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate <= r.RepairTargetDate).ToList();
+                }
+                //Target not met.
+                else if (TargetMetFilter == 2)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate > r.RepairTargetDate).ToList();
+                }
             }
 
             //Keep the TempData.
@@ -420,72 +500,12 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
             //Show the repair table.
             ShowRepairTable = true;
 
-            //Get all required data from session.
-            GetSessionData();
-
-            //Set the pager count to the number of repairs.
+            //Setup Pager.
             Pager.Count = Repairs.Count;
-
-            //Get the paginated repairs by calling the GetPaginatedRepairs method from the _pagerService.
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
-
-            //Order the repairs by target date.
             PagedRepairs = PagedRepairs.OrderBy(r => r.RepairTargetDate).ToList();
         }
         #endregion Pagination
-
-        #region Session Data
-        //Method Summary:
-        //This method is excuted when the map/table tiles are clicked or when any of the pagination buttons are clicked.
-        //When executed the required data is retrieved from session.
-        public async void GetSessionData()
-        {
-            //Get the faults from session.
-            Faults = HttpContext.Session.GetFromSession<List<Fault>>("Faults");
-
-            //Order the faults by priority.
-            Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
-
-            //Get the fault types from session.
-            FaultTypes = HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes");
-
-            //Get the fault priorities from session.
-            FaultPriorities = HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities");
-
-            //Get the fault statuses from session.
-            FaultStatuses = HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses");
-
-            //Get the repairs from session.
-            Repairs = HttpContext.Session.GetFromSession<List<Repair>>("Repairs");
-
-            //Get the repair statuses from session.
-            RepairStatuses = HttpContext.Session.GetFromSession<List<RepairStatus>>("RepairStatuses");
-            
-            //Get the contractor from session.
-            Contractor = HttpContext.Session.GetFromSession<Contractor>("Contractor");
-
-            //Populate repair status dropdown.
-            RepairStatusList = RepairStatuses.Select(rs => new SelectListItem()
-            {
-                Text = rs.RepairStatusDescription,
-                Value = rs.ID.ToString()
-            });
-
-            //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-            string? jwtToken = jwtTokenClaim.Value;
-
-            //Set the CurrentUser property by calling the GetUser method in the _userService.
-            CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
-
-            //Filter out repairs that are not assigned to the current contractor.
-            Repairs = Repairs.Where(r => r.ContractorID == Contractor.ID).ToList();
-        }
-        #endregion Session Data
     }
 }

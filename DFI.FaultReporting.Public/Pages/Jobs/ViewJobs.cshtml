@@ -40,6 +40,22 @@
                                 <label asp-for="RepairStatusFilter" class="form-label"></label>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="TargetMetFilter" class="form-select" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                    <option value="1">
+                                        Target met
+                                    </option>
+                                    <option value="2">
+                                        Target not met
+                                    </option>
+                                </select>
+                                <label asp-for="TargetMetFilter" class="form-label"></label>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

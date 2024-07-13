@@ -217,12 +217,11 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs
             }
 
             //Setup pager for table.
+            Pager.CurrentPage = 1;
             Pager.Count = Repairs.Count;
             Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
             PagedRepairs = PagedRepairs.OrderBy(r => r.RepairStatusID).ToList();
-
-            //await SetSessionData();
 
             //Set the search string, selected repair status and taregt met in TempData.
             TempData["RepairStatusFilter"] = RepairStatusFilter;
@@ -242,22 +241,47 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs
         {
             await PopulateProperties();
 
+            //Get repairs again as need to refresh the list for filtering in this case.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            Repairs = await _repairService.GetRepairs(jwtToken);
+            Repairs = Repairs.OrderBy(r => r.RepairTargetDate).ToList();
+
             //User has selected a repair status.
             if (TempData["RepairStatusFilter"] != null && (int)TempData["RepairStatusFilter"] != 0)
             {
                 RepairStatusFilter = int.Parse(TempData["RepairStatusFilter"].ToString());
+
+                Repairs = Repairs.Where(r => r.RepairStatusID == RepairStatusFilter).ToList();
             }
 
             //User has selected a target met status.
             if (TempData["TargetMetFilter"] != null && (int)TempData["TargetMetFilter"] != 0)
             {
                 TargetMetFilter = int.Parse(TempData["TargetMetFilter"].ToString());
+
+                //Target met.
+                if (TargetMetFilter == 1)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate <= r.RepairTargetDate).ToList();
+                }
+                //Target not met.
+                else if (TargetMetFilter == 2)
+                {
+                    Repairs = Repairs.Where(r => r.RepairStatusID == 3).ToList();
+
+                    Repairs = Repairs.Where(r => r.ActualRepairDate > r.RepairTargetDate).ToList();
+                }
             }
 
             //User has entered a search string.
             if (TempData["SearchString"] != null && TempData["SearchString"].ToString() != string.Empty)
             {
                 SearchString = TempData["SearchString"].ToString();
+
+                Repairs = Repairs.Where(r => r.ContractorID == SearchID).ToList();
             }
 
             TempData.Keep();
