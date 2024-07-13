@@ -48,34 +48,27 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         [BindProperty]
         public Staff CurrentStaff { get; set; }
 
-        //Declare Staff property, this is needed when getting staff from the DB.
         [BindProperty]
         public Staff Staff { get; set; }
 
-        //Declare Roles property, this is needed when getting all roles from the DB.
         [BindProperty]
         public List<Role> Roles { get; set; }
 
         [BindProperty]
         public List<Role> AssignedRoles { get; set; }
 
-        //Declare RolesInput property, this is needed for assigning roles to staff members.
         [BindProperty]
         public RoleInputModel RolesInput { get; set; }
 
-        //Declare RoleInputs property, this is needed for assigning roles to staff members.
         [BindProperty]
         public List<RoleInputModel>SelectedRoles { get; set; }
 
-        //Declare StaffRoles property, this is needed for filtering staff by assigned roles.
         [BindProperty]
         public List<StaffRole> StaffRoles { get; set; }
 
-        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
 
         public class RoleInputModel

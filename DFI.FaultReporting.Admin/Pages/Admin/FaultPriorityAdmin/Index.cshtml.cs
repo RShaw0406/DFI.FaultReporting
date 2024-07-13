@@ -121,7 +121,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin
             string? jwtToken = jwtTokenClaim.Value;
             CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-            //Get all fault priorities from the DB.
             FaultPriorities = await _faultPriorityService.GetFaultPriorities();
             FaultPriorities = FaultPriorities.OrderByDescending(fp => fp.FaultPriorityRating).ToList();
         }

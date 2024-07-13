@@ -61,35 +61,27 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare Staff property, this is needed when getting all staff from the DB.
         [BindProperty]
         public List<Staff> Staff { get; set; }
 
-        //Declare PagedStaff property, this is needed for displaying staff in the table.
         [BindProperty]
         public List<Staff> PagedStaff { get; set; }
 
-        //Declare Roles property, this is needed for displaying roles in the dropdown.
         [BindProperty]
         public List<Role> Roles { get; set; }
 
-        //Declare RolesList property, this is needed for displaying roles in the dropdown.
         [BindProperty]
         public IEnumerable<SelectListItem> RolesList { get; set; }
 
-        //Declare RoleFilter property, this is needed for filtering staff by assigned roles.
         [DisplayName("Role")]
         [BindProperty]
         public int RoleFilter { get; set; }
 
-        //Declare StaffRoles property, this is needed for filtering staff by assigned roles.
         [BindProperty]
         public List<StaffRole> StaffRoles { get; set; }
 
-        //Declare AccountLockedFilter property, this is needed for filtering staff by account locked status.
         [DisplayName("Account locked")]
         [BindProperty]
         public int AccountLockedFilter { get; set; }
@@ -98,7 +90,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         [BindProperty]
         public string SearchString { get; set; }
 
-        //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
         public Pager Pager { get; set; } = new Pager();
         #endregion Properties
@@ -115,76 +106,28 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 //The contexts current user has been authenticated and has admin role
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Clear TempData to ensure fresh start.
-                    TempData.Clear();
+                    await PopulateProperties();
 
-                    //Get all staff from the DB.
-                    Staff = await _staffService.GetAllStaff(jwtToken);
+                    await SetSessionData();
 
-                    //Filter out inactive staff.
-                    Staff = Staff.Where(s => s.Active == true).ToList();
-
-                    //Order the staff by last name.
-                    Staff = Staff.OrderByDescending(s => s.LastName).ToList();
-
-                    //Set the current page to 1.
+                    //Setup the Pager.
                     Pager.CurrentPage = 1;
-
-                    //Set the page size to the value from the settings.
                     Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
-
-                    //Set the pager count to the number of staff.
                     Pager.Count = Staff.Count;
-
-                    //Get the paginated staff by calling the GetPaginatedStaff method from the _pagerService.
                     PagedStaff = await _pagerService.GetPaginatedStaff(Staff, Pager.CurrentPage, Pager.PageSize);
 
-                    //Get all roles from the DB.
-                    Roles = await _roleService.GetRoles(jwtToken);
-
-                    //Filter out roles that are not staff roles.
-                    Roles = Roles.Where(r => r.RoleDescription.Contains("Staff")).ToList();
-
-                    //Populate the roles dropdown.
-                    RolesList = Roles.Select(r => new SelectListItem
-                    {
-                        Value = r.ID.ToString(),
-                        Text = r.RoleDescription
-                    });
-
-                    //Set session values.
-                    HttpContext.Session.SetInSession("Staff", Staff);
-                    HttpContext.Session.SetInSession("Roles", Roles);
-
-                    //Return the page.
                     return Page();
                 }
-                //The contexts current user has not been authenticated.
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -195,22 +138,19 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         //When executed the Faults property is filtered based on the selected filter.
         public async Task<IActionResult> OnPost()
         {
-            //Get all required data from session.
-            GetSessionData();
+            await PopulateProperties();
 
-            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
+            //Get the JWT token claim from the contexts current user.
             Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
             string? jwtToken = jwtTokenClaim.Value;
 
-            //User has entered a search string.
+            //-------------------- SEARCH FILTER --------------------
             if (SearchString != null && SearchString != string.Empty)
             {
                 Staff = Staff.Where(s => s.FirstName + " " + s.LastName == SearchString).ToList();
             }
 
-            //User has selected a role.
+            //-------------------- ROLE FILTER --------------------
             if (RoleFilter != 0)
             {
                 //Declare a new list of staff.
@@ -250,7 +190,6 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                         }
                     }
                 }
-                //User has not entered a search string.
                 else
                 {
                     //Set the Staff list to the StaffInRole list.
@@ -258,7 +197,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 }
             }
 
-            //User has selected a account locked status.
+            //-------------------- ACCOUNT LOCKED FILTER --------------------
             if (AccountLockedFilter != 0)
             {
                 //User has selected to view locked staff.
@@ -275,28 +214,22 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 }
             }
 
-            //Filter out inactive staff.
-            Staff = Staff.Where(s => s.Active == true).ToList();
-
             //Order the staff by last name.
             Staff = Staff.OrderByDescending(s => s.LastName).ToList();
 
-            //Get the paged staff by calling the GetPaginatedStaff method from the _pagerService.
+            //Setup pager for table.
+            Pager.Count = Staff.Count;
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedStaff = await _pagerService.GetPaginatedStaff(Staff, Pager.CurrentPage, Pager.PageSize);
+            PagedStaff = PagedStaff.OrderBy(s => s.ID).ToList();
 
-            //Set the selected role in TempData.
+            await SetSessionData();
+
+            //Set the selected role and account locked status in TempData.
             TempData["RoleFilter"] = RoleFilter;
-
-            //Set the selected account locked status in TempData.
             TempData["AccountLockedFilter"] = AccountLockedFilter;
-
-            //Keep the TempData.
             TempData.Keep();
 
-            //Set the Faults in session, needed for displaying on map.
-            //HttpContext.Session.SetInSession("Staff", Staff);
-
-            //Return the page and show the map, this is needed to ensure the paging is reset.
             return Page();
         }
         #endregion Dropdown Filter Change
@@ -305,7 +238,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
         //When executed the desired page of staff is displayed.
-        public async void OnGetPaging()
+        public async Task OnGetPaging()
         {
             //Set the RoleFilter value to the value from TempData.
             if (TempData["RoleFilter"] != null)
@@ -319,39 +252,49 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 AccountLockedFilter = (int)TempData["AccountLockedFilter"];
             }
 
-            //Keep the TempData.
-            TempData.Keep();
+            await PopulateProperties();
 
-            //Get all required data from session.
-            GetSessionData();
-
-            //Set the pager count to the number of staff.
+            //Setup the Pager.
             Pager.Count = Staff.Count;
-
-            //Get the page of staff by calling the GetPaginatedStaff method from the _pagerService.
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedStaff = await _pagerService.GetPaginatedStaff(Staff, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
 
-        #region Session Data
+        #region Data
         //Method Summary:
-        //This method is excuted when any of filter options change or any of the pagination buttons are clicked.
-        //When executed the required data is retrieved from session.
-        public async void GetSessionData()
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
         {
-            //Get the staff from session.
-            Staff = HttpContext.Session.GetFromSession<List<Staff>>("Staff");
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-            //Get the roles from session.
-            Roles = HttpContext.Session.GetFromSession<List<Role>>("Roles");
+            Staff = await _staffService.GetAllStaff(jwtToken);
+            Staff = Staff.OrderByDescending(s => s.LastName).ToList();
 
-            //Populate the roles dropdown.
+            Roles = await _roleService.GetRoles(jwtToken);
+            Roles = Roles.Where(r => r.RoleDescription.Contains("Staff")).ToList();
+            Roles = Roles.OrderBy(r => r.ID).ToList();
+
             RolesList = Roles.Select(r => new SelectListItem
             {
                 Value = r.ID.ToString(),
                 Text = r.RoleDescription
             });
         }
-        #endregion Session Data
+
+        //Method Summary:
+        //This method is executed when a post occurs.
+        //When executed, the page properties required in the charts javascript are set in session storage.
+        public async Task SetSessionData()
+        {
+            HttpContext.Session.SetInSession("Roles", Roles);
+            HttpContext.Session.SetInSession("Staff", Staff);
+        }
+        #endregion Data
     }
 }

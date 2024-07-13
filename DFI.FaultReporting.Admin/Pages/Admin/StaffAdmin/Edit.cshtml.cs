@@ -38,20 +38,15 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare StaffInput property, this is needed when editing staff member.
         [BindProperty]
         public StaffInputModel StaffInput { get; set; }
 
-        //Declare Staff property, this is needed when getting staff member from the DB.
         public Staff Staff { get; set; }
 
-        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
 
-        //Declare StaffInputModel, this is needed for validating the input when editing staff member.
         public class StaffInputModel
         {
             public int ID { get; set; }
@@ -78,6 +73,9 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
             [RegularExpression(@"^[a-zA-Z''-'\s]{1,125}$", ErrorMessage = "Last name must not contain special characters or numbers")]
             [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
             public string? LastName { get; set; }
+
+            [Required(ErrorMessage = "You must provide an active")]
+            public bool Active { get; set; }
         }
         #endregion Properties
 
@@ -93,22 +91,14 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Get all staff from the DB.
+                    await PopulateProperties();
+
+                    //Get staff from the DB.
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                    string? jwtToken = jwtTokenClaim.Value;
                     Staff = await _staffService.GetStaff((int)ID, jwtToken);
 
                     //Set the StaffInput property with the values from the Staff property.
@@ -118,20 +108,17 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                     StaffInput.Prefix = Staff.Prefix;
                     StaffInput.FirstName = Staff.FirstName;
                     StaffInput.LastName = Staff.LastName;
+                    StaffInput.Active = Staff.Active;
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -146,44 +133,29 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
             //Modelstate is not valid.
             if (!ModelState.IsValid)
             {
-                //Loop through all model state items.
+                //Display each of the model state errors.
                 foreach (var item in ModelState)
                 {
-                    //If the model state error has errors, add them to the model state.
                     if (item.Value.Errors.Count > 0)
                     {
-                        //Loop through all errors and add them to the model state.
                         foreach (var error in item.Value.Errors)
                         {
-                            //Add the error to the model state.
                             ModelState.AddModelError(string.Empty, error.ErrorMessage);
                         }
                     }
                 }
 
-                //Return the page.
                 return Page();
             }
             //Modelstate is valid.
             else
             {
-                //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                string? jwtToken = jwtTokenClaim.Value;
-
-                //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+                await PopulateProperties();
 
                 //Get all staff from the DB.
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                string? jwtToken = jwtTokenClaim.Value;
                 List<Staff> allStaff = await _staffService.GetAllStaff(jwtToken);
-
-                //Filter out inactive staff.
-                allStaff = allStaff.Where(s => s.Active == true).ToList();
 
                 //Get the staff member from the DB.
                 Staff = await _staffService.GetStaff(StaffInput.ID, jwtToken);
@@ -194,11 +166,9 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                     //Check if the email address already exists.
                     if (allStaff.Any(s => s.Email == StaffInput.Email))
                     {
-                        //Return an error message.
                         ModelState.AddModelError(string.Empty, "Email address already used");
                         ModelState.AddModelError("StaffInput.Email", "Email address already used");
 
-                        //Return the page.
                         return Page();
                     }
                 }
@@ -208,6 +178,7 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 Staff.Prefix = StaffInput.Prefix;
                 Staff.FirstName = StaffInput.FirstName;
                 Staff.LastName = StaffInput.LastName;
+                Staff.Active = StaffInput.Active;
 
                 //Update the staff member in the DB.
                 Staff updatedStaff = await _staffService.UpdateStaff(Staff, jwtToken);
@@ -215,23 +186,32 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 //If the staff member was successfully updated, send an email to the new staff member.
                 if (updatedStaff != null)
                 {
-                    //Set the UpdateSuccess property to true.
                     UpdateSuccess = true;
 
-                    //Return the page.
                     return Page();
                 }
-                //If the staff member was not successfully updated, return an error message.
                 else
                 {
-                    //Return an error message.
                     ModelState.AddModelError(string.Empty, "An error occurred while creating the staff member");
 
-                    //Return the page.
                     return Page();
                 }
             }
         }
         #endregion Edit Staff
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+        }
+        #endregion Data
     }
 }

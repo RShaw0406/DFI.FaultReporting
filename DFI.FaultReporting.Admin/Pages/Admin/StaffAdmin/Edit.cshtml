@@ -44,6 +44,14 @@
                     <label asp-for="StaffInput.LastName" class="control-label"></label>
                     <span asp-validation-for="StaffInput.LastName" class="text-danger"></span>
                 </div>
+                <div class="form-floating mb-3">
+                    <select asp-for="StaffInput.Active" class="form-select">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>
+                    <label asp-for="StaffInput.Active" class="control-label"></label>
+                    <span asp-validation-for="StaffInput.Active" class="text-danger"></span>
+                </div>
                 <div class="btn-group">
                     <a asp-page="./Index" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
                     &nbsp;

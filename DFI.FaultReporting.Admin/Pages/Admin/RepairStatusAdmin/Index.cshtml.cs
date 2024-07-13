@@ -45,18 +45,14 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.RepairStatusAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare RepairStatuses property, this is needed when getting all repair statuses from the DB.
         [BindProperty]
         public List<RepairStatus> RepairStatuses { get; set; }
 
-        //Declare PagedRepairStatuses property, this is needed for displaying repair statuses in the table.
         [BindProperty]
         public List<RepairStatus> PagedRepairStatuses { get; set; }
 
-        //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
         public Pager Pager { get; set; } = new Pager();
         #endregion Properties
@@ -73,53 +69,26 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.RepairStatusAdmin
                 //The contexts current user has been authenticated and has admin role
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Set the RepairStatuses property by calling the GetRepairStatuses method in the _repairStatusService.
-                    RepairStatuses = await _repairStatusService.GetRepairStatuses(jwtToken);
+                    await PopulateProperties();
 
-                    //Set the RepairStatuses in session.
-                    HttpContext.Session.SetInSession("RepairStatuses", RepairStatuses);
-
-                    //Set the current page to 1.
+                    //Setup the Pager.
                     Pager.CurrentPage = 1;
-
-                    //Set the page size to the value from the settings.
                     Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
-
-                    //Set the pager to the count of repair statuses.
                     Pager.Count = RepairStatuses.Count;
-
-                    //Set the PagedRepairStatuses property by calling the GetPaginatedRepairStatuses method in the _pagerService.
                     PagedRepairStatuses = await _pagerService.GetPaginatedRepairStatuses(RepairStatuses, Pager.CurrentPage, Pager.PageSize);
 
-                    //Return the page.
                     return Page();
                 }
-                //The contexts current user has not been authenticated.
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -129,17 +98,32 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.RepairStatusAdmin
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
         //When executed the desired page of repair statuses is displayed.
-        public async void OnGetPaging()
+        public async Task OnGetPaging()
         {
-            //Get the repair statuses from session.
-            RepairStatuses = HttpContext.Session.GetFromSession<List<RepairStatus>>("RepairStatuses");
+            await PopulateProperties();
 
-            //Set the pager count to the number of repair statuses.
+            //Setup the Pager.
             Pager.Count = RepairStatuses.Count;
-
-            //Get the page of repair statuses by calling the GetPaginatedRepairStatuses method from the _pagerService.
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairStatuses = await _pagerService.GetPaginatedRepairStatuses(RepairStatuses, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+
+            RepairStatuses = await _repairStatusService.GetRepairStatuses(jwtToken);
+            RepairStatuses = RepairStatuses.OrderBy(rs => rs.ID).ToList();
+        }
+        #endregion Data
     }
 }

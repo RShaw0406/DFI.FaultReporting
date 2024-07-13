@@ -42,14 +42,11 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare FaultPriority property, this is needed when getting the fault from the DB.
         [BindProperty]
         public FaultPriority FaultPriority { get; set; }
 
-        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
         #endregion Properties
 
@@ -65,43 +62,30 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
+                    await PopulateProperties();
+
                     //Get fault priority from the DB.
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                    string? jwtToken = jwtTokenClaim.Value;
                     FaultPriority = await _faultPriorityService.GetFaultPriority((int)ID, jwtToken);
 
                     //Store the fault priority description and rating in TempData.
                     TempData["Description"] = FaultPriority.FaultPriorityDescription;
                     TempData["Rating"] = FaultPriority.FaultPriorityRating;
-
-                    //Keep the TempData.
                     TempData.Keep();
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -116,40 +100,26 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin
             //Modelstate is not valid.
             if (!ModelState.IsValid)
             {
-                //Loop through all model state items.
+                //Display each of the model state errors.
                 foreach (var item in ModelState)
                 {
-                    //If the model state error has errors, add them to the model state.
                     if (item.Value.Errors.Count > 0)
                     {
-                        //Loop through all errors and add them to the model state.
                         foreach (var error in item.Value.Errors)
                         {
-                            //Add the error to the model state.
                             ModelState.AddModelError(string.Empty, error.ErrorMessage);
                         }
                     }
                 }
 
-                //Return the page.
                 return Page();
             }
             //Modelstate is valid.
             else
             {
-                //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                string? jwtToken = jwtTokenClaim.Value;
-
-                //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                 //Get all fault priorities from the DB.
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                string? jwtToken = jwtTokenClaim.Value;
                 List<FaultPriority> faultPriorities = await _faultPriorityService.GetFaultPriorities();
 
                 //Fault priority description has changed.
@@ -158,14 +128,11 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin
                     //Fault priority already exists.
                     if (faultPriorities.Any(fp => fp.FaultPriorityDescription == FaultPriority.FaultPriorityDescription))
                     {
-                        //Keep the TempData.
                         TempData.Keep();
 
-                        //Add model state error.
                         ModelState.AddModelError(string.Empty, "Fault priority already exists");
                         ModelState.AddModelError("FaultPriority.FaultPriorityDescription", "Fault priority already exists");
 
-                        //Return the page.
                         return Page();
                     }
                 }
@@ -176,14 +143,11 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin
                     //Fault priority already exists.
                     if (faultPriorities.Any(fp => fp.FaultPriorityRating == FaultPriority.FaultPriorityRating))
                     {
-                        //Keep the TempData.
                         TempData.Keep();
 
-                        //Add model state error.
                         ModelState.AddModelError(string.Empty, "Fault priority rating already exists");
                         ModelState.AddModelError("FaultPriority.FaultPriorityRating", "Fault priority rating already exists");
 
-                        //Return the page.
                         return Page();
                     }
                 }
@@ -194,33 +158,39 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultPriorityAdmin
                 //Fault priority was updated.
                 if (updatedFaultPriority != null)
                 {
-                    //Set the UpdateSuccess property to true.
                     UpdateSuccess = true;
 
-                    //Store the fault priority description and rating in TempData.
                     TempData["Description"] = updatedFaultPriority.FaultPriorityDescription;
                     TempData["Rating"] = updatedFaultPriority.FaultPriorityRating;
 
-                    //Keep the TempData.
                     TempData.Keep();
 
-                    //Return the page.
                     return Page();
                 }
-                //Fault priority could not be updated.
                 else
                 {
-                    //Add model state error.
                     ModelState.AddModelError(string.Empty, "Fault priority could not be updated");
 
-                    //Keep the TempData.
                     TempData.Keep();
 
-                    //Return the page.
                     return Page();
                 }
             }
         }
         #endregion Edit Fault Type
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+        }
+        #endregion Data
     }
 }

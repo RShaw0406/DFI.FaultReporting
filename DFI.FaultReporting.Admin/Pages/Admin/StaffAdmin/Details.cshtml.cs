@@ -32,10 +32,8 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare Staff property, this is needed when getting staff member from the DB.
         [BindProperty]
         public Staff Staff { get; set; }
         #endregion Properties
@@ -52,37 +50,29 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.StaffAdmin
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    //Clear session to ensure fresh start.
+                    HttpContext.Session.Clear();
 
                     //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
                     string? jwtToken = jwtTokenClaim.Value;
 
                     //Set the CurrentStaff property by calling the GetUser method in the _userService.
+                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
-                    //Clear session to ensure fresh start.
-                    HttpContext.Session.Clear();
 
                     //Get staff from the DB.
                     Staff = await _staffService.GetStaff((int)ID, jwtToken);
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }

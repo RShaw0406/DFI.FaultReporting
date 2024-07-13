@@ -43,10 +43,8 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare FaultStatus property, this is needed when inputting new fault status to the DB.
         [BindProperty]
         public FaultStatus FaultStatus { get; set; }
         #endregion Properties
@@ -63,20 +61,10 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
+
+                    await PopulateProperties();
 
                     //Set the FaultStatus property to a new instance of FaultStatus.
                     FaultStatus = new FaultStatus();
@@ -84,19 +72,15 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
                     FaultStatus.InputOn = DateTime.Now;
                     FaultStatus.Active = true;
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -111,50 +95,36 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
             //Model state is not valid.
             if (!ModelState.IsValid)
             {
-                //Loop through all model state items.
+                //Display each of the model errors.
                 foreach (var item in ModelState)
                 {
-                    //If the model state error has errors, add them to the model state.
                     if (item.Value.Errors.Count > 0)
                     {
-                        //Loop through all errors and add them to the model state.
                         foreach (var error in item.Value.Errors)
                         {
-                            //Add the error to the model state.
                             ModelState.AddModelError(string.Empty, error.ErrorMessage);
                         }
                     }
                 }
 
-                //Return the page.
                 return Page();
             }
             //ModelState is valid.
             else
             {
-                //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                string? jwtToken = jwtTokenClaim.Value;
-
-                //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+                await PopulateProperties();
 
                 //Get all fault statuses from the DB.
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                string? jwtToken = jwtTokenClaim.Value;
                 List<FaultStatus> faultStatuses = await _faultStatusService.GetFaultStatuses();
 
                 //Fault status already exists.
                 if (faultStatuses.Any(fs => fs.FaultStatusDescription == FaultStatus.FaultStatusDescription))
                 {
-                    //Add model state error.
                     ModelState.AddModelError(string.Empty, "Fault status already exists");
                     ModelState.AddModelError("FaultStatus.FaultStatusDescription", "Fault status already exists");
 
-                    //Return the page.
                     return Page();
                 }
 
@@ -164,20 +134,30 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.FaultStatusAdmin
                 //If the fault status was successfully created.
                 if (insertedFaultStatus != null)
                 {
-                    //Return to the index page.
                     return RedirectToPage("./Index");
                 }
-                //Fault status was not successfully created.
                 else
                 {
-                    //Return an error message.
                     ModelState.AddModelError(string.Empty, "An error occurred while creating the fault status");
 
-                    //Return the page.
                     return Page();
                 }
             }
         }
         #endregion Create Fault Status
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+        }
+        #endregion Data
     }
 }

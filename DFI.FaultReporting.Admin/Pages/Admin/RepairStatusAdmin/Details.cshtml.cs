@@ -41,10 +41,8 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.RepairStatusAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare RepairStatus property, this is needed when inputting a new repair status.
         [BindProperty]
         public RepairStatus RepairStatus { get; set; }
         #endregion Properties
@@ -61,36 +59,29 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.RepairStatusAdmin
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    //Clear session to ensure fresh start.
+                    HttpContext.Session.Clear();
 
                     //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
                     string? jwtToken = jwtTokenClaim.Value;
 
                     //Set the CurrentStaff property by calling the GetUser method in the _userService.
+                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
-                    //Clear session to ensure fresh start.
-                    HttpContext.Session.Clear();
 
                     //Get repair status from the DB.
                     RepairStatus = await _repairStatusService.GetRepairStatus((int)ID, jwtToken);
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }

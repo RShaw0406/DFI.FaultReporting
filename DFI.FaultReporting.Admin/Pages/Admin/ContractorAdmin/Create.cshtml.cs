@@ -47,10 +47,8 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare Contractor property, this is needed when getting contractor from the DB.
         [BindProperty]
         public Contractor Contractor { get; set; }
         #endregion Properties
