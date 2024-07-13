@@ -28,7 +28,6 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs
         private readonly IFaultPriorityService _faultPriorityService;
         private readonly IFaultStatusService _faultStatusService;
         private readonly IFaultTypeService _faultTypeService;
-        private readonly IReportService _reportService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IPagerService _pagerService;
         private readonly ISettingsService _settingsService;
@@ -38,8 +37,8 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs
 
         //Inject dependencies in constructor.
         public RepairsModel(ILogger<RepairsModel> logger, IStaffService staffService, IFaultService faultService, IFaultTypeService faultTypeService,
-            IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService, IReportService reportService,
-            IHttpContextAccessor httpContextAccessor, IPagerService pagerService, ISettingsService settingsService, IRepairService repairService, IRepairStatusService repairStatusService
+            IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService, IHttpContextAccessor httpContextAccessor, 
+            IPagerService pagerService, ISettingsService settingsService, IRepairService repairService, IRepairStatusService repairStatusService
             , IContractorService contractorService)
         {
             _logger = logger;
@@ -48,7 +47,6 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs
             _faultPriorityService = faultPriorityService;
             _faultStatusService = faultStatusService;
             _faultTypeService = faultTypeService;
-            _reportService = reportService;
             _httpContextAccessor = httpContextAccessor;
             _pagerService = pagerService;
             _settingsService = settingsService;

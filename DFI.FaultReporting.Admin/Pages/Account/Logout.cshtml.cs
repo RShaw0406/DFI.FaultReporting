@@ -43,7 +43,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
         //When executed it returns the page.
         public async Task<IActionResult> OnGetAsync()
         {
-            //Return the page.
             return Page();
         }
         #endregion Page Load
@@ -66,7 +65,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                 _logger.LogInformation("User logged in.");
             }
 
-            //Return to the index page.
             return Redirect("/Index");
         }
 
@@ -75,7 +73,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
         //When executed it returns the user to the index page.
         public async Task<IActionResult> OnPostCancel()
         {
-            //Return to the index page.
             return Redirect("/Index");
         }
         #endregion Logout

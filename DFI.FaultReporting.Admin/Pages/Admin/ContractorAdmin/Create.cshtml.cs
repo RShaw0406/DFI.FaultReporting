@@ -67,20 +67,10 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
+
+                    await PopulateProperties();
 
                     //Created and populate a new Contractor object.
                     Contractor = new Contractor();
@@ -88,19 +78,15 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
                     Contractor.InputOn = DateTime.Now;
                     Contractor.Active = true;
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -115,50 +101,36 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
             //Model state is not valid.
             if (!ModelState.IsValid)
             {
-                //Loop through all model state items.
+                //Display each of the model errors.
                 foreach (var item in ModelState)
                 {
-                    //If the model state error has errors, add them to the model state.
                     if (item.Value.Errors.Count > 0)
                     {
-                        //Loop through all errors and add them to the model state.
                         foreach (var error in item.Value.Errors)
                         {
-                            //Add the error to the model state.
                             ModelState.AddModelError(string.Empty, error.ErrorMessage);
                         }
                     }
                 }
 
-                //Return the page.
                 return Page();
             }
             //ModelState is valid.
             else
             {
-                //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                string? jwtToken = jwtTokenClaim.Value;
-
-                //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+                await PopulateProperties();
 
                 //Get all contractors from the DB.
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                string? jwtToken = jwtTokenClaim.Value;
                 List<Contractor> contractors = await _contractorService.GetContractors(jwtToken);
 
                 //Contractor email already exists.
                 if (contractors.Any(c => c.Email == Contractor.Email))
                 {
-                    //Add model state error.
                     ModelState.AddModelError(string.Empty, "Contractor email already exists");
                     ModelState.AddModelError("Contractor.Email", "Contractor email already exists");
 
-                    //Return the page.
                     return Page();
                 }
 
@@ -170,47 +142,51 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
                 {
 
                     //Send an email to the approved contractor email address.
-                    //Response emailResponse = await SendApprovedContractorEmail(insertedContractor.Email);
+                    Response emailResponse = await SendApprovedContractorEmail(insertedContractor.Email);
 
-                    //Return to the index page.
                     return RedirectToPage("./Index");
                 }
-                //Contractor was not successfully created.
                 else
                 {
-                    //Return an error message.
                     ModelState.AddModelError(string.Empty, "An error occurred while creating the contractor");
 
-                    //Return the page.
                     return Page();
                 }
             }
         }
+        #endregion Create Contractor
 
+        #region Email
         //Method Summary:
         //This method is executed when the "Submit" button is clicked.
         //When executed this method attempts to send an email to the approved contractor and returns the response from the _emailService.
         public async Task<SendGrid.Response> SendApprovedContractorEmail(string emailAddress)
         {
-            //Set the subject of the email explaining that the users email has been added to the approved contractors list
+            //Construct the email.
             string subject = "DFI Fault Reporting Administration: Approved Contractor";
-
-            //Declare a new EmailAddress object and assign the users email address as the value.
             EmailAddress to = new EmailAddress(emailAddress);
-
-            //Set textContent to empty string as it will not be used here.
             string textContent = string.Empty;
-
-            //Set the htmlContent to a message explaining to the user that they can now register to use the public application.
             string htmlContent = "<p>Hello,</p><p>A system administrator has added this email address to the DFI Faulting Reporting approved contractors list.</p>" +
                 "<p>You can now use your this email address to register and log in to the DFI Fault Reporting application to view your assigned jobs.</p><br/>";
-
-            //Set the attachment to null as it will not be used here.
             SendGrid.Helpers.Mail.Attachment? attachment = null;
 
             //Call the SendEmail in the _emailService and return the response.
             return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
         }
-        #endregion Create Contractor
+        #endregion Email
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+        }
+        #endregion Data
     }
 }

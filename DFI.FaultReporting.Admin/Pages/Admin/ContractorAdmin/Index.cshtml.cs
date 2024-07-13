@@ -45,18 +45,14 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare Contractors property, this is needed when getting all contractors from the DB.
         [BindProperty]
         public List<Contractor> Contractors { get; set; }
 
-        //Declare PagedContractors property, this is needed for displaying contractors in the table.
         [BindProperty]
         public List<Contractor> PagedContractors { get; set; }
 
-        //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
         public Pager Pager { get; set; } = new Pager();
         #endregion Properties
@@ -73,53 +69,26 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
                 //The contexts current user has been authenticated and has admin role
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Set the Contractors property by calling the GetContractors method in the _contractorService.
-                    Contractors = await _contractorService.GetContractors(jwtToken);
+                    await PopulateProperties();
 
-                    //Set the Contractors in session.
-                    HttpContext.Session.SetInSession("Contractors", Contractors);
-
-                    //Set the current page to 1.
+                    //Setup the Pager.
                     Pager.CurrentPage = 1;
-
-                    //Set the page size to the value from the settings.
                     Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
-
-                    //Set the pager to the count of contractors.
                     Pager.Count = Contractors.Count;
-
-                    //Set the PagedContractors property by calling the GetPaginatedContractors method in the _pagerService.
                     PagedContractors = await _pagerService.GetPaginatedContractors(Contractors, Pager.CurrentPage, Pager.PageSize);
 
-                    //Return the page.
                     return Page();
                 }
-                //The contexts current user has not been authenticated.
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -129,17 +98,31 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ContractorAdmin
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
         //When executed the desired page of contractors is displayed.
-        public async void OnGetPaging()
+        public async Task OnGetPaging()
         {
-            //Get the contractors from session.
-            Contractors = HttpContext.Session.GetFromSession<List<Contractor>>("Contractors");
+            await PopulateProperties();
 
-            //Set the pager to the count of contractors.
+            //Setup the Pager.
             Pager.Count = Contractors.Count;
-
-            //Set the PagedContractors property by calling the GetPaginatedContractors method in the _pagerService.
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedContractors = await _pagerService.GetPaginatedContractors(Contractors, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+
+            Contractors = await _contractorService.GetContractors(jwtToken);
+        }
+        #endregion Data
     }
 }

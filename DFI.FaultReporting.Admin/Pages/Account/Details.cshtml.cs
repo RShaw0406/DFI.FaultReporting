@@ -26,52 +26,41 @@ namespace DFI.FaultReporting.Admin.Pages.Account
         private readonly ILogger<DetailsModel> _logger;
         private readonly IStaffService _staffService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ISettingsService _settingsService;
         private readonly IEmailService _emailService;
         private readonly IVerificationTokenService _verificationTokenService;
 
         //Inject dependencies in constructor.
-        public DetailsModel(ILogger<DetailsModel> logger, IStaffService staffService, IHttpContextAccessor httpContextAccessor, ISettingsService settingsService, IEmailService emailService,
+        public DetailsModel(ILogger<DetailsModel> logger, IStaffService staffService, IHttpContextAccessor httpContextAccessor, IEmailService emailService,
             IVerificationTokenService verificationTokenService)
         {
             _logger = logger;
             _staffService = staffService;
             _httpContextAccessor = httpContextAccessor;
-            _settingsService = settingsService;
             _emailService = emailService;
             _verificationTokenService = verificationTokenService;
         }
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare AccountDetailsInput property, this is needed when updating account details.
         [BindProperty]
         public AccountDetailsInputModel AccountDetailsInput { get; set; }
 
-        //Declare VerificationCodeInput property, this is needed when inputting sent verification code when updating account details.
         [BindProperty]
         public VerificationCodeModel VerificationCodeInput { get; set; }
 
-        //Declare PersonalDetailsInput property, this is needed when updating personal details.
         [BindProperty]
         public PersonalDetailsInputModel PersonalDetailsInput { get; set; }
 
-        //Declare ShowAccountDetails property, this is needed for displaying account details section. 
         public bool ShowAccountDetails { get; set; }
 
-        //Declare ShowPersonalDetails property, this is needed for displaying personal details section.
         public bool ShowPersonalDetails { get; set; }
 
-        //Declare VerificationCodeSent property, this is needed for displaying the section for inputting the verification code.
         public bool VerificationCodeSent { get; set; }
 
-        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
 
-        //Declare AccountDetailsInputModel class, this is needed for updating account details.
         public class AccountDetailsInputModel
         {
             [DisplayName("New email address")]
@@ -95,7 +84,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             public string? ConfirmPassword { get; set; }
         }
 
-        //Declare VerificationCodeModel class, this is needed when inputting sent verification code when updating account details.
         public class VerificationCodeModel
         {
             public string? EmailVerificationCode { get; set; }
@@ -106,7 +94,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             public string? VerificationCode { get; set; }
         }
 
-        //Declare PersonalDetailsInputModel class, this is needed when updating personal details.
         public class PersonalDetailsInputModel
         {
             [DisplayName("New title")]
@@ -131,43 +118,42 @@ namespace DFI.FaultReporting.Admin.Pages.Account
         //This method is executed when the page loads and is used for setting the CurrentUser in session.
         public async Task<IActionResult> OnGetAsync()
         {
-            //Clear session to ensure fresh start.
-            HttpContext.Session.Clear();
-
-            //Clear TempData to ensure fresh start.
-            TempData.Clear();
-
-            //Ensure UpdateSuccess message is not showing.
-            UpdateSuccess = false;
-
             //The contexts current user exists.
             if (_httpContextAccessor.HttpContext.User != null)
             {
                 //The contexts current user has been authenticated
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true)
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentStaff property from DB.
+                    //Clear session and temp data to ensure fresh start.
+                    HttpContext.Session.Clear();
+                    TempData.Clear();
+
+                    //Get the ID and JWT token from the contexts current user, needed for populating CurrentStaff property from DB.
                     string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentStaff property from DB.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentStaff property from DB.
                     string? jwtToken = jwtTokenClaim.Value;
 
-                    //Set the CurrentStaff property by calling the GetStaff method in the _staffService.
+                    //Set the CurrentStaff property by calling the GetStaff method in the _staffService and set in session.
                     CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
-                    //Set the CurrentStaff in session, needed for displaying details.
                     HttpContext.Session.SetInSession("Staff", CurrentStaff);
+
+                    //Ensure UpdateSuccess message is not showing.
+                    UpdateSuccess = false;
 
                     //Set ShowAccountDetails, this is the default view a user has.
                     ShowAccountDetails = true;
+
+                    return Page();
+                }
+                else
+                {
+                    return Redirect("/NoPermission");
                 }
             }
-
-            //Return the page.
-            return Page();
+            else
+            {
+                return Redirect("/NoPermission");
+            }
         }
         #endregion Page Load
 
@@ -183,7 +169,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //Set the ShowAccountDetails property to true.
             ShowAccountDetails = true;
 
-            //Clear all TempData to ensure a fresh start.
             TempData.Clear();
         }
 
@@ -205,13 +190,9 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //The staff has changed at least 1 piece of information.
             if (AccountDetailsInput.NewEmail != null || AccountDetailsInput.NewPassword != null && AccountDetailsInput.ConfirmPassword != null)
             {
-                //Initialise a new ValidationContext to be used to validate the AccountDetailsInput model only.
+                //Validate the AccountDetailsInput model only.
                 ValidationContext validationContext = new ValidationContext(AccountDetailsInput);
-
-                //Create a collection to store the returned AccountDetailsInput model validation results.
                 ICollection<ValidationResult> validationResults = new List<ValidationResult>();
-
-                //Carry out validation check on the AccountDetailsInput model.
                 bool isAccountDetailsValid = Validator.TryValidateObject(AccountDetailsInput, validationContext, validationResults, true);
 
                 //The AccountDetailsInput model is valid.
@@ -220,8 +201,7 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                     //Generate a verification code by calling the GenerateToken() method from the _verificationTokenService.
                     int verificationToken = await _verificationTokenService.GenerateToken();
 
-                    //Declare a new string to store the email address to be used for sending the verification code.
-                    string? emailAddress = string.Empty;
+                    string emailAddress = string.Empty;
 
                     //The user has changed their email address.
                     if (AccountDetailsInput.NewEmail != null)
@@ -229,17 +209,15 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                         //Set the emailAddress string to the new email address.
                         emailAddress = AccountDetailsInput.NewEmail;
                     }
-                    //The user has not changed their email address.
                     else
                     {
                         //Set the emailAddress string to the staff current email address.
                         emailAddress = CurrentStaff.Email;
                     }
 
-                    //Declare new Response to store the reponse from the email service and populate by calling the SendVerificationCode method.
+                    //Attempt to send the verification code email to the user.
                     Response emailResponse = await SendVerificationCode(emailAddress, verificationToken);
 
-                    //The email has successfully been sent.
                     if (emailResponse.IsSuccessStatusCode)
                     {
                         //Set the VerificationCodeSent property to true as this will be needed to show the textbox for the user to input the code they received.
@@ -247,71 +225,51 @@ namespace DFI.FaultReporting.Admin.Pages.Account
 
                         //Store the verificationToken in TempData as it will be needed to check against the code input by the user.
                         TempData["VerificationToken"] = verificationToken;
-
                         //Store the VerificationCodeSent property value in TempData as it will be needed to ensure the code input textboxe remains visible if an error occurs.
                         TempData["VerificationCodeSent"] = VerificationCodeSent;
-
-                        //Keep all TempData
                         TempData.Keep();
                     }
-                    //The email has not been sent successfully.
                     else
                     {
                         //Set the VerificationCodeSent property to false to ensure the "Account details" section remains visible.
                         VerificationCodeSent = false;
 
-                        //Clear all TempData to ensure a fresh start.
                         TempData.Clear();
 
-                        //Add an error to the ModelState to inform the user that the email was not sent.
                         ModelState.AddModelError(string.Empty, "There was a problem sending the verification code");
 
-                        //Return the Page.
                         return Page();
                     }
                 }
-                //The AccountDetailsInput model is not valid.
                 else
                 {
                     //Set the VerificationCodeSent property to false to ensure the "Account details" section remains visible.
                     VerificationCodeSent = false;
 
-                    //Clear all TempData to ensure a fresh start.
                     TempData.Clear();
 
-                    //Loop over each validationResult in the returned validationResults
+                    //Display each of the validation errors.
                     foreach (ValidationResult validationResult in validationResults)
                     {
-                        //Add an error to the ModelState to inform the user of en validation errors.
                         ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
                     }
-
-                    //Return the Page.
                     return Page();
                 }
             }
-            //The user has not changed any information.
             else
             {
                 //Set the VerificationCodeSent property to false to ensure the "Account details" section remains visible.
                 VerificationCodeSent = false;
 
-                //Clear all TempData to ensure a fresh start.
                 TempData.Clear();
 
-                //Add an error to the ModelState to inform the user that they have not changed any information.
                 ModelState.AddModelError(string.Empty, "You have not changed any account details");
 
-                //Return the Page();
                 return Page();
             }
 
-            //If the method get this far something has gone wrong.
-
-            //Keep all TempData so that it can be reused if needed.
             TempData.Keep();
 
-            //Return the Page.
             return Page();
         }
 
@@ -335,13 +293,9 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //Get the sent verification code from TempData, needed for validating whether codes match. 
             VerificationCodeInput.EmailVerificationCode = TempData["VerificationToken"].ToString();
 
-            //Initialise a new ValidationContext to be used to validate the VerificationCodeInput model only.
+            //Validate the VerificationCodeInput model only.
             ValidationContext validationContext = new ValidationContext(VerificationCodeInput);
-
-            //Create a collection to store the returned VerificationCodeInput model validation results.
             ICollection<ValidationResult> validationResults = new List<ValidationResult>();
-
-            //Carry out validation check on the VerificationCodeInput model.
             bool isVerificationCodeValid = Validator.TryValidateObject(VerificationCodeInput, validationContext, validationResults, true);
 
             //User has input the correct verification code.
@@ -349,8 +303,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             {
                 //Get JWT Token Claim from HttpContext Users Claims.
                 Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                //Assign value of JWT Token Claim to jwtToken string, needed for passing to API in header.
                 string? jwtToken = jwtTokenClaim.Value;
 
                 //User has changed their email.
@@ -374,7 +326,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                         iterationCount: 100000,
                         numBytesRequested: 256 / 8));
 
-                    //Set the CurrentStaff password to the hashed password.
                     CurrentStaff.Password = passwordHash;
 
                     //Set the CurrentStaff salt to the generated salt, must convert to base64 string to enable the API to consume request.
@@ -388,10 +339,8 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                 //User has been successfully updated.
                 if (updatedStaff != null)
                 {
-                    //Clear the current Session to ensure fresh start.
-                    HttpContext.Session.Clear();
-
                     //Reset the "Staff" session object so that any changes are reflected on screen.
+                    HttpContext.Session.Clear();
                     HttpContext.Session.SetInSession("Staff", CurrentStaff);
 
                     //Repopulate the CurrentStaff class property so that any changes are reflected in class property values.
@@ -399,95 +348,70 @@ namespace DFI.FaultReporting.Admin.Pages.Account
 
                     //Create a claimsIdentity to store the updated HttpContext User claims, this is needed to ensure that claims are updated to reflect ay changes.
                     ClaimsIdentity claimsIdentity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    //Add the new email address to the claimsIdentity to ensure it is included instead of the old email address.
                     claimsIdentity.AddClaim(new Claim(ClaimTypes.Name, CurrentStaff.Email));
 
-                    //Loop over each of the claims in the HttpContext users claims.
+                    //Add the new email claim to the claimsIdentity.
                     foreach (Claim claim in HttpContext.User.Claims)
                     {
-                        //The claim is not of type "Name", this is needed to ensure that the old "Name" claim containing the old email address is not added.
                         if (claim.Type != ClaimTypes.Name)
                         {
-                            //Add the claim to the claimsIdentity.
                             claimsIdentity.AddClaim(claim);
                         }
                     }
 
                     //Create a ClaimsPrinicipal to store the claimsIdentity, this is needed for re-logging the user into the application.
                     ClaimsPrincipal currentUser = new ClaimsPrincipal();
-
-                    //Add the claimsIdentity to the ClaimsPrinicipal
                     currentUser.AddIdentity(claimsIdentity);
 
                     //Get the expires claim, this is needed to ensure that the re-login session expires at the same time as the previous.
                     Claim expiresClaim = currentUser.FindFirst("exp");
-
-                    //Convert the expires claim value to a long so it can be converted to a datetime.
                     long ticks = long.Parse(expiresClaim.Value);
-
-                    //Convert the expires claims long value to a datetime.
                     DateTime? Expires = DateTimeOffset.FromUnixTimeSeconds(ticks).LocalDateTime;
 
                     //Initialise a new AuthenticationProperties instance, this is needed when re-logging the user into the application.
                     AuthenticationProperties authenticationProperties = new AuthenticationProperties();
-
-                    //Set the expires of the AuthenticationProperties to the expires value from the expires claim of the claimsIdentity.
                     authenticationProperties.ExpiresUtc = Expires;
 
                     //Sign the user out.
                     await HttpContext.SignOutAsync();
 
-                    //Set the HttpContext user to the current user.
-                    HttpContext.User = currentUser;
-
                     //Sign the user in, this is needed to ensure that the new email address is included in the claims which will mean it can be used throughout the rest of the application.
+                    HttpContext.User = currentUser;
                     await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, currentUser, authenticationProperties);
 
                     //Set the VerificationCodeSent property to false to ensure the veirification code input section is no longer shown.
                     VerificationCodeSent = false;
 
-                    //Clear the AccountDetailsInput model to ensure fresh start.
+                    //Clear data to ensure fresh start.
                     AccountDetailsInput.NewEmail = string.Empty;
                     AccountDetailsInput.NewPassword = string.Empty;
                     AccountDetailsInput.ConfirmPassword = string.Empty;
-
-                    //Clear TempData to ensure fresh start.
                     TempData.Clear();
 
                     //Set the UpdateSuccess property to true so the success message is shown onscreen.
                     UpdateSuccess = true;
 
-                    //Return the Page.
                     return Page();
                 }
-                //User was not successfully updated.
                 else
                 {
-                    //Keep TempData to ensure values can be reused.
                     TempData.Keep();
 
-                    //Add an error to the ModelState to inform the user that their account details have not been updated.
                     ModelState.AddModelError(string.Empty, "There was a problem updating your account details.");
 
-                    //Return the Page.
                     return Page();
                 }
             }
-            //User has entered an incorrect verification code.
             else
             {
-                //Keep TempData to ensure values can be reused.
                 TempData.Keep();
 
-                //Loop over each validationResult in the returned validationResults
+                //Display each of the validation errors.
                 foreach (ValidationResult validationResult in validationResults)
                 {
-                    //Add an error to the ModelState to inform the user that the code they entered is not valid/does not match the sent code.
                     ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
                 }
 
-                //Return the Page.
                 return Page();
             }
         }
@@ -500,13 +424,11 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //Set the CurrentStaff to the "Staff" session object.
             CurrentStaff = HttpContext.Session.GetFromSession<Staff>("Staff");
 
-            //Clear the AccountDetailsInput model to ensure fresh start.
+            //Clear the AccountDetailsInput model data to ensure fresh start.
             ModelState.Clear();
             AccountDetailsInput.NewEmail = string.Empty;
             AccountDetailsInput.NewPassword = string.Empty;
             AccountDetailsInput.ConfirmPassword = string.Empty;
-
-            //Clear TempData to ensure fresh start.
             TempData.Clear();
 
             //Set the UpdateSuccess property to false to ensure the success message does not show.
@@ -518,7 +440,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //Set the ShowAccountDetails property to true to ensure that the users account details section is shown.
             ShowAccountDetails = true;
 
-            //Return the Page.
             return Page();
         }
 
@@ -528,10 +449,8 @@ namespace DFI.FaultReporting.Admin.Pages.Account
         //When executed this method attempts to send a verification code email to the user and returns the response from the _emailService.
         public async Task<Response> SendVerificationCode(string emailAddress, int verficationToken)
         {
-            //Declare a new EmailAddress object and assign the users email address as the value.
+            //Attempt to send the verification code email to the user.
             EmailAddress to = new EmailAddress(emailAddress);
-
-            //Call the SendVerificationCodeEmail in the _emailService and return the response.
             return await _emailService.SendVerificationCodeEmail(to, verficationToken);
         }
         #endregion Account Details
@@ -548,7 +467,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //Set the ShowPersonalDetails property to true.
             ShowPersonalDetails = true;
 
-            //Clear TempDate to ensure fresh start.
             TempData.Clear();
         }
 
@@ -563,13 +481,9 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //Set the CurrentStaff property by getting the "Staff" object stored in session.
             CurrentStaff = HttpContext.Session.GetFromSession<Staff>("Staff");
 
-            //Initialise a new ValidationContext to be used to validate the PersonalDetailsInput model only.
+            //Validate the PersonalDetailsInput model only.
             ValidationContext validationContext = new ValidationContext(PersonalDetailsInput);
-
-            //Create a collection to store the returned PersonalDetailsInput model validation results.
             ICollection<ValidationResult> validationResults = new List<ValidationResult>();
-
-            //Carry out validation check on the PersonalDetailsInput model.
             bool isPersonalDetailsValid = Validator.TryValidateObject(PersonalDetailsInput, validationContext, validationResults, true);
 
             //User has changed at least 1 piece of information.
@@ -599,11 +513,8 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                         CurrentStaff.LastName = PersonalDetailsInput.LastName;
                     }
 
-
                     //Get JWT Token Claim from HttpContext Users Claims.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Assign value of JWT Token Claim to jwtToken string, needed for passing to API in header.
                     string? jwtToken = jwtTokenClaim.Value;
 
                     //Update the CurrentStaff by calling the UpdateStaff method form the _staffService.
@@ -612,15 +523,12 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                     //Staff has been successfully updated.
                     if (updatedStaff != null)
                     {
-                        //Clear the current Session to ensure fresh start.
-                        HttpContext.Session.Clear();
-
                         //Reset the "Staff" session object so that any changes are reflected on screen.
+                        HttpContext.Session.Clear();
                         HttpContext.Session.SetInSession("Staff", CurrentStaff);
 
                         //Set the CurrentStaff property by getting the "Staff" object stored in session.
                         CurrentStaff = HttpContext.Session.GetFromSession<Staff>("Staff");
-
 
                         //Clear the PersonalDetailsInput model to ensure fresh start.
                         ModelState.Clear();
@@ -631,43 +539,32 @@ namespace DFI.FaultReporting.Admin.Pages.Account
                         //Set the UpdateSuccess property to true so the success message is shown onscreen.
                         UpdateSuccess = true;
 
-                        //Return the Page.
                         return Page();
                     }
-                    //Staff was not successfully updated.
                     else
                     {
-                        //Keep TempData to ensure values can be reused.
                         TempData.Keep();
 
-                        //Add an error to the ModelState to inform the user that their personal details have not been updated.
                         ModelState.AddModelError(string.Empty, "There was a problem updating your personal details.");
 
-                        //Return the Page.
                         return Page();
                     }
                 }
-                //The PersonalDetailsInput model is not valid.
                 else
                 {
-                    //Loop over each validationResult in the returned validationResults
+                    //Display each of the validation errors.
                     foreach (ValidationResult validationResult in validationResults)
                     {
-                        //Add an error to the ModelState to inform the user of en validation errors.
                         ModelState.AddModelError(string.Empty, validationResult.ErrorMessage);
                     }
 
-                    //Return the Page.
                     return Page();
                 }
             }
-            //User has not changed any information.
             else
             {
-                //Add an error to the ModelState to inform the user that they have not changed any information.
                 ModelState.AddModelError(string.Empty, "You have not changed any personal details");
 
-                //Return the Page();
                 return Page();
             }
         }
@@ -692,7 +589,6 @@ namespace DFI.FaultReporting.Admin.Pages.Account
             //Set the ShowPersonalDetails property to true.
             ShowPersonalDetails = true;
 
-            //Return the Page();
             return Page();
         }
         #endregion Personal Details

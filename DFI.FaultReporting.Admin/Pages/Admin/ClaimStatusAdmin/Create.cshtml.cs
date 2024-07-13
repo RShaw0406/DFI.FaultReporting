@@ -14,6 +14,7 @@ using DFI.FaultReporting.Services.Interfaces.Users;
 using DFI.FaultReporting.Common.Pagination;
 using DFI.FaultReporting.Models.Users;
 using System.Security.Claims;
+using DFI.FaultReporting.Services.Admin;
 
 namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
 {
@@ -42,10 +43,8 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare ClaimStatus property, this is needed when inputting a new claim status.
         [BindProperty]
         public ClaimStatus ClaimStatus { get; set; }
         #endregion Properties
@@ -62,40 +61,26 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffAdmin"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                     //Clear session to ensure fresh start.
                     HttpContext.Session.Clear();
 
-                    //Created and populate a new ClaimStatus object.
+                    await PopulateProperties();
+
+                    //Create and populate a new ClaimStatus object.
                     ClaimStatus = new ClaimStatus();
                     ClaimStatus.InputBy = CurrentStaff.Email;
                     ClaimStatus.InputOn = DateTime.Now;
                     ClaimStatus.Active = true;
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -110,50 +95,34 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
             //Model state is not valid.
             if (!ModelState.IsValid)
             {
-                //Loop through all model state items.
+                //Display each of the model errors.
                 foreach (var item in ModelState)
                 {
-                    //If the model state error has errors, add them to the model state.
                     if (item.Value.Errors.Count > 0)
                     {
-                        //Loop through all errors and add them to the model state.
                         foreach (var error in item.Value.Errors)
                         {
-                            //Add the error to the model state.
                             ModelState.AddModelError(string.Empty, error.ErrorMessage);
                         }
                     }
                 }
-
-                //Return the page.
                 return Page();
             }
             //ModelState is valid.
             else
             {
-                //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                string? jwtToken = jwtTokenClaim.Value;
-
-                //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+                await PopulateProperties();
 
                 //Get all claim statuses from the DB.
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                string? jwtToken = jwtTokenClaim.Value;
                 List<ClaimStatus> claimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
 
                 //Claim status already exists.
                 if (claimStatuses.Any(cs => cs.ClaimStatusDescription == ClaimStatus.ClaimStatusDescription))
                 {
-                    //Add model state error.
                     ModelState.AddModelError(string.Empty, "Claim status already exists");
                     ModelState.AddModelError("ClaimStatus.ClaimStatusDescription", "Claim status already exists");
-
-                    //Return the page.
                     return Page();
                 }
 
@@ -163,20 +132,31 @@ namespace DFI.FaultReporting.Admin.Pages.Admin.ClaimStatusAdmin
                 //If the claim status was successfully created.
                 if (insertedClaimStatus != null)
                 {
-                    //Return to the index page.
                     return RedirectToPage("./Index");
                 }
                 //Claim status was not successfully created.
                 else
                 {
-                    //Return an error message.
                     ModelState.AddModelError(string.Empty, "An error occurred while creating the claim status");
 
-                    //Return the page.
                     return Page();
                 }
             }
         }
         #endregion Create Claim Status
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+        }
+        #endregion Data
     }
 }
