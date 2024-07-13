@@ -1,16 +1,20 @@
 using DFI.FaultReporting.Common.Pagination;
+using DFI.FaultReporting.Common.SessionStorage;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Users;
+using DFI.FaultReporting.Services.FaultReports;
 using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Users;
 using DFI.FaultReporting.Services.Users;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 
 namespace DFI.FaultReporting.Admin.Pages.Faults
@@ -49,34 +53,26 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare Faults property, this is needed for displaying on fault details.
         [BindProperty]
         public Fault Fault { get; set; }
 
-        //Declare Reports property, this is needed for displaying the number of reports for each fault.
         [BindProperty]
         public List<Report> Reports { get; set; }
 
-        //Declare PagedReports property, this is needed for displaying reports in the table.
         [BindProperty]
         public List<Report> PagedReports { get; set; }
 
-        //Declare FaultPriority property, this is needed for displaying on fault details.
         [BindProperty]
         public FaultPriority FaultPriority { get; set; }
 
-        //Declare FaultStatus property, this is needed for displaying on fault details.
         [BindProperty]
         public FaultStatus FaultStatus { get; set; }
 
-        //Declare FaultType property, this is needed for displaying on fault details.
         [BindProperty]
         public FaultType FaultType { get; set; }
 
-        //Declare Pager property, this is needed for pagination.
         [BindProperty(SupportsGet = true)]
         public Pager Pager { get; set; } = new Pager();
         #endregion Properties
@@ -94,113 +90,75 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 //The contexts current user has been authenticated.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffReadWrite") || HttpContext.User.IsInRole("StaffRead"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentStaff property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentStaff property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                    await PopulateProperties((int)ID);
 
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentStaff property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
-                    //Retreive the ID in the url query string.
-                    string? mapQueryID = HttpContext.Request.Query["ID"].ToString();
-
-                    //User has arrived on page by clicking link in map.
-                    if (mapQueryID != null && mapQueryID != string.Empty)
-                    {
-                        //Set the Fault property by calling the GetFault method from the _faultService using the query string ID.
-                        Fault = await _faultService.GetFault(Convert.ToInt32(mapQueryID), jwtToken);
-                    }
-                    //User has arrived on page by clicking link in table.
-                    else
-                    {
-                        //Set the Fault property by calling the GetFault method from the _faultService using the ID in TempData.
-                        Fault = await _faultService.GetFault(Convert.ToInt32(ID), jwtToken);
-                    }
-
-                    //Keep the TempData.
+                    //Set the ID in tempdata.
+                    TempData["ID"] = ID;
                     TempData.Keep();
-
-                    //Set the FaultPriority property by calling the GetFaultPriority method from the _faultPriorityService.
-                    FaultType = await _faultTypeService.GetFaultType(Fault.FaultTypeID, jwtToken);
-
-                    //Set the FaultStatus property by calling the GetFaultStatus method from the _faultStatusService.
-                    FaultStatus = await _faultStatusService.GetFaultStatus(Fault.FaultStatusID, jwtToken);
-
-                    //Set the FaultPriority property by calling the GetFaultPriority method from the _faultPriorityService.
-                    FaultPriority = await _faultPriorityService.GetFaultPriority(Fault.FaultPriorityID, jwtToken);
-
-                    //Get all Reports by calling the GetReports method from the _reportService.
-                    Reports = await _reportService.GetReports();
-
-                    //Get the reports for selected fault
-                    Reports = Reports.Where(r => r.FaultID == Fault.ID).ToList();
-
-                    //Set the current page to 1.
+                
+                    //Setup the pager.
                     Pager.CurrentPage = 1;
-
-                    //Set the page size to the value from the settings.
                     Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
-
-                    //Set the pager count to the number of reports.
                     Pager.Count = Reports.Count;
-
-                    //Get the paginated reports by calling the GetPaginatedReports method from the _pagerService.
                     PagedReports = await _pagerService.GetPaginatedReports(Reports, Pager.CurrentPage, Pager.PageSize);
 
-                    //Return the page.
                     return Page();
                 }
-                //The contexts current user has not been authenticated.
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user does not exist.
             else
             {
-                //Redirect user to no permission
                 return Redirect("/NoPermission");
             }
         }
         #endregion Page Load
 
-        #region View Images
-        //Method Summary:
-        //This method is excuted when the "View Images" button in the reports table view is clicked.
-        //When executed the report ID is stored in TempData and the user is redirected to the ReportImages page.
-        public async Task<IActionResult> OnGetViewImages(int ID)
-        {
-            //Set the report ID in TempData.
-            TempData["ReportID"] = ID;
-            TempData.Keep();
-
-            //Redirect user to the ReportImages page.
-            return Redirect("/Faults/ReportImages");
-        }
-        #endregion View Images
-
         #region Pagination
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
         //When executed the desired page of reports is displayed.
-        public async void OnGetPaging()
+        public async Task OnGetPaging()
         {
+            await PopulateProperties((int)TempData["ID"]);
+
             //Keep the TempData.
             TempData.Keep();
 
-            //Set the pager count to the number of reports.
+            //Setup the pager.
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             Pager.Count = Reports.Count;
-
-            //Get the first page of reports by calling the GetPaginatedReports method from the _pagerService.
             PagedReports = await _pagerService.GetPaginatedReports(Reports, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties(int ID)
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+
+            Fault = await _faultService.GetFault(Convert.ToInt32(ID), jwtToken);
+
+            FaultType = await _faultTypeService.GetFaultType(Fault.FaultTypeID, jwtToken);
+
+            FaultStatus = await _faultStatusService.GetFaultStatus(Fault.FaultStatusID, jwtToken);
+
+            FaultPriority = await _faultPriorityService.GetFaultPriority(Fault.FaultPriorityID, jwtToken);
+
+            Reports = await _reportService.GetReports();
+
+            Reports = Reports.Where(r => r.FaultID == Fault.ID).ToList();
+        }
+        #endregion Data
     }
 }

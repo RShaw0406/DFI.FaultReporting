@@ -55,38 +55,29 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare Fault property, this is needed for getting the selected fault from the DB.
         [BindProperty]
         public Fault Fault { get; set; }
 
-        //Declare FaultPriorities property, this is needed for populatinh fault priority dropdown list.
         [BindProperty]
         public List<FaultPriority> FaultPriorities { get; set; }
 
-        //Declare FaultPriorityList property, this is needed for populating fault priority dropdown list.
         [BindProperty]
         public IEnumerable<SelectListItem> FaultPriorityList { get; set; }
 
-        //Declare FaultStatuses property, this is needed for populating fault status dropdown list.
         [BindProperty]
         public List<FaultStatus> FaultStatuses { get; set; }
 
-        //Declare FaultStatusList property, this is needed for populating fault status dropdown list.
         [BindProperty]
         public IEnumerable<SelectListItem> FaultStatusList { get; set; }
 
-        //Declare FaultTypes property, this is needed for populating fault types dropdown list.
         [BindProperty]
         public List<FaultType> FaultTypes { get; set; }
 
-        //Declare FaultTypesList property, this is needed for populating fault types dropdown list.
         [BindProperty]
         public IEnumerable<SelectListItem> FaultTypesList { get; set; }
 
-        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
         #endregion Properties
 
@@ -102,81 +93,29 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffReadWrite"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    //Clear session to ensure fresh start.
+                    HttpContext.Session.Clear();
 
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+                    await PopulateProperties();
 
                     //Get fault from the DB.
+                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                    string? jwtToken = jwtTokenClaim.Value;
                     Fault = await _faultService.GetFault((int)ID, jwtToken);
 
                     //Store the fault status ID in TempData.
                     TempData["StatusID"] = Fault.FaultStatusID;
-
-                    //Get fault types for dropdown.
-                    FaultTypes = await _faultTypeService.GetFaultTypes();
-
-                    //Filter out inactive fault types.
-                    FaultTypes = FaultTypes.Where(ft => ft.Active == true).ToList();
-
-                    //Populate fault types dropdown.
-                    FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
-                    {
-                        Text = ft.FaultTypeDescription,
-                        Value = ft.ID.ToString()
-                    });
-
-                    //Get all fault priorities by calling the GetFaultPriorities method from the _faultPriorityService.
-                    FaultPriorities = await _faultPriorityService.GetFaultPriorities();
-
-                    //Filter out inactive fault priorities.
-                    FaultPriorities = FaultPriorities.Where(fp => fp.Active == true).ToList();
-
-                    //Populate fault priorities dropdown.
-                    FaultPriorityList = FaultPriorities.Select(fp => new SelectListItem()
-                    {
-                        Text = fp.FaultPriorityRating,
-                        Value = fp.ID.ToString()
-                    });
-
-                    //Get all fault statuses by calling the GetFaultStatuses method from the _faultStatusService.
-                    FaultStatuses = await _faultStatusService.GetFaultStatuses();
-
-                    //Filter out inactive fault statuses.
-                    FaultStatuses = FaultStatuses.Where(fs => fs.Active == true).ToList();
-
-                    //Remove the repaired status from the fault statuses list.
-                    FaultStatuses = FaultStatuses.Where(fs => fs.ID != 4).ToList();
-
-                    //Populate fault statuses dropdown.
-                    FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
-                    {
-                        Text = fs.FaultStatusDescription,
-                        Value = fs.ID.ToString()
-                    });
-
-                    //Keep the TempData.
                     TempData.Keep();
 
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -188,91 +127,36 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //When executed, it updates the fault in the DB.
         public async Task<IActionResult> OnPostAsync()
         {
-            //Get fault types for dropdown.
-            FaultTypes = await _faultTypeService.GetFaultTypes();
-
-            //Filter out inactive fault types.
-            FaultTypes = FaultTypes.Where(ft => ft.Active == true).ToList();
-
-            //Populate fault types dropdown.
-            FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
-            {
-                Text = ft.FaultTypeDescription,
-                Value = ft.ID.ToString()
-            });
-
-            //Get all fault priorities by calling the GetFaultPriorities method from the _faultPriorityService.
-            FaultPriorities = await _faultPriorityService.GetFaultPriorities();
-
-            //Filter out inactive fault priorities.
-            FaultPriorities = FaultPriorities.Where(fp => fp.Active == true).ToList();
-
-            //Populate fault priorities dropdown.
-            FaultPriorityList = FaultPriorities.Select(fp => new SelectListItem()
-            {
-                Text = fp.FaultPriorityRating,
-                Value = fp.ID.ToString()
-            });
-
-            //Get all fault statuses by calling the GetFaultStatuses method from the _faultStatusService.
-            FaultStatuses = await _faultStatusService.GetFaultStatuses();
-
-            //Filter out inactive fault statuses.
-            FaultStatuses = FaultStatuses.Where(fs => fs.Active == true).ToList();
-
-            //Remove the repaired status from the fault statuses list.
-            FaultStatuses = FaultStatuses.Where(fs => fs.ID != 4).ToList();
-
-            //Populate fault statuses dropdown.
-            FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
-            {
-                Text = fs.FaultStatusDescription,
-                Value = fs.ID.ToString()
-            });
+            await PopulateProperties();
 
             //Modelstate is not valid.
             if (!ModelState.IsValid)
             {
-                //Loop through all model state items.
+                //Display each of the model state errors.
                 foreach (var item in ModelState)
                 {
-                    //If the model state error has errors, add them to the model state.
                     if (item.Value.Errors.Count > 0)
                     {
-                        //Loop through all errors and add them to the model state.
                         foreach (var error in item.Value.Errors)
                         {
-                            //Add the error to the model state.
                             ModelState.AddModelError(string.Empty, error.ErrorMessage);
                         }
                     }
                 }
 
-                //Return the page.
                 return Page();
             }
             //Modelstate is valid.
             else
             {
-                //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                string? jwtToken = jwtTokenClaim.Value;
-
-                //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
                 //Update fault in the DB.
+                Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                string? jwtToken = jwtTokenClaim.Value;
                 Fault updatedFault = await _faultService.UpdateFault(Fault, jwtToken);
 
                 //Fault was updated.
                 if (updatedFault != null)
                 {
-                    //Set the UpdateSuccess property to true.
                     UpdateSuccess = true;
 
                     //Check if the fault status ID has changed.
@@ -281,7 +165,6 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                         //Get all reports from the DB.
                         List<Report> reports = await _reportService.GetReports();
 
-                        //Loop through all reports.
                         foreach (Report report in reports)
                         {
                             //If the fault ID from the report is the same as the updated fault ID.
@@ -289,70 +172,45 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                             {
                                 //Send email to user who reported the fault.
                                 SendGrid.Response response = await SendFaultUpdateEmail(report.InputBy);
-
-                                //Email was sent.
-                                if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
-                                {
-                                    //Set the UpdateSuccess property to true.
-                                    UpdateSuccess = true;
-                                }
                             }
                         }
                     }
 
                     //Store the fault status ID in TempData.
                     TempData["StatusID"] = updatedFault.FaultStatusID;
-
-                    //Keep the TempData.
                     TempData.Keep();
 
-                    //Return the page.
                     return Page();
                 }
-                //Fault could not be updated.
                 else
                 {
-                    //Add model state error.
                     ModelState.AddModelError(string.Empty, "Fault could not be updated");
 
-                    //Keep the TempData.
                     TempData.Keep();
 
-                    //Return the page.
                     return Page();
                 }
             }
         }
+        #endregion Edit Fault
 
+        #region Email
         //Method Summary:
         //This method is executed when the fault status has changed "Update" button is clicked.
         //When executed this method attempts to send an email to user who reported the fault and returns the response from the _emailService.
         public async Task<SendGrid.Response> SendFaultUpdateEmail(string emailAddress)
         {
-            //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-            string? jwtToken = jwtTokenClaim.Value;
-
             //Get the status, priority and type of the fault, this is needed for sending info in the email.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
             FaultStatus faultStatus = await _faultStatusService.GetFaultStatus(Fault.FaultStatusID, jwtToken);
             FaultPriority faultPriority = await _faultPriorityService.GetFaultPriority(Fault.FaultPriorityID, jwtToken);
             FaultType faultType = await _faultTypeService.GetFaultType(Fault.FaultTypeID, jwtToken);
 
-            //Set the subject of the email explaining that the status of the reported fault has changed.
+            //Construct the email.
             string subject = "DFI Fault Reporting Administration: Reported fault status has changed";
-
-            //Declare a new EmailAddress object and assign the user email address as the value.
             EmailAddress to = new EmailAddress(emailAddress);
-
-            //Set textContent to empty string as it will not be used here.
             string textContent = string.Empty;
-
-            //Set the htmlContent to a message explaining to the user that the status of their reported fault has changed.
             string htmlContent = "<p>Hello,</p><p>The status of your reported fault has changed.</p>" +
                 "<p><strong>Reported fault details:</strong></p>" +
                 faultType.FaultTypeDescription + "<br/>" +
@@ -360,13 +218,58 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 "<p><strong>Status has been changed to:</strong></p>" +
                 faultStatus.FaultStatusDescription + "<br/><br/>" +
                 "You can continue to track the progress of your reported fault using the DFI Fault Reporting application.";
-
-            //Set the attachment to null as it will not be used here.
             SendGrid.Helpers.Mail.Attachment? attachment = null;
 
             //Call the SendEmail in the _emailService and return the response.
             return await _emailService.SendEmail(subject, to, textContent, htmlContent, attachment);
         }
-        #endregion Edit Fault
+        #endregion Email
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties()
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+
+            //Get fault types for dropdown.
+            FaultTypes = await _faultTypeService.GetFaultTypes();
+            FaultTypes = FaultTypes.Where(ft => ft.Active == true).ToList();
+
+            FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
+            {
+                Text = ft.FaultTypeDescription,
+                Value = ft.ID.ToString()
+            });
+
+            //Get all fault priorities by calling the GetFaultPriorities method from the _faultPriorityService.
+            FaultPriorities = await _faultPriorityService.GetFaultPriorities();
+            FaultPriorities = FaultPriorities.Where(fp => fp.Active == true).ToList();
+
+            FaultPriorityList = FaultPriorities.Select(fp => new SelectListItem()
+            {
+                Text = fp.FaultPriorityRating,
+                Value = fp.ID.ToString()
+            });
+
+            //Get all fault statuses by calling the GetFaultStatuses method from the _faultStatusService.
+            FaultStatuses = await _faultStatusService.GetFaultStatuses();
+            FaultStatuses = FaultStatuses.Where(fs => fs.Active == true).ToList();
+
+            //Remove the repaired status from the fault statuses list as this status is only set by contractors through the jobs page on the public app.
+            FaultStatuses = FaultStatuses.Where(fs => fs.ID != 4).ToList();
+
+            FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
+            {
+                Text = fs.FaultStatusDescription,
+                Value = fs.ID.ToString()
+            });
+        }
+        #endregion Data
     }
 }

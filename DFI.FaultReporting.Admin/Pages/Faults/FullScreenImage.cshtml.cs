@@ -30,10 +30,8 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare ReportPhoto property, this is needed to store returned report photo from the DB.
         [BindProperty]
         public ReportPhoto ReportPhoto { get; set; }
         #endregion Properties
@@ -42,7 +40,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //Method Summary:
         //This method is executed when the page loads.
         //When executed the images related to a reported fault are displayed on screen.
-        public async Task<IActionResult> OnGetAsync()
+        public async Task<IActionResult> OnGetAsync(int? ID)
         {
             //The contexts current user exists.
             if (_httpContextAccessor.HttpContext.User != null)
@@ -50,38 +48,25 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 //The contexts current user has been authenticated.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffReadWrite") || HttpContext.User.IsInRole("StaffRead"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
                     //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
                     Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
                     string? jwtToken = jwtTokenClaim.Value;
 
                     //Set the CurrentStaff property by calling the GetUser method in the _userService.
+                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                     CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-                    //Set the Report property by calling the GetReport method from the _reportService using the ID in TempData.
-                    ReportPhoto = await _reportPhotoService.GetReportPhoto(Convert.ToInt32(TempData["ReportPhotoID"]), jwtToken);
+                    ReportPhoto = await _reportPhotoService.GetReportPhoto(Convert.ToInt32((int)ID), jwtToken);
 
-                    //Keep the TempData.
-                    TempData.Keep();
-
-                    //Return the page.
                     return Page();
                 }
-                //The contexts current user has not been authenticated.
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user does not exist.
             else
             {
-                //Redirect user to no permission
                 return Redirect("/NoPermission");
             }
         }

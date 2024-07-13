@@ -9,6 +9,7 @@ using DFI.FaultReporting.Services.Interfaces.Admin;
 using DFI.FaultReporting.Services.Interfaces.Pagination;
 using DFI.FaultReporting.Services.Interfaces.Settings;
 using DFI.FaultReporting.Services.Interfaces.Users;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -51,31 +52,24 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         #endregion Dependency Injection
 
         #region Properties
-        //Declare CurrentStaff property, this is needed when calling the _staffService.
         public Staff CurrentStaff { get; set; }
 
-        //Declare Fault property, this is needed for assign staff to the fault.
         [BindProperty]
         public Fault Fault { get; set; }
 
-        //Declare Staff property, this is needed when getting all staff from the DB.
         [BindProperty]
         public List<Staff> Staff { get; set; }
 
-        //Declare StaffToAssign property, this is needed for assign staff to the fault.
         [BindProperty]
         public Staff? StaffToAssign { get; set; }
 
-        //Declare SearchString property, this is needed for searching staff.
         [DisplayName("Search for staff")]
         [BindProperty]
         public string? SearchString { get; set; }
 
-        //Declare SearchID property, this is needed for searching staff.
         [BindProperty]
         public int SearchID { get; set; }
 
-        //Declare UpdateSuccess property, this is needed for displaying the updated success message.
         public bool UpdateSuccess { get; set; }
         #endregion Properties
 
@@ -91,55 +85,32 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
                 //The contexts current user has been authenticated and has admin role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && HttpContext.User.IsInRole("StaffReadWrite"))
                 {
-                    //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-                    string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    await PopulateProperties((int)ID);
 
-                    //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-                    Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+                    //Set Staff session value, this is needed for the javascript search.
+                    HttpContext.Session.SetInSession("Staff", Staff);
 
-                    //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-                    string? jwtToken = jwtTokenClaim.Value;
-
-                    //Set the CurrentStaff property by calling the GetUser method in the _userService.
-                    CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
-
-                    //Get fault from DB.
-                    Fault = await _faultService.GetFault((int)ID, jwtToken);
-
-                    //Get staff from DB.
-                    Staff = await _staffService.GetAllStaff(jwtToken);
-
-                    //Filter out inactive staff.
-                    Staff = Staff.Where(s => s.Active == true).ToList();
+                    //Set the ID in TempData.
+                    TempData["ID"] = ID;
+                    TempData.Keep();
 
                     //The fault has a staff member assigned.
                     if (Fault.StaffID != 0)
                     {
                         //Get the staff member assigned to the fault.
                         Staff faultStaff = Staff.Where(s => s.ID == Fault.StaffID).FirstOrDefault();
-
-                        //Get the staff member assigned to the fault.
                         StaffToAssign = faultStaff;
                     }
 
-                    //Set staff session values.
-                    HttpContext.Session.SetInSession("Staff", Staff);
-                    //Set Fault session values.
-                    HttpContext.Session.SetInSession("Fault", Fault);
-
-                    //Return the page.
                     return Page();
                 }
                 else
                 {
-                    //Redirect user to no permission.
                     return Redirect("/NoPermission");
                 }
             }
-            //The contexts current user has not been authenticated.
             else
             {
-                //Redirect user to no permission.
                 return Redirect("/NoPermission");
             }
         }
@@ -151,32 +122,26 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //When executed, it sets the staff to assign to the staff member selected in the search.
         public async Task<IActionResult> OnPostAssignToSearch()
         {
-            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-            string? jwtToken = jwtTokenClaim.Value;
+            await PopulateProperties((int)TempData["ID"]);
 
             //User has entered a search string.
             if (SearchString != null && SearchString != string.Empty)
             {
-                //Get staff from DB.
-                List<Staff> staff = await _staffService.GetAllStaff(jwtToken);
-
                 //Set the staff to assign to the staff member selected in the search.
-                StaffToAssign = staff.Where(s => s.ID == SearchID).FirstOrDefault();
+                StaffToAssign = Staff.Where(s => s.ID == SearchID).FirstOrDefault();
 
                 //Set the StaffToAssign in session.
                 HttpContext.Session.SetInSession("StaffToAssign", StaffToAssign);
 
-                //Return the page.
+                TempData.Keep();
+
                 return Page();
             }
-            //User has not entered a search string.
             else
             {
-                //Set staff to null.
                 StaffToAssign = null;
+
+                TempData.Keep();
 
                 return Page();
             }
@@ -187,17 +152,7 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //When executed, it sets the staff to assign to the current logged in staff member.
         public async Task<IActionResult> OnPostAssignToMe()
         {
-            //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-            string? jwtToken = jwtTokenClaim.Value;
-
-            //Set the CurrentStaff property by calling the GetUser method in the _userService.
-            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+            await PopulateProperties((int)TempData["ID"]);
 
             //Set the staff to assign to the current logged in staff member.
             StaffToAssign = CurrentStaff;
@@ -205,7 +160,8 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
             //Set the StaffToAssign in session.
             HttpContext.Session.SetInSession("StaffToAssign", StaffToAssign);
 
-            //Return the page.
+            TempData.Keep();
+
             return Page();
         }
 
@@ -214,47 +170,54 @@ namespace DFI.FaultReporting.Admin.Pages.Faults
         //When executed, it updates the fault with the staff member selected to assign.
         public async Task<IActionResult> OnPostAssignStaff()
         {
-            //Get the ID from the contexts current user, needed for populating CurrentUser property from DB.
-            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
-            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
-
-            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
-            string? jwtToken = jwtTokenClaim.Value;
-
-            //Set the CurrentStaff property by calling the GetUser method in the _userService.
-            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+            await PopulateProperties((int)TempData["ID"]);
 
             //Get the StaffToAssign from session.
             StaffToAssign = HttpContext.Session.GetFromSession<Staff>("StaffToAssign");
 
-            //Get the Fault from session.
-            Fault = HttpContext.Session.GetFromSession<Fault>("Fault");
-
             //Update the fault with the staff member selected to assign.
             Fault.StaffID = StaffToAssign.ID;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
             Fault updatedFault = await _faultService.UpdateFault(Fault, jwtToken);
 
             //The staff member has been assigned.
             if (updatedFault != null)
             {
-                //Set the UpdateSuccess property to true.
                 UpdateSuccess = true;
 
-                //Return the page.
+                TempData.Keep();
+
                 return Page();
             }
-            //The staff member has not been assigned.
             else
             {
-                //Return an error message.
                 ModelState.AddModelError(string.Empty, "An error occurred while assigning the staff member");
 
-                //Return the page.
+                TempData.Keep();
+
                 return Page();
             }
         }
         #endregion Assign Staff
+
+        #region Data
+        //Method Summary:
+        //This method is excuted when the a post occurs.
+        //When excuted, it populates the page properties.
+        public async Task PopulateProperties(int ID)
+        {
+            //Get the current user ID and JWT token.
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? jwtToken = jwtTokenClaim.Value;
+            CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
+
+            Staff = await _staffService.GetAllStaff(jwtToken);
+            Staff = Staff.Where(s => s.Active == true).ToList();
+
+            Fault = await _faultService.GetFault((int)ID, jwtToken);
+        }
+        #endregion Data
     }
 }
