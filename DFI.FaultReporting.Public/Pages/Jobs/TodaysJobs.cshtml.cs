@@ -123,7 +123,7 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
             public bool isSelected { get; set; }
         }
 
-        public bool ShowRouteMap { get; set; }
+        public bool SelectionSuccess { get; set; }
         #endregion Properties
 
         #region Page Load
@@ -281,8 +281,14 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 AvailableJobs.Add(SelectedJobsInput);
             }
 
+            //Get the selected jobs from session and mark them as selected in the AvailableJobs list.
             SelectedJobs = HttpContext.Session.GetFromSession<List<SelectedJobsInputModel>>("SelectedJobs");
+            if (SelectedJobs == null || SelectedJobs.Count == 0)
+            {
+                SelectedJobs = new List<SelectedJobsInputModel>();
+            }
 
+            //Mark the selected jobs in the AvailableJobs list.
             foreach (SelectedJobsInputModel selectedJob in SelectedJobs)
             {
                 foreach (SelectedJobsInputModel availableJob in AvailableJobs)
@@ -294,8 +300,7 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 }
             }
 
-            HttpContext.Session.SetInSession("AvailableJobs", AvailableJobs);
-
+            //Set the current page in TempData, needed to ensure the page is maintained when the user selects jobs.
             TempData["CurrentPage"] = Pager.CurrentPage;
             TempData.Keep();
         }
@@ -308,27 +313,27 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
         {
             await PopulateProperties();
 
-            int CurrentPage = 1;
-
+            //Get the current page from TempData.
             if (TempData["CurrentPage"] != null && (int)TempData["CurrentPage"] != 0)
             {
-                CurrentPage = (int)TempData["CurrentPage"];
+                int CurrentPage = (int)TempData["CurrentPage"];
+                Pager.CurrentPage = CurrentPage;
             }
 
             //Setup Pager.
             Pager.Count = Repairs.Count;
-            Pager.CurrentPage = CurrentPage;
             Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
             PagedRepairs = PagedRepairs.OrderBy(r => r.RepairTargetDate).ToList();
 
+            //Get the selected jobs from session.
             SelectedJobs = HttpContext.Session.GetFromSession<List<SelectedJobsInputModel>>("SelectedJobs");
-
             if (SelectedJobs == null || SelectedJobs.Count == 0)
             {
                 SelectedJobs = new List<SelectedJobsInputModel>();
             }
 
+            //Get the available jobs.
             if (AvailableJobs == null || AvailableJobs.Count == 0)
             {
                 //Create a new list of AvailableJobs objects.
@@ -348,8 +353,10 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 }
             }
 
+            //Loop through the available jobs and update the selected jobs list if available job is selected or not.
             foreach (SelectedJobsInputModel availableJob in AvailableJobs)
             {
+                //Available job is selected so add to selected jobs list, if not already in the list.
                 if (availableJob.isSelected)
                 {
                     SelectedJobsInputModel jobToAdd = SelectedJobs.Where(sj => sj.RepairID == availableJob.RepairID).FirstOrDefault();
@@ -363,6 +370,7 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                         SelectedJobs.Add(selectedJob);
                     }
                 }
+                //Available job is not selected so remove from selected jobs list, if in the list.
                 else
                 {
                     SelectedJobsInputModel jobToRemove = SelectedJobs.Where(sj => sj.RepairID == availableJob.RepairID).FirstOrDefault();
@@ -374,6 +382,7 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 }
             }
 
+            //Mark the selected jobs in the AvailableJobs list.
             foreach (SelectedJobsInputModel selectedJob in SelectedJobs)
             {
                 foreach (SelectedJobsInputModel availableJob in AvailableJobs)
@@ -385,7 +394,7 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 }
             }
 
-            HttpContext.Session.SetInSession("AvailableJobs", AvailableJobs);
+            //Set the selected jobs in session.
             HttpContext.Session.SetInSession("SelectedJobs", SelectedJobs);
 
             TempData.Keep();
@@ -398,30 +407,32 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
         //Method Summary:
         //This method is excuted when the plot route button is clicked.
         //When executed the repairs are sorted by priority, the map is shown and the route is plotted.
-        public async Task OnGetPlotRoute()
+        public async Task OnGetSaveSelection()
         {
-            ShowRouteMap = true;
+            TempData.Keep();
+
+            SelectionSuccess = true;
 
             await PopulateProperties();
 
-            int CurrentPage = 1;
-
+            //Get the current page from TempData.
             if (TempData["CurrentPage"] != null && (int)TempData["CurrentPage"] != 0)
             {
-                CurrentPage = (int)TempData["CurrentPage"];
+                int CurrentPage = (int)TempData["CurrentPage"];
+                Pager.CurrentPage = CurrentPage;
             }
 
             //Setup Pager.
             Pager.Count = Repairs.Count;
-            Pager.CurrentPage = CurrentPage;
             Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
             PagedRepairs = await _pagerService.GetPaginatedRepairs(Repairs, Pager.CurrentPage, Pager.PageSize);
             PagedRepairs = PagedRepairs.OrderBy(r => r.RepairTargetDate).ToList();
 
+            //Get the selected jobs from session.
             SelectedJobs = HttpContext.Session.GetFromSession<List<SelectedJobsInputModel>>("SelectedJobs");
 
+            //Get the selected repairs from the selected jobs.
             List<Repair> SelectedRepairs = new List<Repair>();
-
             foreach (SelectedJobsInputModel selectedJob in SelectedJobs)
             {
                 foreach (Repair repair in Repairs)
@@ -433,8 +444,8 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 }
             }
 
+            //Get the selected faults from the selected repairs.
             List<Fault> selectedFaults = new List<Fault>();
-
             foreach (Fault fault in Faults)
             {
                 foreach (Repair repair in SelectedRepairs)
@@ -446,12 +457,53 @@ namespace DFI.FaultReporting.Public.Pages.Jobs
                 }
             }
 
+            //Sort the selected faults by priority, needed for inital routing that will calculate the route based on the priority of the fault.
             selectedFaults = selectedFaults.OrderBy(f => f.FaultPriorityID).ToList();
 
+            //Set the selected repairs and faults in session.
             HttpContext.Session.SetInSession("SelectedRepairs", SelectedRepairs);
             HttpContext.Session.SetInSession("SelectedFaults", selectedFaults);
 
             await SetSessionData();
+
+            //Get the selected jobs from session.
+            SelectedJobs = HttpContext.Session.GetFromSession<List<SelectedJobsInputModel>>("SelectedJobs");
+            if (SelectedJobs == null || SelectedJobs.Count == 0)
+            {
+                SelectedJobs = new List<SelectedJobsInputModel>();
+            }
+
+            //Get the available jobs.
+            if (AvailableJobs == null || AvailableJobs.Count == 0)
+            {
+                //Create a new list of AvailableJobs objects.
+                AvailableJobs = new List<SelectedJobsInputModel>();
+                AvailableJobs = new List<SelectedJobsInputModel>();
+
+                //Loop through all repairs and add them to the AvailableJobs list.
+                foreach (Repair repair in PagedRepairs)
+                {
+                    //Create a new SelectedJobsInput object.
+                    SelectedJobsInput = new SelectedJobsInputModel();
+                    SelectedJobsInput.RepairID = repair.ID;
+                    SelectedJobsInput.isSelected = false;
+
+                    //Add the SelectedJobsInput object to the AvailableJobs list.
+                    AvailableJobs.Add(SelectedJobsInput);
+                }
+            }
+
+            //Mark the selected jobs in the AvailableJobs list.
+            foreach (SelectedJobsInputModel selectedJob in SelectedJobs)
+            {
+                foreach (SelectedJobsInputModel availableJob in AvailableJobs)
+                {
+                    if (selectedJob.RepairID == availableJob.RepairID && selectedJob.isSelected)
+                    {
+                        availableJob.isSelected = true;
+                    }
+                }
+            }
         }
         #endregion Plot Routes
     }

@@ -15,6 +15,7 @@ const mapBounds = [-8.3, 53.9, -5.3, 55.4]
 //This method is used for setting up the map control and adding event listeners to the map - uses the Azure Maps Web SDK.
 //In this instance a data source for displaying reapirs is created and added to the map also.
 function initRouteMap() {
+
     //Find map on page
     var routeMap = document.getElementById('routeMap');
 
@@ -61,7 +62,6 @@ function initRouteMap() {
             routePoints.push(position)
         });
 
-        navigator.geolocation.getCurrentPosition(SetStartPosition);
 
         //Wait until the map resources are ready.
         map.events.add('ready', function () {
@@ -69,6 +69,8 @@ function initRouteMap() {
             //Create a data source to store the data in.
             datasource = new atlas.source.DataSource();
             map.sources.add(datasource);
+
+            var markerLayer;
 
             //Add layers fro rendering data in the data source.
             map.layers.add([
@@ -78,15 +80,50 @@ function initRouteMap() {
                     strokeWidth: 5
                 }),
 
-                //Render point data using a symbol layer.
-                new atlas.layer.SymbolLayer(datasource, null, {
-                    textOptions: {
-                        textField: ['get', 'title'],
-                        offset: [0, -1.2],
-                        color: 'white'
-                    },
-                    filter: ['any', ['==', ['geometry-type'], 'Point'], ['==', ['geometry-type'], 'MultiPoint']] //Only render Point or MultiPoints in this layer.
-                })
+                markerLayer = new atlas.layer.HtmlMarkerLayer(datasource, null, {
+                    markerCallback: (id, position, properties) => {
+                        //Marker will represent a cluster of repairs close together.
+                        if (properties.cluster) {
+                            console.log("Properties:");
+                            console.log(properties);
+
+                            //Return a created marker for the cluster.
+                            return new atlas.HtmlMarker({
+                                text: properties.title,
+                                color: 'blue',
+                                position: position
+                            });
+                        }
+
+                        if (properties.title == "0") {
+                            //Return a created marker for the cluster.
+                            return new atlas.HtmlMarker({
+                                color: 'green',
+                                position: position
+                            });
+                        }
+                        else
+                        {
+                            //Use a promise to create a marker.
+                            return Promise.resolve(new atlas.HtmlMarker({
+                                text: properties.title,
+                                color: 'blue',
+                                position: position
+                            }));
+                        }
+                    }
+                }),
+
+
+                ////Render point data using a symbol layer.
+                //new atlas.layer.SymbolLayer(datasource, null, {
+                //    textOptions: {
+                //        textField: ['get', 'title'],
+                //        offset: [0, -1.2],
+                //        color: 'white'
+                //    },
+                //    filter: ['any', ['==', ['geometry-type'], 'Point'], ['==', ['geometry-type'], 'MultiPoint']] //Only render Point or MultiPoints in this layer.
+                //})
             ]);
 
             //Add routePoints to the map and build the waypoint query string.
@@ -113,6 +150,20 @@ function initRouteMap() {
     }
 }
 
+function GetUserLocation() {
+
+    const geoLocationOptions = {
+        enableHighAccuracy: true,
+        timeout: 300000
+    };
+
+    navigator.geolocation.getCurrentPosition(SetStartPosition, GeoLocationError, geoLocationOptions);
+}
+
+function GeoLocationError(error) {
+    console.log('Error occurred. Error code: ' + error.code + ' Error message: ' + error.message);
+}
+
 function SetStartPosition(position) {
 
     var startPosition = [];
@@ -120,6 +171,8 @@ function SetStartPosition(position) {
     startPosition[1] = position.coords.latitude;
 
     routePoints.push(startPosition)
+
+    initRouteMap();
 }
 
 function GenerateRoute(optimized) {
@@ -141,8 +194,6 @@ function GenerateRoute(optimized) {
     processRequest(requestUrl).then(r => {
         PlotRoute(r.routes[0]);
 
-        var output = 'Distance: ' + Math.round(r.routes[0].summary.lengthInMeters / 10) / 100 + ' km<br/>';
-
         if (optimized) {
             var pinOrder = ['0'];
 
@@ -153,10 +204,6 @@ function GenerateRoute(optimized) {
 
             //Add the desintation index to the end.
             pinOrder.push(routePoints.length - 1);
-
-            output += 'Waypoint Order: ' + pinOrder.join(', ');
-        } else {
-            output += 'Waypoint Order: ' + defaultOrder.join(', ');
         }
     });
 }

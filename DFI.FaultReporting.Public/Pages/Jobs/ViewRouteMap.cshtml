@@ -1,0 +1,211 @@
+﻿@page
+@inject IHttpContextAccessor HttpContextAccessor
+@using DFI.FaultReporting.Common.SessionStorage
+@using DFI.FaultReporting.Models.FaultReports
+@using DFI.FaultReporting.Models.Admin
+@using DFI.FaultReporting.Models.Users
+@model DFI.FaultReporting.Public.Pages.Jobs.ViewRouteMapModel
+@{
+    ViewData["Title"] = "Route map";
+}
+<body onload="GetUserLocation()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>View the route to each of your selected jobs.</h2>
+        <hr />
+        @if (Model.Faults.Count() == 0)
+        {
+            <div class="alert alert-warning">
+                <strong>Warning: </strong>
+                <p>No jobs have been selected to view the route for.</p>
+            </div>
+        }
+        else
+        {
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <strong>Info: </strong>
+                        <p>The jobs you selected are shown below. Your current location is shown on the map by the green marker.</p>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Route num.</th>
+                                    <th>
+                                        Fault
+                                    </th>
+                                    <th>
+                                        Location
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var fault in Model.PagedFaults)
+                                {
+                                    <tr>
+                                        <td>
+                                            @for (var i = 0; i < Model.Faults.Count(); i++)
+                                            {
+                                                int routeNum = i + 1;
+
+                                                if (Model.Faults[i].ID == fault.ID)
+                                                {
+                                                    @routeNum
+                                                    ;
+                                                }
+                                            }
+                                        </td>
+                                        <td>
+                                            <strong>Type:</strong>
+                                            <br />
+                                            @Model.FaultTypes.FirstOrDefault(ft => ft.ID == fault.FaultTypeID).FaultTypeDescription
+                                            <br />
+                                            <br />
+                                            <strong>Status:</strong>
+                                            <br />
+                                            @Model.FaultStatuses.FirstOrDefault(fs => fs.ID == fault.FaultStatusID).FaultStatusDescription
+                                            <br />
+                                            <br />
+                                            <strong>Priority:</strong>
+                                            <br />
+                                            @foreach (var faultPriority in Model.FaultPriorities)
+                                            {
+                                                if (fault.FaultPriorityID == faultPriority.ID)
+                                                {
+                                                    @faultPriority.FaultPriorityRating
+                                                }
+                                            }
+                                            <br />
+                                            @Model.FaultPriorities.FirstOrDefault(fp => fp.ID == fault.FaultPriorityID).FaultPriorityDescription
+                                        </td>
+                                        <td>
+                                            @if (fault.RoadNumber != "undefined" && fault.RoadNumber != null)
+                                            {
+                                                @fault.RoadNumber
+                                                <br />
+                                            }
+                                            @if (fault.RoadName != "undefined" && fault.RoadName != null)
+                                            {
+                                                @fault.RoadName
+                                                <br />
+                                            }
+                                            @if (fault.RoadTown != "undefined" && fault.RoadTown != null)
+                                            {
+                                                @fault.RoadTown
+                                                <br />
+                                            }
+                                            @if (fault.RoadCounty != "undefined" && fault.RoadCounty != null)
+                                            {
+                                                @fault.RoadCounty
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    @{
+                        var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                        var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+                    }
+                    <div>
+                        <ul class="pagination text-center">
+                            <li>
+                                <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                                   class="btn btn-outline-primary btn-sm @prevDisabled"
+                                   aria-label="First page button" style="font-size: 1em !important;">
+                                    <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                                </a>&nbsp;
+                            </li>
+                            <li>
+                                <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                                   class="btn btn-outline-primary btn-sm @prevDisabled"
+                                   aria-label="Previous page button" style="font-size: 1em !important;">
+                                    <span class="fa fa-chevron-left"></span> Prev
+                                </a>
+                            </li>
+                            <li>
+                                &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                            </li>
+                            <li>
+                                <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                                   class="btn btn-outline-primary btn-sm @nextDisabled"
+                                   aria-label="Next page button"
+                                   style="font-size: 1em !important;">
+                                    Next <span class="fa fa-chevron-right"></span>
+                                </a>&nbsp;
+                            </li>
+                            <li>
+                                <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                                   class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                                   style="font-size: 1em !important;">
+                                    Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div id="routeMapDiv">
+                <br />
+                <div class="btn-group">
+                    <a class="btn btn-lg btn-outline-primary" onclick="GenerateRoute()"><i class="fa-solid fa-route"></i> Get route</a>
+                    &nbsp;
+                    <a class="btn btn-lg btn-outline-primary" onclick="GenerateRoute(true)"><i class="fa-solid fa-repeat"></i> Optimise route</a>
+                </div>
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="d-flex justify-content-center">
+                            <div id="routeMap" style="height: 1000px; width: 100%;">
+                                <div class="autocomplete">
+                                    <label for="searchBox" class="form-label" hidden></label>
+                                    <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+        }
+        <br />
+        <div class="btn-group">
+            <a asp-page="./TodaysJobs" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+        </div>
+        <br />
+    </div>
+    <br />
+</body>
+<script type="text/javascript">
+
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    //Retrieve session data to be used for displaying on map/popup.
+    var faults = @Json.Serialize(HttpContext.Session.GetFromSession<List<Fault>>("SelectedFaults"));
+    var faultTypes = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes"));
+    var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
+    var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
+    var repairs = @Json.Serialize(HttpContext.Session.GetFromSession<List<Repair>>("SelectedRepairs"));
+    var repairStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<RepairStatus>>("RepairStatuses"));
+
+
+
+</script>
+<script src="https://samples.azuremaps.com/lib/azure-maps/azure-maps-helper.min.js"></script>
+<script src="~/js/mapping/PlotJobRoute.js"></script>
+<script src="~/js/mapping/AutoCompleteSearch.js"></script>
