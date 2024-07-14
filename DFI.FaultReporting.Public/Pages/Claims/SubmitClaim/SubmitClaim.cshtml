@@ -1,0 +1,55 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.SubmitClaimModel
+@{
+    ViewData["Title"] = "Submit claim";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Submit a claim for compensation from DFI</h2>
+    <hr />
+    @if (User.Identity != null)
+    {
+        @if (User.Identity.IsAuthenticated == true && User.IsInRole("User"))
+        {
+            <form id="beginForm" method="post">
+                <div class="alert alert-info">
+                    <strong>Info: </strong>
+                    <p>You will be required to complete 4 steps to report a fault:</p>
+                    <ul>
+                        <li>Step 1: Select type and location of fault</li>
+                        <li>Step 2: Additional information/description of fault</li>
+                        <li>Step 3: Upload photos of fault</li>
+                        <li>Step 4: Review details and submit report</li>
+                    </ul>
+                </div>
+                <br />
+                <div>
+                    <button id="btnBegin" asp-page-handler="Begin" type="submit" class="btn btn-lg btn-outline-primary">Begin <i class="fa-regular fa-circle-right"></i></button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <div class="alert alert-warning">
+                <strong>Warning: </strong>
+                <p>You must have an account and be logged in to submit a claim.</p>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Register link" title="Register" asp-page="/Account/Register"><i class="fa-solid fa-user-plus"></i> Register</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <div class="small-tile">
+                        <a class="nav-link" aria-label="Login link" title="Login" asp-page="/Account/Login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Login</a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

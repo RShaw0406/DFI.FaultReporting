@@ -1,0 +1,135 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.Step1Model
+@{
+    ViewData["Title"] = "Step 1";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:25%"></div>
+    </div>
+    <br />
+    <h2>Select type of claim and legal representation</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <form id="step1ClaimTypeForm" method="post" asp-page-handler="ClaimTypeSelected">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <select asp-for="Step1ClaimInput.ClaimTypeID" class="form-select" asp-items="Model.ClaimTypesList" onchange="this.form.submit()">
+                                <option value="">
+                                    Please select...
+                                </option>
+                            </select>
+                            <label asp-for="Step1ClaimInput.ClaimTypeID" class="form-label"></label>
+                            <span asp-validation-for="Step1ClaimInput.ClaimTypeID" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form id="step1LegalRepQuestionForm" method="post" asp-page-handler="LegalRepYesNo">
+                <span>Are you a legal representative for the claimant?</span>
+                <br />
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Step1LegalRepQuestionInput.YesNo" type="radio" value="1" id="legalRepNo" onchange="this.form.submit()">
+                    <label class="form-check-label" for="legalRepNo">
+                        No
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Step1LegalRepQuestionInput.YesNo" type="radio" value="2" id="legalRepYes" onchange="this.form.submit()">
+                    <label class="form-check-label" for="legalRepYes">
+                        Yes
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+    @if (Model.ShowLegalRepInput)
+    {
+        <br />
+        <h3>Legal representative details</h3>
+        <hr />
+        @if (Model.SaveSuccess)
+        {
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>Success: </strong>
+                <p>Legal representative details saved.</p>
+            </div>
+        }
+        <div class="row">
+            <div class="col-md-12">
+                <form id="step1LegalRepForm" method="post" asp-page-handler="CreateLegalRep">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.Title" class="form-control" />
+                                <label asp-for="LegalRep.Title" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.Title" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.FirstName" class="form-control" />
+                                <label asp-for="LegalRep.FirstName" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.LastName" class="form-control" />
+                                <label asp-for="LegalRep.LastName" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.LastName" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.CompanyName" class="form-control" />
+                                <label asp-for="LegalRep.CompanyName" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.CompanyName" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.Postcode" class="form-control" />
+                                <label asp-for="LegalRep.Postcode" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.Postcode" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.AddressLine1" class="form-control" />
+                                <label asp-for="LegalRep.AddressLine1" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.AddressLine1" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.AddressLine2" class="form-control" />
+                                <label asp-for="LegalRep.AddressLine2" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.AddressLine2" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="LegalRep.AddressLine3" class="form-control" />
+                                <label asp-for="LegalRep.AddressLine3" class="control-label"></label>
+                                <span asp-validation-for="LegalRep.AddressLine3" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button id="btnSave" type="submit" asp-page-handler="CreateLegalRep" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Save</button>
+                    </div>
+                    <br />
+                </form>
+            </div>
+        </div>
+        <br />
+    }
+    <hr />
+    <form id="step1NextForm" method="post">
+        <div class="btn-group">
+            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+            &nbsp;
+            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+        </div>
+    </form>
+    <br />
+</div>

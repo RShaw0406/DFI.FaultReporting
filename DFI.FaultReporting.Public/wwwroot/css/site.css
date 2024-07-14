@@ -355,11 +355,11 @@ body {
 
 /* ---------- Styles for other form controls ---------- */
 .form-check, .form-check-input {
-    font-size: 1.5rem !important;
+    font-size: 1rem !important;
 }
 
 .form-check-input, .fomr-check-label {
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .chart {
