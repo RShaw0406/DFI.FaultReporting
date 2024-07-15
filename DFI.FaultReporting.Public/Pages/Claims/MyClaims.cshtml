@@ -53,7 +53,7 @@
                                 <th>
                                     Witness details
                                 </th>
-                                <th>
+                                <th class="text-center">
                                     View location
                                 </th>
                                 <th class="text-center">
@@ -179,6 +179,15 @@
                                                 <br />
                                             }
                                         }
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./ClaimLocation" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-map-location-dot"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./ClaimImages" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-image"></i></a>
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./ClaimDocuments" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-regular fa-file-lines"></i></a>
                                     </td>
                                 </tr>
                             }

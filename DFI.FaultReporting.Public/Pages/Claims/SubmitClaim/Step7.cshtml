@@ -35,35 +35,43 @@
                 </div>
             </div>
         </div>
+        <br />
         <div class="row">
-            @{
-                if (Model.ClaimFiles != null)
-                {
-                    foreach (var file in Model.ClaimFiles)
+            <div class="col-md-12">
+                @{
+                    if (Model.ClaimFiles != null)
                     {
-                        <div class="col-md-2 text-center">
-                            @if (file.Type == ".pdf")
+                        <div class="row">
+                            @foreach (var file in Model.ClaimFiles)
                             {
-                                <i class="fa-solid fa-file-pdf" style="color: red; font-size: 2rem;"></i>
-                                <br />
-                                @file.Description
-                            }
+                                <div class="col-md-2 text-center">
+                                    <div action="row" style="min-height: 150px !important;">
+                                        @if (file.Type == ".pdf")
+                                        {
+                                            <i class="fa-solid fa-file-pdf" style="color: red; font-size: 2rem;"></i>
+                                            <br />
+                                            @file.Description
+                                        }
 
-                            @if (file.Type == ".doc" || file.Type == ".docx")
-                            {
-                                <i class="fa-solid fa-file-word" style="color: blue; font-size: 2rem;"></i>
-                                <br />
-                                @file.Description
+                                        @if (file.Type == ".doc" || file.Type == ".docx")
+                                        {
+                                            <i class="fa-solid fa-file-word" style="color: blue; font-size: 2rem;"></i>
+                                            <br />
+                                            @file.Description
+                                        }
+                                    </div>
+
+                                    <br />
+                                    <br />
+                                    <button id="btnRemoveFile" name="removeFileValue" value="@file.Description" asp-page-handler="RemoveFile" type="submit" class="btn btn-lg btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
+                                    <br />
+                                    <br />
+                                </div>
                             }
-                            <br />
-                            <br />
-                            <button id="btnRemoveFile" name="removeFileValue" value="@file.Description" asp-page-handler="RemoveFile" type="submit" class="btn btn-lg btn-outline-danger"><i class="fa-regular fa-trash-can"></i></button>
-                            <br />
-                            <br />
                         </div>
                     }
                 }
-            }
+            </div>
         </div>
         <hr />
         <br />

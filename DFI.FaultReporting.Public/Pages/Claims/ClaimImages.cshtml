@@ -1,0 +1,43 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.ClaimImagesModel
+@{
+    ViewData["Title"] = "Claim images";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>View the images you uploaded when submitting the claim</h2>
+    <hr />
+    <div class="col-12">
+        <div class="row">
+            @{
+                if (Model.ClaimHasPhotos)
+                {
+                    foreach (var photo in Model.ClaimPhotos)
+                    {
+                        <div class="col-sm-6 col-md-4 text-center">
+                            <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                            <br />
+                            <br />
+                            <a asp-page="/Claims/FullScreenImage" asp-route-id="@photo.ID" target="_blank" class="btn btn-lg btn-outline-primary"><i class="fa-solid fa-expand"></i></a>
+                            <br />
+                            <br />
+                        </div>
+                    }
+                }
+
+                if (!Model.ClaimHasPhotos)
+                {
+                    <div class="alert alert-info">
+                        <strong>Info: </strong>
+                        <p>No images uploaded when this claim was submitted.</p>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <div class="btn-group">
+        <a asp-page="./MyClaims"  class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+    </div>
+    <br />
+</div>

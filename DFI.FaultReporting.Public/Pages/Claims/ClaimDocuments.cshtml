@@ -1,0 +1,62 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.ClaimDocumentsModel
+@{
+    ViewData["Title"] = "Claim Documents";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>View the documents you uploaded when submitting the claim</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-12">
+            <form id="fileForm" method="post" enctype="multipart/form-data">
+                @{
+                    if (Model.ClaimHasDocuments)
+                    {
+                        <div class="row">
+                            @foreach (var file in Model.ClaimFiles)
+                            {
+                                <div class="col-md-2 text-center">
+                                    <div class="row" style="min-height: 150px !important;">
+                                        @if (file.Type == ".pdf")
+                                        {
+                                            <i class="fa-solid fa-file-pdf" style="color: red; font-size: 2rem;"></i>
+                                            <br />
+                                            @file.Description
+                                        }
+
+                                        @if (file.Type == ".doc" || file.Type == ".docx")
+                                        {
+                                            <i class="fa-solid fa-file-word" style="color: blue; font-size: 2rem;"></i>
+                                            <br />
+                                            @file.Description
+                                        }
+                                    </div>                            
+                                    <br />
+                                    <br />
+                                    <button id="btnDownload" name="downloadFileValue" value="@file.ID" asp-page-handler="DownloadFile" type="submit" class="btn btn-lg btn-outline-primary"><i class="fa-solid fa-download"></i></button>
+                                    <br />
+                                    <br />
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    if (!Model.ClaimHasDocuments)
+                    {
+                        <div class="alert alert-info">
+                            <strong>Info: </strong>
+                            <p>No documents uploaded when this claim was submitted.</p>
+                        </div>
+                    }
+                }
+            </form>
+        </div>
+    </div>
+    <div class="btn-group">
+        <a asp-page="./MyClaims" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+    </div>
+    <br />
+</div>

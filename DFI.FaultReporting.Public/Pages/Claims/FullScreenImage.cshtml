@@ -1,0 +1,15 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.FullScreenImageModel
+@{
+    ViewData["Title"] = "Claim image";
+}
+@{
+    <div class="container">
+        <div class="col-md-12">
+            <div class="row text-center">
+                <img src="data:image/@Model.ClaimPhoto.Type;base64,@Model.ClaimPhoto.Data" style="max-width: 100%; max-height: 100%;" />
+            </div>
+        </div>
+    </div>
+    <br />
+}
