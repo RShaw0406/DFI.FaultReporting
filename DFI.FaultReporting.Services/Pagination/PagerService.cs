@@ -1,4 +1,5 @@
 ﻿using DFI.FaultReporting.Models.Admin;
+using DFI.FaultReporting.Models.Claims;
 using DFI.FaultReporting.Models.FaultReports;
 using DFI.FaultReporting.Models.Roles;
 using DFI.FaultReporting.Models.Users;
@@ -83,6 +84,12 @@ namespace DFI.FaultReporting.Services.Pagination
         public async Task<List<Repair>> GetPaginatedRepairs(List<Repair> repairs, int currentPage, int pageSize)
         {
             return repairs.OrderBy(r => r.RepairTargetDate).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+        }
+
+        //Method to get paginated claims.
+        public async Task<List<Claim>> GetPaginatedClaims(List<Claim> claims, int currentPage, int pageSize)
+        {
+            return claims.OrderByDescending(c => c.ID).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
         }
     }
 }

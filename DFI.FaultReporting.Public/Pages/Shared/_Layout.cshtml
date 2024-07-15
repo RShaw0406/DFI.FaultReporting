@@ -56,7 +56,7 @@
                                     <li><a class="dropdown-item" asp-page="/Claims/SubmitClaim/SubmitClaim"><i class="fa-solid fa-file-circle-plus"></i> Submit a claim</a></li>
                                     @if (User.Identity.IsAuthenticated == true && User.IsInRole("User"))
                                     {
-                                        <li><a class="dropdown-item" asp-page="/Faults/ReportFault/Step1"><i class="fa-solid fa-file"></i> My claims</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Claims/MyClaims"><i class="fa-solid fa-file"></i> My claims</a></li>
                                     }
                                 </ul>
                             </li>
