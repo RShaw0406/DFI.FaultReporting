@@ -36,9 +36,11 @@ namespace DFI.FaultReporting.Models.Claims
         public DateTime IncidentDate { get; set; }
 
         [DisplayName("Description of incident")]
+        [Required(ErrorMessage = "You must enter a description of the incident")]
         public string? IncidentDescription { get; set; }
 
         [DisplayName("Description of incident location")]
+        [Required(ErrorMessage = "You must enter a description of the incident location")]
         public string? IncidentLocationDescription { get; set; }
 
         [DisplayName("Lat")]

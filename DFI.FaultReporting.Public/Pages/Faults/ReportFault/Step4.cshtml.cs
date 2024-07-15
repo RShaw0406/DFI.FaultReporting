@@ -243,7 +243,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults.ReportFault
 
             //Set the htmlContent to a message explaining to the user that their account has been successfully deleted.
             string htmlContent = "<p>Hello,</p><p>Thank you for submitting a fault report.</p>" +
-                "<p>DFI staff will now review your report and you will receive update emails as the status of the report progress.</p>" +
+                "<p>DFI staff will now review your report and you will receive update emails as the status of the report progresses.</p>" +
                 "<br/>" +
                 "<p><strong>Report details:</strong></p>" +
                 "<p>"+ FaultType.FaultTypeDescription +"</p>" +

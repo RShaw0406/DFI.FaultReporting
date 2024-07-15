@@ -474,6 +474,52 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
                     claim.InputBy = CurrentUser.Email;
                     claim.InputOn = DateTime.Now;
 
+                    //Get the claim from "Claim" object stored in session.
+                    Claim? sessionClaim = HttpContext.Session.GetFromSession<Claim>("Claim");
+                    if (sessionClaim != null)
+                    {
+                        if (sessionClaim.IncidentLocationLatitude != null && sessionClaim.IncidentLocationLongitude != null)
+                        {
+                            claim.IncidentLocationLatitude = sessionClaim.IncidentLocationLatitude;
+                            claim.IncidentLocationLongitude = sessionClaim.IncidentLocationLongitude;
+                        }
+
+                        if (sessionClaim.FaultID != null)
+                        {
+                            claim.FaultID = sessionClaim.FaultID;
+                        }
+
+                        if (sessionClaim.IncidentDate != null)
+                        {
+                            claim.IncidentDate = sessionClaim.IncidentDate;
+                        }
+
+                        if (sessionClaim.IncidentDescription != null)
+                        {
+                            claim.IncidentDescription = sessionClaim.IncidentDescription;
+                        }
+
+                        if (sessionClaim.IncidentLocationDescription != null)
+                        {
+                            claim.IncidentLocationDescription = sessionClaim.IncidentLocationDescription;
+                        }
+
+                        if (sessionClaim.InjuryDescription != null)
+                        {
+                            claim.InjuryDescription = sessionClaim.InjuryDescription;
+                        }
+
+                        if (sessionClaim.DamageDescription != null)
+                        {
+                            claim.DamageDescription = sessionClaim.DamageDescription;
+                        }
+
+                        if (sessionClaim.DamageClaimDescription != null)
+                        {
+                            claim.DamageClaimDescription = sessionClaim.DamageClaimDescription;
+                        }
+                    }
+
                     //Store the claim object in session.
                     HttpContext.Session.SetInSession("Claim", claim);
 

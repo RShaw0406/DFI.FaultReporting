@@ -1,0 +1,86 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.Step3Model
+@{
+    ViewData["Title"] = "Step 3";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:37.5%"></div>
+    </div>
+    <br />
+    <h2>Description and date of incident</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <form id="step3Form" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Step3Input.IncidentLocationDescription" style="height: auto!important" class="form-control" autocomplete="locationDescription" placeholder="Enter location description" rows="10"></textarea>
+                            <label asp-for="Step3Input.IncidentLocationDescription" class="form-label"></label>
+                            <span asp-validation-for="Step3Input.IncidentLocationDescription" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                            <textarea asp-for="Step3Input.IncidentDescription" style="height: auto!important" class="form-control" autocomplete="description" placeholder="Enter description" rows="10"></textarea>
+                            <label asp-for="Step3Input.IncidentDescription" class="form-label"></label>
+                            <span asp-validation-for="Step3Input.IncidentDescription" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <span class="form-label">Incident date</span>
+                        <div class="form-floating mb-3 input-group">
+                            <div class="col-2">
+                                <div class="form-floating mb-3 input-group">
+                                    <input asp-for="Step3Input.Day" class="form-control" autocomplete="day" placeholder="Enter day" type="text" />
+                                    <label asp-for="Step3Input.Day" class="form-label"></label>
+                                </div>
+                            </div>
+                            &nbsp;
+                            <div class="col-2">
+                                <div class="form-floating mb-3 input-group">
+                                    <input asp-for="Step3Input.Month" class="form-control" autocomplete="month" placeholder="Enter month" type="text" />
+                                    <label asp-for="Step3Input.Month" class="form-label"></label>
+                                </div>
+                            </div>
+                            &nbsp;
+                            <div class="col-4">
+                                <div class="form-floating mb-3 input-group">
+                                    <input asp-for="Step3Input.Year" class="form-control" autocomplete="year" placeholder="Enter year" type="text" />
+                                    <label asp-for="Step3Input.Year" class="form-label"></label>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Step3Input.Day" class="text-danger"></span>
+                            <span asp-validation-for="Step3Input.Month" class="text-danger"></span>
+                            @if (Model.InValidYear)
+                            {
+                                <span asp-validation-for="Step3Input.Year" class="text-danger">@Model.InValidYearMessage</span>
+                            }
+                            @if (!Model.ValidDate)
+                            {
+                                <span class="text-danger">Incident date must contain day, month, and year</span>
+                            }
+                        </div>
+                    </div>
+                </div>     
+                <hr />
+                <div class="btn-group">
+                    <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                    &nbsp;
+                    <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>   
+    <br />
+</div>

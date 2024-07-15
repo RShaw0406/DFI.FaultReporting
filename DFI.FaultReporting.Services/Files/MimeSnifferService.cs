@@ -39,12 +39,6 @@ namespace DFI.FaultReporting.Services.Files
             return ImageMimeTypes.Contains(sniffedMimeType.Result);
         }
 
-
-        /// <summary>
-        /// Inspects the supplied bytes to determine the Mime Type
-        /// </summary>
-        /// <param name="documentBytes"></param>
-        /// <returns></returns>
         public async Task<string> SniffMimeType(byte[] documentBytes)
         {
             var fileType = documentBytes.GetFileType();
@@ -55,16 +49,9 @@ namespace DFI.FaultReporting.Services.Files
                 return documentBytes.GetFileType().Mime;
             }
 
-            //could not determine mime type so return empty string
             return "undetermined";
         }
 
-        /// <summary>
-        /// Compares the MimeType from the filename with the MimeType sniffed from the supplied byte array
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="documentBytes"></param>
-        /// <returns></returns>
         public async Task<bool> VerifyMimeType(string fileName, byte[] documentBytes)
         {
             string sniffedMime = await SniffMimeType(documentBytes);

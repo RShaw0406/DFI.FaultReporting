@@ -1,0 +1,192 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.Step8Model
+@{
+    ViewData["Title"] = "Step 8";
+}
+<body onload="initReviewMap()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%"></div>
+        </div>
+        <br />
+        <h2>Review details and submit claim</h2>
+        <hr />
+         <form id="reviewForm" method="post">
+             <h3>Claim details</h3>
+             <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-center">
+                        <div id="reviewMap" style="height: 500px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="row" hidden>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Claim.IncidentLocationLatitude" id="lat" class="form-control" />
+                                <label asp-for="Claim.IncidentLocationLatitude" class="form-label"></label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" hidden>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Claim.IncidentLocationLongitude" id="long" class="form-control" />
+                                <label asp-for="Claim.IncidentLocationLongitude" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <input asp-for="ClaimType.ClaimTypeDescription" id="claimType" class="form-control" disabled />
+                                <label asp-for="ClaimType.ClaimTypeDescription" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <textarea style="height: auto!important" asp-for="Claim.IncidentDescription" id="incidentDesc" class="form-control" rows="10" disabled></textarea>
+                                <label asp-for="Claim.IncidentDescription" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <span class="form-label">Incident date</span>
+                            <div class="form-floating mb-3 input-group">
+                                <div class="col-2">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="Day" class="form-control" disabled />
+                                        <label asp-for="Day" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-2">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="Month" class="form-control" disabled />
+                                        <label asp-for="Month" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-4">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="Year" class="form-control" disabled />
+                                        <label asp-for="Year" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-floating mb-3">
+                                <textarea style="height: auto!important" asp-for="Claim.IncidentLocationDescription" id="locationDesc" class="form-control" rows="10" disabled></textarea>
+                                <label asp-for="Claim.IncidentLocationDescription" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    @if (Model.Claim.ClaimTypeID == 8)
+                    {
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-floating mb-3">
+                                    <textarea style="height: auto!important" asp-for="Claim.InjuryDescription" id="injuryDesc" class="form-control" rows="10" disabled></textarea>
+                                    <label asp-for="Claim.InjuryDescription" class="form-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-floating mb-3">
+                                    <textarea asp-for="Claim.DamageDescription" style="height: auto!important" id="damageDesc" class="form-control" rows="10" disabled></textarea>
+                                    <label asp-for="Claim.DamageDescription" class="form-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-floating mb-3">
+                                    <textarea asp-for="Claim.DamageClaimDescription" style="height: auto!important" id="damageClaimDesc" class="form-control" rows="10" disabled></textarea>
+                                    <label asp-for="Claim.DamageClaimDescription" class="form-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <br />
+                <h3>Uploaded photos</h3>
+                <hr />
+                <div class="col-12 col-md-12">
+                    <div class="row">
+                        @{
+                            if (Model.ClaimPhotos != null)
+                            {
+                                foreach (var photo in Model.ClaimPhotos)
+                                {
+                                    <div class="col-sm-6 col-md-4 text-center">
+                                        <img src="data:image/@photo.Type;base64,@photo.Data" class="img-thumbnail" />
+                                        <br />
+                                        <br />
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+                <br />
+                <h3>Uploaded files</h3>
+                <hr />
+                <div class="col-12 col-md-12">
+                    <div class="row">
+                        @{
+                            if (Model.ClaimFiles != null)
+                            {
+                                foreach (var file in Model.ClaimFiles)
+                                {
+                                    <div class="col-md-2 text-center">
+                                        @if (file.Type == ".pdf")
+                                        {
+                                            <i class="fa-solid fa-file-pdf" style="color: red; font-size: 2rem;"></i>
+                                            <br />
+                                            @file.Description
+                                        }
+
+                                        @if (file.Type == ".doc" || file.Type == ".docx")
+                                        {
+                                            <i class="fa-solid fa-file-word" style="color: blue; font-size: 2rem;"></i>
+                                            <br />
+                                            @file.Description
+                                        }
+                                        <br />
+                                        <br />
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="btn-group">
+                <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                &nbsp;
+                <button id="btnSubmit" asp-page-handler="SubmitClaim" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Submit</button>
+            </div>
+         </form>
+    </div>
+    <br />
+</body>
+<script src="~/js/mapping/ReviewMap.js"></script>

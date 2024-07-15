@@ -1,7 +1,6 @@
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.Claims;
 using DFI.FaultReporting.Interfaces.FaultReports;
-using DFI.FaultReporting.Models.Admin;
 using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Emails;
 using DFI.FaultReporting.Services.Interfaces.Settings;
@@ -9,22 +8,17 @@ using DFI.FaultReporting.Services.Interfaces.Tokens;
 using DFI.FaultReporting.Services.Interfaces.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using DFI.FaultReporting.Models.FaultReports;
-using System.Security.Claims;
 using DFI.FaultReporting.Common.SessionStorage;
-using static DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.Step1Model;
-using DFI.FaultReporting.Models.Claims;
 
 namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
 {
-    public class Step2Model : PageModel
+    public class Step4Model : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
-        private readonly ILogger<Step2Model> _logger;
+        private readonly ILogger<Step4Model> _logger;
         private readonly IUserService _userService;
         private readonly IClaimService _claimService;
         private readonly IClaimTypeService _claimTypeService;
@@ -36,7 +30,7 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
         private readonly IVerificationTokenService _verificationTokenService;
 
         //Inject dependencies in constructor.
-        public Step2Model(ILogger<Step2Model> logger, IUserService userService, IClaimService claimService, IClaimTypeService claimTypeService, 
+        public Step4Model(ILogger<Step4Model> logger, IUserService userService, IClaimService claimService, IClaimTypeService claimTypeService,
             IFaultService faultService, IFaultTypeService faultTypeService, IHttpContextAccessor httpContextAccessor, ISettingsService settingsService, IEmailService emailService,
             IVerificationTokenService verificationTokenService)
         {
@@ -58,27 +52,23 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
         public Models.Claims.Claim Claim { get; set; }
 
         [BindProperty]
-        public Fault Fault { get; set; }
+        public Step4InputModel Step4Input { get; set; }
 
-        [BindProperty]
-        public List<Fault> Faults { get; set; }
-
-        [BindProperty]
-        public Step2InputModel Step2Input { get; set; }
-
-        public class Step2InputModel
+        public class Step4InputModel
         {
-            [DisplayName("Fault")]
-            public int? FaultID { get; set; } = null;
+            [DisplayName("Description of injury")]
+            public string? InjuryDescription { get; set; }
 
-            [DisplayName("Lat")]
-            [Required(ErrorMessage = "You must select a location or a fault")]
-            public string? IncidentLocationLatitude { get; set; }
+            [DisplayName("Description of damage")]
+            public string? DamageDescription { get; set; }
 
-            [DisplayName("Long")]
-            public string? IncidentLocationLongitude { get; set; }
+            [DisplayName("Description of claim")]
+            public string? DamageClaimDescription { get; set; }
         }
 
+        public bool isInjuryClaim { get; set; }
+
+        public bool isDamageClaim { get; set; }
         #endregion Properties
 
         #region Page Load
@@ -86,32 +76,31 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
         //This method is executed when the page loads and required page properties are set.
         public async Task<IActionResult> OnGetAsync()
         {
-            //The contexts current user exists.
             if (_httpContextAccessor.HttpContext.User != null)
             {
                 //The contexts current user has been authenticated and has user role.
                 if (_httpContextAccessor.HttpContext.User.Identity.IsAuthenticated == true && _httpContextAccessor.HttpContext.User.IsInRole("User"))
                 {
-                    await PopulateProperties();
-
-                    //Store the Faults object in session, needed for selectin faults on map.
-                    HttpContext.Session.SetInSession("Faults", Faults);
-
                     //Get the claim from "Claim" object stored in session.
                     Models.Claims.Claim? sessionClaim = HttpContext.Session.GetFromSession<Models.Claims.Claim>("Claim");
 
                     //User has previously input step2 and has clicked the back button on step3.
                     if (sessionClaim != null)
                     {
-                        //Populate Step2Input model with session values.
-                        Step2Input = new Step2InputModel();
+                        //Populate Step4Input model with session values.
+                        Step4Input = new Step4InputModel();
+                        Step4Input.InjuryDescription = sessionClaim.InjuryDescription;
+                        Step4Input.DamageDescription = sessionClaim.DamageDescription;
+                        Step4Input.DamageClaimDescription = sessionClaim.DamageClaimDescription;
+                    }
 
-                        if (sessionClaim.FaultID != null)
-                        {
-                            Step2Input.FaultID = sessionClaim.FaultID;
-                        }
-                        Step2Input.IncidentLocationLatitude = sessionClaim.IncidentLocationLatitude;
-                        Step2Input.IncidentLocationLongitude = sessionClaim.IncidentLocationLongitude;
+                    if (sessionClaim.ClaimTypeID == 8)
+                    {
+                        isInjuryClaim = true;
+                    }
+                    else
+                    {
+                        isDamageClaim = true;
                     }
 
                     return Page();
@@ -126,7 +115,7 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
                 return Redirect("/NoPermission");
             }
         }
-        #endregion Page Load
+        #endregion
 
         #region Page Buttons
         //Method Summary:
@@ -142,35 +131,25 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
             string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
             CurrentUser = await _userService.GetUser(Convert.ToInt32(userID), jwtToken);
 
-            //Initialise a new ValidationContext to be used to validate the Step2Input model only.
-            ValidationContext validationContext = new ValidationContext(Step2Input);
+            //Initialise a new ValidationContext to be used to validate the Step4Input model only.
+            ValidationContext validationContext = new ValidationContext(Step4Input);
             ICollection<ValidationResult> validationResults = new List<ValidationResult>();
-            bool isStep2InputValid = Validator.TryValidateObject(Step2Input, validationContext, validationResults, true);
-
-            if (isStep2InputValid)
-            {
+            bool isStep4InputValid = Validator.TryValidateObject(Step4Input, validationContext, validationResults, true);
+         
+            if (isStep4InputValid)
+            {              
                 //Get the claim from "Claim" object stored in session.
                 Models.Claims.Claim? sessionClaim = HttpContext.Session.GetFromSession<Models.Claims.Claim>("Claim");
 
-                if (Step2Input.FaultID != null)
-                {
-                    sessionClaim.FaultID = Step2Input.FaultID;
-
-                    HttpContext.Session.SetInSession("HasFault", true);
-                }
-                else
-                {
-                    HttpContext.Session.SetInSession("HasFault", false);
-                }
-
-                sessionClaim.IncidentLocationLatitude = Step2Input.IncidentLocationLatitude;
-                sessionClaim.IncidentLocationLongitude = Step2Input.IncidentLocationLongitude;
+                sessionClaim.InjuryDescription = Step4Input.InjuryDescription;
+                sessionClaim.DamageDescription = Step4Input.DamageDescription;
+                sessionClaim.DamageClaimDescription = Step4Input.DamageClaimDescription;
 
                 //Store the claim object in session.
                 HttpContext.Session.SetInSession("Claim", sessionClaim);
 
                 //Redirect to Step3 page.
-                return Redirect("/Claims/SubmitClaim/Step3");
+                return Redirect("/Claims/SubmitClaim/Step5");
             }
             else
             {
@@ -181,32 +160,20 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
                     ModelState.AddModelError("Step1ClaimInput.ClaimTypeID", validationResult.ErrorMessage);
                 }
 
-                await PopulateProperties();
-
                 TempData.Keep();
 
                 return Page();
             }
-        }
 
+        }
 
         //Method Summary:
         //This method is executed when the back button is clicked.
-        //When executed the user is redirected to Step1 page.
+        //When executed the user is redirected to Step3 page.
         public async Task<IActionResult> OnPostBack()
         {
-            return Redirect("/Claims/SubmitClaim/Step1");
+            return Redirect("/Claims/SubmitClaim/Step3");
         }
         #endregion Page Buttons
-
-        #region Data
-        //Method Summary:
-        //This method is excuted when the a post occurs.
-        //When excuted, it populates the page properties.
-        public async Task PopulateProperties()
-        {
-            Faults = await _faultService.GetFaults();
-        }
-        #endregion Data
     }
 }

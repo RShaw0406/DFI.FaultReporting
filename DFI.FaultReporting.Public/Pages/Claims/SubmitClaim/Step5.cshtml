@@ -1,0 +1,121 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.Step5Model
+@{
+    ViewData["Title"] = "Step 5";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:62.5%"></div>
+    </div>
+    <br />
+    <h2>Wtiness to the incident</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <form id="step5WitnessQuestionForm" method="post" asp-page-handler="WitnessYesNo">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                <span>Was there a witness to the incident?</span>
+                <br />
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Step5WitnessQuestionInput.YesNo" type="radio" value="1" id="WitnessNo" onchange="this.form.submit()">
+                    <label class="form-check-label" for="WitnessNo">
+                        No
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" asp-for="Step5WitnessQuestionInput.YesNo" type="radio" value="2" id="WitnessYes" onchange="this.form.submit()">
+                    <label class="form-check-label" for="WitnessYes">
+                        Yes
+                    </label>
+                </div>
+            </form>
+        </div>
+    </div>
+    @if (Model.ShowWitnessInput)
+    {
+        <br />
+        <h3>Witness details</h3>
+        <hr />
+        @if (Model.SaveSuccess)
+        {
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>Success: </strong>
+                <p>Witness details saved.</p>
+            </div>
+        }
+        <div class="row">
+            <div class="col-md-12">
+                <form id="step5WitnessForm" method="post" asp-page-handler="CreateWitness">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.Title" class="form-control" />
+                                <label asp-for="Witness.Title" class="control-label"></label>
+                                <span asp-validation-for="Witness.Title" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.FirstName" class="form-control" />
+                                <label asp-for="Witness.FirstName" class="control-label"></label>
+                                <span asp-validation-for="Witness.FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.LastName" class="form-control" />
+                                <label asp-for="Witness.LastName" class="control-label"></label>
+                                <span asp-validation-for="Witness.LastName" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.Email" class="form-control" />
+                                <label asp-for="Witness.Email" class="control-label"></label>
+                                <span asp-validation-for="Witness.Email" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.ContactNumber" class="form-control" />
+                                <label asp-for="Witness.ContactNumber" class="control-label"></label>
+                                <span asp-validation-for="Witness.ContactNumber" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.Postcode" class="form-control" />
+                                <label asp-for="Witness.Postcode" class="control-label"></label>
+                                <span asp-validation-for="Witness.Postcode" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.AddressLine1" class="form-control" />
+                                <label asp-for="Witness.AddressLine1" class="control-label"></label>
+                                <span asp-validation-for="Witness.AddressLine1" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.AddressLine2" class="form-control" />
+                                <label asp-for="Witness.AddressLine2" class="control-label"></label>
+                                <span asp-validation-for="Witness.AddressLine2" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="Witness.AddressLine3" class="form-control" />
+                                <label asp-for="Witness.AddressLine3" class="control-label"></label>
+                                <span asp-validation-for="Witness.AddressLine3" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button id="btnSave" type="submit" asp-page-handler="CreateWitness" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Save</button>
+                    </div>
+                    <br />
+                </form>
+            </div>
+        </div>
+        <br />
+    }
+    <hr />
+    <form id="step5NextForm" method="post">
+        <div class="btn-group">
+            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+            &nbsp;
+            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+        </div>
+    </form>
+    <br />
+</div>

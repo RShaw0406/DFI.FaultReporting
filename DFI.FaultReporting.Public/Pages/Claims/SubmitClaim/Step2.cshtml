@@ -1,14 +1,172 @@
 ﻿@page
+@using DFI.FaultReporting.Common.SessionStorage
+@using DFI.FaultReporting.Models.FaultReports
+@using DFI.FaultReporting.Models.Admin
+@using DFI.FaultReporting.Models.Claims
 @model DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.Step2Model
 @{
+    ViewData["Title"] = "Step 2";
 }
-<div class="container">
-    <form id="step2NextForm" method="post">
-        <div class="btn-group">
-            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
-            &nbsp;
-            <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+<body onload="SetYesNo()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:25%"></div>
         </div>
-    </form>
-    <br />
-</div>
+        <br />
+        <h2>Select location of incident</h2>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <span>Is this claim related to a reported fault?</span>
+                <br />
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" value="1" id="faultNo" name="faultYesNo" onchange="ShowLocationMap()">
+                    <label class="form-check-label" for="faultNo">
+                        No
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" value="2" id="faultYes" name="faultYesNo" onchange="ShowFaultMap()">
+                    <label class="form-check-label" for="faultYes">
+                        Yes
+                    </label>
+                </div>
+            </div>
+        </div>
+        <br />
+        <form id="step2Form" method="post">
+            <div class="row" id="locationMapDiv" style="display: none;">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-center">
+                                <div id="map" style="height: 1000px; width: 100%;">
+                                    <div class="autocomplete">
+                                        <label for="searchBox" class="form-label" hidden></label>
+                                        <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+                                    </div>
+                                    <div id="selectionError" class="alert alert-danger col-md-4" style="display: none; z-index: 200; margin: 0.25rem;">
+                                        <strong>Error: </strong>
+                                        <p>You can only select a location within Northern Ireland.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="row" id="faultMapDiv" style="display: none;">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="d-flex justify-content-center">
+                                <div id="faultsMap" style="height: 1000px; width: 100%;">
+                                    <div class="autocomplete">
+                                        <label for="searchBox" class="form-label" hidden></label>
+                                        <input id="searchBox" autocomplete="off" class="form-control" type="text" placeholder="Search for a place or road..." />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" hidden>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step2Input.FaultID" id="faultID" class="form-control" />
+                        <label asp-for="Step2Input.FaultID" class="form-label"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="row" hidden>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step2Input.IncidentLocationLatitude" id="lat" class="form-control" />
+                        <label asp-for="Step2Input.IncidentLocationLatitude" class="form-label"></label>
+                        <span asp-validation-for="Step2Input.IncidentLocationLatitude" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row" hidden>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Step2Input.IncidentLocationLongitude" id="long" class="form-control" />
+                        <label asp-for="Step2Input.IncidentLocationLongitude" class="form-label"></label>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <hr />
+            <div class="btn-group">
+                <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                &nbsp;
+                <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+            </div>
+        </form>
+        <br />
+    </div>
+</body>
+
+<script type="text/javascript">
+
+    var faults = @Json.Serialize(HttpContext.Session.GetFromSession<List<Fault>>("Faults"));
+    var faultTypes = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes"));
+    var faultStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses"));
+    var faultPriorities = @Json.Serialize(HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities"));
+    var hasFault = @Json.Serialize(HttpContext.Session.GetFromSession<bool>("HasFault"));
+    var claim = @Json.Serialize(HttpContext.Session.GetFromSession<Claim>("Claim"));
+
+    function SetYesNo() {
+    
+        if (hasFault == true) {
+            document.getElementById("faultYes").checked = true;
+            ShowFaultMap();
+        }
+        else {
+            document.getElementById("faultNo").checked = true;
+            ShowLocationMap();
+        }
+    }
+
+    //Azure Maps Subscription Key - Needed to access the service
+    const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
+
+    //Define map boundaries - this will restrict how far a user can pan on the map control and also the search results returned in the autocomplete
+    const mapBounds = [-8.3, 53.9, -5.3, 55.4]
+
+    function ShowLocationMap() {
+
+        document.getElementById("locationMapDiv").style.display = "block";
+        document.getElementById("faultMapDiv").style.display = "none";
+
+        if (hasFault) {
+            document.getElementById("faultID").value = null;
+            document.getElementById('lat').value = null;
+            document.getElementById('long').value = null;
+        }
+
+        initClaimLocationMap();
+    }
+
+    function ShowFaultMap() {
+
+        document.getElementById("locationMapDiv").style.display = "none";
+        document.getElementById("faultMapDiv").style.display = "block";
+
+        if (!hasFault) {
+            document.getElementById("faultID").value = null;
+            document.getElementById('lat').value = null;
+            document.getElementById('long').value = null;
+        }
+
+        initFaultMap();
+    }
+
+</script>
+<script src="~/js/mapping/SelectClaimLocation.js"></script>
+<script src="~/js/mapping/SelectClaimFault.js"></script>
+<script src="~/js/mapping/AutoCompleteSearch.js"></script>

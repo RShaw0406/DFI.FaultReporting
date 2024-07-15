@@ -34,11 +34,6 @@ namespace DFI.FaultReporting.Models.Claims
         [StringLength(125, ErrorMessage = "Last name must not be more than 125 characters")]
         public string? LastName { get; set; }
 
-        [DisplayName("Date of birth")]
-        [Required(ErrorMessage = "You must enter a date of birth")]
-        [DataType(DataType.Date)]
-        public DateTime? DOB { get; set; }
-
         [DisplayName("Email Address")]
         [DataType(DataType.EmailAddress, ErrorMessage = "You must enter a valid email address")]
         public string? Email { get; set; }

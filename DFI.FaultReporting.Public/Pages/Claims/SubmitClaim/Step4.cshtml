@@ -1,0 +1,64 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.SubmitClaim.Step4Model
+@{
+    ViewData["Title"] = "Step 4";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <div class="progress">
+        <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:50%"></div>
+    </div>
+    <br />
+    <h2>Description of injury or damage</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <form id="step4Form" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert">
+                    <span><strong>Please review and correct the following errors:</strong></span>
+                </div>
+                @if (Model.isInjuryClaim)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea asp-for="Step4Input.InjuryDescription" style="height: auto!important" class="form-control" autocomplete="InjuryDescription" placeholder="Enter injury description" rows="10"></textarea>
+                                <label asp-for="Step4Input.InjuryDescription" class="form-label"></label>
+                                <span asp-validation-for="Step4Input.InjuryDescription" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Model.isDamageClaim)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea asp-for="Step4Input.DamageDescription" style="height: auto!important" class="form-control" autocomplete="DamageDescription" placeholder="Enter damage description" rows="10"></textarea>
+                                <label asp-for="Step4Input.DamageDescription" class="form-label"></label>
+                                <span asp-validation-for="Step4Input.DamageDescription" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                <textarea asp-for="Step4Input.DamageClaimDescription" style="height: auto!important" class="form-control" autocomplete="ClaimDescription" placeholder="Enter claim description" rows="10"></textarea>
+                                <label asp-for="Step4Input.DamageClaimDescription" class="form-label"></label>
+                                <span asp-validation-for="Step4Input.DamageClaimDescription" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <hr />
+                <div class="btn-group">
+                    <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+                    &nbsp;
+                    <button id="btnNext" asp-page-handler="Next" type="submit" class="btn btn-lg btn-outline-primary">Next <i class="fa-regular fa-circle-right"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <br />
+</div>
