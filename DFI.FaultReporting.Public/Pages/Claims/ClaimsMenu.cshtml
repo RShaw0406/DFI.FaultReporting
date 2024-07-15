@@ -1,0 +1,28 @@
+﻿@page
+@model DFI.FaultReporting.Public.Pages.Claims.ClaimsMenuModel
+@{
+    ViewData["Title"] = "Claims menu";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>Select from one of the options below</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Submit claim link" title="Submit claim" asp-page="/Claims/SubmitClaim/SubmitClaim"><i class="fa-solid fa-file-circle-plus"></i> Submit a claim</a>
+            </div>
+        </div>
+    </div>
+    @if (User.Identity.IsAuthenticated == true)
+    {
+        <div class="row">
+            <div class="col-md-12 text-center">
+                <div class="small-tile">
+                    <a class="nav-link" aria-label="My claims link" title="My claims" asp-page="/Claims/MyClaims"><i class="fa-solid fa-file"></i> My claims</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
