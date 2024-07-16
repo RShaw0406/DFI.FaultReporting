@@ -16,6 +16,9 @@ using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 using DFI.FaultReporting.Models.Admin;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System.Security.Cryptography;
 
 namespace DFI.FaultReporting.API.Controllers
 {
@@ -72,6 +75,42 @@ namespace DFI.FaultReporting.API.Controllers
             }
 
             return true;
+        }
+
+        [HttpPut("resetpassword/{email}/{password}")]
+        public async Task<ActionResult<bool>> ResetPassword(string email, string password)
+        {
+            Users = await _userSQLRepository.GetUsers();
+
+            User user = Users.FirstOrDefault(u => u.Email == email);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
+
+            string passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password!,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+
+            user.PasswordSalt = Convert.ToBase64String(salt);
+            user.Password = passwordHash;
+
+            User updatedUser = await _userSQLRepository.UpdateUser(user);
+
+            if (updatedUser == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         // POST: api/Users

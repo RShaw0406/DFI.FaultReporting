@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.Models.Users;
-using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.Services.Interfaces.Users;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;

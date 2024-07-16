@@ -93,22 +93,5 @@ namespace DFI.FaultReporting.API.Controllers
                 }
             }
         }
-
-        // DELETE: api/ReportPhotos/5
-        [HttpDelete("{ID}")]
-        [Authorize]
-        public async Task<ActionResult<int>> DeleteReportPhoto(int ID)
-        {
-            ReportPhoto reportPhoto = await _reportPhotoSQLRepository.GetReportPhoto(ID);
-
-            if (reportPhoto == null)
-            {
-                return NotFound();
-            }
-
-            await _reportPhotoSQLRepository.DeleteReportPhoto(ID);
-
-            return ID;
-        }
     }
 }

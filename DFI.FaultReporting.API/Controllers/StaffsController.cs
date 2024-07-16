@@ -99,6 +99,57 @@ namespace DFI.FaultReporting.API.Controllers
             return CreatedAtAction("GetStaff", new { staff.ID }, staff);
         }
 
+        [HttpGet("check/{email}")]
+        public async Task<ActionResult<bool>> CheckEmail(string email)
+        {
+            Staff = await _staffSQLRepository.GetStaff();
+
+            Staff staff = Staff.FirstOrDefault(s => s.Email == email);
+
+            if (staff == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        [HttpPut("resetpassword/{email}/{password}")]
+        public async Task<ActionResult<bool>> ResetPassword(string email, string password)
+        {
+            Staff = await _staffSQLRepository.GetStaff();
+
+            Staff staff = Staff.FirstOrDefault(s => s.Email == email);
+
+            if (staff == null)
+            {
+                return false;
+            }
+
+            byte[] salt = RandomNumberGenerator.GetBytes(128 / 8);
+
+            string passwordHash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password!,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+
+            staff.PasswordSalt = Convert.ToBase64String(salt);
+            staff.Password = passwordHash;
+
+            Staff updatedStaff = await _staffSQLRepository.UpdateStaff(staff);
+
+            if (updatedStaff == null)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         // PUT: api/Staffs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
@@ -124,22 +175,6 @@ namespace DFI.FaultReporting.API.Controllers
                     return StatusCode((int)HttpStatusCode.BadRequest, ex.Message.ToString());
                 }
             }
-        }
-
-        // DELETE: api/Staffs/5
-        [HttpDelete("{ID}")]
-        [Authorize(Roles = "StaffAdmin, StaffReadWrite")]
-        public async Task<ActionResult<int>> DeleteStaff(int ID)
-        {
-            Staff staff = await _staffSQLRepository.GetStaff(ID);
-            if (staff == null)
-            {
-                return NotFound();
-            }
-
-            await _staffSQLRepository.DeleteStaff(ID);
-
-            return Ok(ID);
         }
     }
 }

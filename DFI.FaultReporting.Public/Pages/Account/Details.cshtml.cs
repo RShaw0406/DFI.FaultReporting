@@ -319,6 +319,19 @@ namespace DFI.FaultReporting.Public.Pages.Account
                     {
                         //Set the emailAddress string to the new email address.
                         emailAddress = AccountDetailsInput.NewEmail;
+
+                        //Check if the input email already exists in the database.
+                        bool emailExists = await _userService.CheckEmail(AccountDetailsInput.NewEmail);
+
+                        //Email already exists in the database.
+                        if (emailExists)
+                        {
+                            //Add an error to the ModelState to inform the user that the email already exists.
+                            ModelState.AddModelError(string.Empty, "Email already exists");
+
+                            //Return the Page.
+                            return Page();
+                        }
                     }
                     //The user has not changed their email address.
                     else

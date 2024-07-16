@@ -35,8 +35,10 @@
                                 <label asp-for="loginInput.Password" class="form-label">Password</label>
                                 <span asp-validation-for="loginInput.Password" class="text-danger"></span>
                             </div>
-                            <div>
+                            <div class="btn-group">
                                 <button id="btnVerificationCode" asp-page-handler="RequestVerificationCode" type="submit" class="btn btn-lg btn-outline-primary"><i class="fa-regular fa-envelope"></i> Request verification code</button>
+                                &nbsp;
+                                <a class="btn btn-lg btn-outline-primary" id="resetPasswordLink" asp-page="/Account/ResetPassword"><i class="fa-solid fa-circle-question"></i> Reset password</a>
                             </div>
                         </div>
                     </div>

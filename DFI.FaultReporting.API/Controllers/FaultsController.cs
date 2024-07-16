@@ -91,22 +91,5 @@ namespace DFI.FaultReporting.API.Controllers
                 }
             }
         }
-
-        // DELETE: api/Faults/5
-        [HttpDelete("{ID}")]
-        [Authorize]
-        public async Task<ActionResult<int>> DeleteFault(int ID)
-        {
-            Fault fault = await _faultSQLRepository.GetFault(ID);
-
-            if (fault == null)
-            {
-                return NotFound();
-            }
-
-            await _faultSQLRepository.DeleteFault(ID);
-
-            return ID;
-        }
     }
 }

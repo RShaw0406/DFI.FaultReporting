@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.Models.Admin;
-using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Models.Users;
 using DFI.FaultReporting.Services.Interfaces.Pagination;

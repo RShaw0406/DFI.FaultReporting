@@ -137,6 +137,76 @@ namespace DFI.FaultReporting.Http.Users
             }
         }
 
+        public async Task<bool> CheckEmail(string email)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(baseURL + APIEndPoints.Staff + "/" + "check" + "/" + email)
+            };
+
+            var result = await client.SendAsync(request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+
+                bool emailExists = JsonConvert.DeserializeObject<bool>(response);
+
+                if (emailExists)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> ResetPassword(string email, string password)
+        {
+            var baseURL = await _settings.GetSettingString(Settings.APIURL);
+
+            var client = _client.CreateClient();
+
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(baseURL + APIEndPoints.Staff + "/" + "resetpassword" + "/" + email + "/" + password)
+            };
+
+            var result = await client.SendAsync(request);
+
+            if (result.IsSuccessStatusCode)
+            {
+                var response = await result.Content.ReadAsStringAsync();
+
+                bool passwordReset = JsonConvert.DeserializeObject<bool>(response);
+
+                if (passwordReset)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public async Task<Staff> CreateStaff(Staff staff, string token)
         {
             var baseURL = await _settings.GetSettingString(Settings.APIURL);

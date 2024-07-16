@@ -23,6 +23,8 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
 
         Task<bool> CheckEmail(string email);
 
+        Task<bool> ResetPassword(string email, string password);
+
         Task<User> CreateUser(User user);
 
         Task<User> UpdateUser(User user, string token);

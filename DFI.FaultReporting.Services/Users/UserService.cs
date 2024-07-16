@@ -67,6 +67,13 @@ namespace DFI.FaultReporting.Services.Users
             return emailExists;
         }
 
+        public async Task<bool> ResetPassword(string email, string password)
+        {
+            bool passwordReset = await _userHttp.ResetPassword(email, password);
+
+            return passwordReset;
+        }
+
         public async Task<User> CreateUser(User user)
         {
             user = await _userHttp.CreateUser(user);

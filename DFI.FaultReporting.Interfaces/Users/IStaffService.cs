@@ -16,6 +16,10 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
 
         Task<Staff> GetStaff(int ID, string token);
 
+        Task<bool> CheckEmail(string email);
+
+        Task<bool> ResetPassword(string email, string password);
+
         Task<Staff> CreateStaff(Staff staff, string token);
 
         Task<Staff> UpdateStaff(Staff staff, string token);

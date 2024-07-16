@@ -50,6 +50,20 @@ namespace DFI.FaultReporting.Services.Users
             return staff;
         }
 
+        public async Task<bool> CheckEmail(string email)
+        {
+            bool emailExists = await _staffHttp.CheckEmail(email);
+
+            return emailExists;
+        }
+
+        public async Task<bool> ResetPassword(string email, string password)
+        {
+            bool passwordReset = await _staffHttp.ResetPassword(email, password);
+
+            return passwordReset;
+        }
+
         public async Task<Staff> CreateStaff(Staff staff, string token)
         {
             Staff newStaff = await _staffHttp.CreateStaff(staff, token);

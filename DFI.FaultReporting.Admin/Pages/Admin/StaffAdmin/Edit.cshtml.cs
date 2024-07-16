@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DFI.FaultReporting.Models.Users;
-using DFI.FaultReporting.SQL.Repository.Contexts;
 using DFI.FaultReporting.Services.Interfaces.Emails;
 using DFI.FaultReporting.Services.Interfaces.Passwords;
 using DFI.FaultReporting.Services.Interfaces.Roles;
