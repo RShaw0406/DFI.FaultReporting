@@ -1,3 +1,5 @@
+using DFI.FaultReporting.Admin.Pages.Faults.Reports;
+using DFI.FaultReporting.Common.Pagination;
 using DFI.FaultReporting.Interfaces.Admin;
 using DFI.FaultReporting.Interfaces.FaultReports;
 using DFI.FaultReporting.Models.Admin;
@@ -12,95 +14,84 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using DFI.FaultReporting.Interfaces.Claims;
+using DFI.FaultReporting.Services.Interfaces.Claims;
+using DFI.FaultReporting.Models.Claims;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DFI.FaultReporting.Common.SessionStorage;
-using System.Security.Claims;
-using System.Drawing;
-using DFI.FaultReporting.Common.Pagination;
-using DocumentFormat.OpenXml.Wordprocessing;
-using System.Text;
 using OfficeOpenXml;
-using DFI.FaultReporting.Services.Admin;
-using DFI.FaultReporting.Services.FaultReports;
+using static DFI.FaultReporting.Admin.Pages.Faults.Reports.FaultsDataReportModel;
 
-namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
+namespace DFI.FaultReporting.Admin.Pages.Claims.Reports
 {
-    public class FaultsDataReportModel : PageModel
+    public class ClaimsDataReportModel : PageModel
     {
         #region Dependency Injection
         //Declare dependencies.
-        private readonly ILogger<FaultsDataReportModel> _logger;
+        private readonly ILogger<ClaimsDataReportModel> _logger;
         private readonly IStaffService _staffService;
-        private readonly IFaultService _faultService;
-        private readonly IFaultPriorityService _faultPriorityService;
-        private readonly IFaultStatusService _faultStatusService;
-        private readonly IFaultTypeService _faultTypeService;
-        private readonly IReportService _reportService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IPagerService _pagerService;
+        private readonly IClaimService _claimService;
+        private readonly IClaimTypeService _claimTypeService;
+        private readonly ILegalRepService _legalRepService;
         private readonly ISettingsService _settingsService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IClaimStatusService _claimStatusService;
+        private readonly IWitnessService _witnessService;
+        private readonly IPagerService _pagerService;
+        private readonly IUserService _userService;
 
         //Inject dependencies in constructor.
-        public FaultsDataReportModel(ILogger<FaultsDataReportModel> logger, IStaffService staffService, IFaultService faultService, IFaultTypeService faultTypeService,
-            IFaultPriorityService faultPriorityService, IFaultStatusService faultStatusService, IReportService reportService,
-            IHttpContextAccessor httpContextAccessor, IPagerService pagerService, ISettingsService settingsService)
+        public ClaimsDataReportModel(ILogger<ClaimsDataReportModel> logger, IStaffService staffService, IClaimService claimService, IClaimTypeService claimTypeService,
+            ISettingsService settingsService, IHttpContextAccessor httpContextAccessor, IClaimStatusService claimStatusService,
+            IWitnessService witnessService, ILegalRepService legalRepService, IPagerService pagerService, IUserService userService)
         {
             _logger = logger;
             _staffService = staffService;
-            _faultService = faultService;
-            _faultPriorityService = faultPriorityService;
-            _faultStatusService = faultStatusService;
-            _faultTypeService = faultTypeService;
-            _reportService = reportService;
-            _httpContextAccessor = httpContextAccessor;
-            _pagerService = pagerService;
+            _claimService = claimService;
+            _claimTypeService = claimTypeService;
             _settingsService = settingsService;
+            _httpContextAccessor = httpContextAccessor;
+            _claimStatusService = claimStatusService;
+            _witnessService = witnessService;
+            _legalRepService = legalRepService;
+            _pagerService = pagerService;
+            _userService = userService;
         }
         #endregion Dependency Injection
 
         #region Properties
         public Staff CurrentStaff { get; set; }
 
-        [BindProperty]
-        public List<Fault> Faults { get; set; }
+        public List<Claim> Claims { get; set; }
+
+        public List<Claim> PagedClaims { get; set; }
+
+        [BindProperty(SupportsGet = true)]
+        public Pager Pager { get; set; } = new Pager();
+
+        public List<ClaimType> ClaimTypes { get; set; }
 
         [BindProperty]
-        public List<Fault> PagedFaults { get; set; }
+        public IEnumerable<SelectListItem> ClaimTypesList { get; set; }
+
+        [DisplayName("Claim type")]
+        [BindProperty]
+        public int ClaimTypeFilter { get; set; }
+
+        public List<ClaimStatus> ClaimStatuses { get; set; }
 
         [BindProperty]
+        public IEnumerable<SelectListItem> ClaimStatusList { get; set; }
+
+        [DisplayName("Claim status")]
+        [BindProperty]
+        public int ClaimStatusFilter { get; set; }
+
+        public List<Witness> Witnesses { get; set; }
+
+        public List<LegalRep> LegalReps { get; set; }
+
         public List<Staff> Staff { get; set; }
-
-        [BindProperty]
-        public List<Report> Reports { get; set; }
-
-        [BindProperty]
-        public List<FaultPriority> FaultPriorities { get; set; }
-
-        [BindProperty]
-        public IEnumerable<SelectListItem> FaultPriorityList { get; set; }
-
-        [BindProperty]
-        public List<FaultStatus> FaultStatuses { get; set; }
-
-        [BindProperty]
-        public IEnumerable<SelectListItem> FaultStatusList { get; set; }
-
-        [BindProperty]
-        public List<FaultType> FaultTypes { get; set; }
-
-        [BindProperty]
-        public IEnumerable<SelectListItem> FaultTypesList { get; set; }
-
-        [DisplayName("Fault type")]
-        [BindProperty]
-        public int FaultTypeFilter { get; set; }
-
-        [DisplayName("Fault status")]
-        [BindProperty]
-        public int FaultStatusFilter { get; set; }
-
-        [DisplayName("Fault priority")]
-        [BindProperty]
-        public int FaultPriorityFilter { get; set; }
 
         public bool ValidFromDate { get; set; }
 
@@ -144,46 +135,48 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         [BindProperty]
         public DateTime? DateTo { get; set; }
 
-        [BindProperty(SupportsGet = true)]
-        public Pager Pager { get; set; } = new Pager();
-
         [BindProperty]
         public List<string> ChartColors { get; set; }
 
         [BindProperty]
-        public List<ExportFaultDataModel> ExportFaultDataList { get; set; }
+        public List<ExportClaimDataModel> ExportClaimDataList { get; set; }
 
         [BindProperty]
-        public ExportFaultDataModel ExportFaultData { get; set; }
+        public ExportClaimDataModel ExportClaimData { get; set; }
 
-        public class ExportFaultDataModel
+        public class ExportClaimDataModel
         {
             public int ID { get; set; }
+
             public string? Type { get; set; }
-
-            public string? PriorityRating { get; set; }
-
-            public string? Priority { get; set; }
 
             public string? Status { get; set; }
 
-            public string? RoadNumber { get; set; }
+            public string? FaultID { get; set; }
 
-            public string? RoadName { get; set; }
+            public string? IncidentDate { get; set; }
 
-            public string? RoadTown { get; set; }
+            public string? IncidentDescription { get; set; }
 
-            public string? RoadCounty { get; set; }
+            public string? IncidentLocationDescription { get; set; }
+
+            public string? InjuryDescription { get; set; }
+
+            public string? DamageDescription { get; set; }
+
+            public string? DamageClaimDescription { get; set; }
 
             public string? InputOn { get; set; }
             public string? Staff { get; set; }
         }
         #endregion Properties
 
+
         #region Page Load
+
         //Method Summary:
         //This method is executed when the page loads.
-        //When executed the FaultTypes, Faults, FaultPriorities, and FaultStatuses properties are populated.
+        //When executed the ClaimTypes, and ClaimStatuses properties are populated.
         public async Task<IActionResult> OnGetAsync()
         {
             //The contexts current user exists.
@@ -203,9 +196,9 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 
                     //Setup pager.
                     Pager.CurrentPage = 1;
-                    Pager.Count = Faults.Count;
-                    PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
-                    PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+                    Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
+                    Pager.Count = Claims.Count;
+                    PagedClaims = await _pagerService.GetPaginatedClaims(Claims, Pager.CurrentPage, Pager.PageSize);
 
                     return Page();
                 }
@@ -230,31 +223,17 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 
             //-------------------- TYPE FILTER --------------------
             //User has selected an type that is not "All".
-            if (FaultTypeFilter != 0)
+            if (ClaimTypeFilter != 0)
             {
-                //Get the faults for the selected type.
-                Faults = Faults.Where(f => f.FaultTypeID == FaultTypeFilter).ToList();
+                Claims = Claims.Where(c => c.ClaimTypeID == ClaimTypeFilter).ToList();
             }
 
             //-------------------- STATUS FILTER --------------------
             //User has selected a status that is not "All".
-            if (FaultStatusFilter != 0)
+            if (ClaimStatusFilter != 0)
             {
-                //Get the faults for the selected status.
-                Faults = Faults.Where(f => f.FaultStatusID == FaultStatusFilter).ToList();
+                Claims = Claims.Where(c => c.ClaimStatusID == ClaimStatusFilter).ToList();
             }
-
-            //-------------------- PRIORITY FILTER --------------------
-            //User has selected a fault priority that is not "All".
-            if (FaultPriorityFilter != 0)
-            {
-                //Get the faults for the selected priority.
-                Faults = Faults.Where(f => f.FaultPriorityID == FaultPriorityFilter).ToList();
-
-                //Order the faults by priority.
-                Faults = Faults.OrderBy(f => f.FaultPriorityID).ToList();
-            }
-
 
             //-------------------- DATE FILTER --------------------
             if (DayFrom != null && MonthFrom != null && YearFrom != null)
@@ -355,69 +334,64 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
             {
                 if (DateFrom == DateTo)
                 {
-                    //Get the faults for the selected date range.
-                    Faults = Faults.Where(f => f.InputOn.Date == DateFrom).ToList();
+                    //Get the claims for the selected date range.
+                    Claims = Claims.Where(c => c.InputOn.Date == DateFrom).ToList();
                 }
                 else
                 {
-                    //Get the faults for the selected date range.
-                    Faults = Faults.Where(f => f.InputOn.Date >= DateFrom && f.InputOn.Date <= DateTo).ToList();
+                    //Get the claims for the selected date range.
+                    Claims = Claims.Where(c => c.InputOn.Date >= DateFrom && c.InputOn.Date <= DateTo).ToList();
                 }
             }
 
             //Setup pager.
             Pager.CurrentPage = 1;
-            Pager.Count = Faults.Count;
-            PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
-            PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+            Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
+            Pager.Count = Claims.Count;
+            PagedClaims = await _pagerService.GetPaginatedClaims(Claims, Pager.CurrentPage, Pager.PageSize);
 
             await SetSessionData();
 
-            //Set the selected fault type in TempData.
-            TempData["FaultTypeFilter"] = FaultTypeFilter;
-            TempData["FaultStatusFilter"] = FaultStatusFilter;
-            TempData["FaultPriorityFilter"] = FaultPriorityFilter;
+            //Set the selected filters in temp data.
+            TempData["ClaimTypeFilter"] = ClaimTypeFilter;
+            TempData["ClaimStatusFilter"] = ClaimStatusFilter;
             TempData.Keep();
 
             return Page();
         }
-        #endregion Filters    
+        #endregion Filters 
 
         #region Pagination
         //Method Summary:
         //This method is excuted when the pagination buttons are clicked.
-        //When executed the desired page of faults is displayed.
+        //When executed the desired page of claims is displayed.
         public async Task OnGetPaging()
         {
             await PopulateProperties();
 
-            //User has selected a fault type.
-            if (TempData["FaultTypeFilter"] != null)
+            //User has selected a claim type.
+            if (TempData["ClaimTypeFilter"] != null && (int)TempData["ClaimTypeFilter"] != 0)
             {
-                //Get the FaultTypeFilter value from TempData.
-                FaultTypeFilter = int.Parse(TempData["FaultTypeFilter"].ToString());
+                ClaimTypeFilter = int.Parse(TempData["ClaimTypeFilter"].ToString());
+
+                Claims = Claims.Where(c => c.ClaimTypeID == ClaimTypeFilter).ToList();
             }
 
-            //User has selected a fault status.
-            if (TempData["FaultStatusFilter"] != null)
+            //User has selected a claim status.
+            if (TempData["ClaimStatusFilter"] != null && (int)TempData["ClaimStatusFilter"] != 0)
             {
-                //Get the FaultStatusFilter value from TempData.
-                FaultStatusFilter = int.Parse(TempData["FaultStatusFilter"].ToString());
+                ClaimStatusFilter = int.Parse(TempData["ClaimStatusFilter"].ToString());
+
+                Claims = Claims.Where(c => c.ClaimStatusID == ClaimStatusFilter).ToList();
             }
 
-            //User has selected a fault priority.
-            if (TempData["FaultPriorityFilter"] != null)
-            {
-                //Get the FaultPriorityFilter value from TempData.
-                FaultPriorityFilter = int.Parse(TempData["FaultPriorityFilter"].ToString());
-            }
-
+            //Keep the TempData.
             TempData.Keep();
 
-            Pager.Count = Faults.Count;
+            //Setup Pager.
             Pager.PageSize = await _settingsService.GetSettingInt(DFI.FaultReporting.Common.Constants.Settings.PAGESIZE);
-            PagedFaults = await _pagerService.GetPaginatedFaults(Faults, Pager.CurrentPage, Pager.PageSize);
-            PagedFaults = PagedFaults.OrderBy(f => f.FaultPriorityID).ToList();
+            Pager.Count = Claims.Count;
+            PagedClaims = await _pagerService.GetPaginatedClaims(Claims, Pager.CurrentPage, Pager.PageSize);
         }
         #endregion Pagination
 
@@ -434,8 +408,8 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
 
                 Random random = new Random();
 
-                //Loop through each fault type, this is needed to ensure that all types are assigned a color with any colors being reused.
-                foreach (FaultType faultype in FaultTypes)
+                //Loop through each claim type, this is needed to ensure that all types are assigned a color with any colors being reused.
+                foreach (ClaimType claimType in ClaimTypes)
                 {
                     System.Drawing.Color color = System.Drawing.Color.FromArgb(random.Next(0, 256), random.Next(0, 256), random.Next(0, 256));
 
@@ -466,44 +440,31 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         public async Task PopulateProperties()
         {
             //Get the current user ID and JWT token.
-            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+            string? userID = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+            System.Security.Claims.Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
             string? jwtToken = jwtTokenClaim.Value;
             CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
-            Faults = await _faultService.GetFaults();
-            Faults = Faults.OrderBy(f => f.FaultStatusID).ToList();
+            Claims = await _claimService.GetClaims(jwtToken);
 
-            FaultTypes = await _faultTypeService.GetFaultTypes();
-            FaultTypes = FaultTypes.Where(ft => ft.Active == true).ToList();
-
-            FaultTypesList = FaultTypes.Select(ft => new SelectListItem()
+            ClaimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
+            ClaimTypesList = ClaimTypes.Select(ct => new SelectListItem
             {
-                Text = ft.FaultTypeDescription,
-                Value = ft.ID.ToString()
+                Value = ct.ID.ToString(),
+                Text = ct.ClaimTypeDescription
             });
 
-            FaultPriorities = await _faultPriorityService.GetFaultPriorities();
-            FaultPriorities = FaultPriorities.Where(fp => fp.Active == true).ToList();
-
-            FaultPriorityList = FaultPriorities.Select(fp => new SelectListItem()
+            ClaimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
+            ClaimStatusList = ClaimStatuses.Select(cs => new SelectListItem
             {
-                Text = fp.FaultPriorityRating,
-                Value = fp.ID.ToString()
+                Value = cs.ID.ToString(),
+                Text = cs.ClaimStatusDescription
             });
 
-            FaultStatuses = await _faultStatusService.GetFaultStatuses();
-            FaultStatuses = FaultStatuses.Where(fs => fs.Active == true).ToList();
-
-            FaultStatusList = FaultStatuses.Select(fs => new SelectListItem()
-            {
-                Text = fs.FaultStatusDescription,
-                Value = fs.ID.ToString()
-            });
+            Witnesses = await _witnessService.GetWitnesses(jwtToken);
+            LegalReps = await _legalRepService.GetLegalReps(jwtToken);
 
             Staff = await _staffService.GetAllStaff(jwtToken);
-
-            Reports = await _reportService.GetReports();
         }
 
         //Method Summary:
@@ -511,11 +472,9 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         //When executed, the page properties required in the charts javascript are set in session storage.
         public async Task SetSessionData()
         {
-            HttpContext.Session.SetInSession("Faults", Faults);
-            HttpContext.Session.SetInSession("FaultTypes", FaultTypes);
-            HttpContext.Session.SetInSession("FaultPriorities", FaultPriorities);
-            HttpContext.Session.SetInSession("FaultStatuses", FaultStatuses);
-            HttpContext.Session.SetInSession("Reports", Reports);
+            HttpContext.Session.SetInSession("Claims", Claims);
+            HttpContext.Session.SetInSession("ClaimTypes", ClaimTypes);
+            HttpContext.Session.SetInSession("ClaimStatuses", ClaimStatuses);
             HttpContext.Session.SetInSession("Staff", Staff);
         }
 
@@ -524,11 +483,9 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         //When executed, the page properties required in the charts javascript are retrieved from session storage.
         public void GetSessionData()
         {
-            Faults = HttpContext.Session.GetFromSession<List<Fault>>("Faults");
-            FaultTypes = HttpContext.Session.GetFromSession<List<FaultType>>("FaultTypes");
-            FaultPriorities = HttpContext.Session.GetFromSession<List<FaultPriority>>("FaultPriorities");
-            FaultStatuses = HttpContext.Session.GetFromSession<List<FaultStatus>>("FaultStatuses");
-            Reports = HttpContext.Session.GetFromSession<List<Report>>("Reports");
+            Claims = HttpContext.Session.GetFromSession<List<Claim>>("Claims");
+            ClaimTypes = HttpContext.Session.GetFromSession<List<ClaimType>>("ClaimTypes");
+            ClaimStatuses = HttpContext.Session.GetFromSession<List<ClaimStatus>>("ClaimStatuses");
             Staff = HttpContext.Session.GetFromSession<List<Staff>>("Staff");
         }
         #endregion Data
@@ -541,44 +498,40 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
         {
             GetSessionData();
 
-            foreach (Fault fault in Faults)
+            foreach (Claim claim in Claims)
             {
-                //Populate the data needed for the excel file.
-                FaultType faultType = FaultTypes.Where(ft => ft.ID == fault.FaultTypeID).FirstOrDefault();
-                string Type = faultType.FaultTypeDescription;
+                ClaimType claimType = ClaimTypes.Where(ct => ct.ID == claim.ClaimTypeID).FirstOrDefault();
+                string Type = claimType.ClaimTypeDescription;
 
-                FaultPriority faultPriority = FaultPriorities.Where(fp => fp.ID == fault.FaultPriorityID).FirstOrDefault();
-                string PriorityRating = faultPriority.FaultPriorityRating;
-                string Priority = faultPriority.FaultPriorityDescription;
-
-                FaultStatus faultStatus = FaultStatuses.Where(fs => fs.ID == fault.FaultStatusID).FirstOrDefault();
-                string Status = faultStatus.FaultStatusDescription;
+                ClaimStatus claimStatus = ClaimStatuses.Where(cs => cs.ID == claim.ClaimStatusID).FirstOrDefault();
+                string Status = claimStatus.ClaimStatusDescription;
 
                 string staffName = "";
 
-                if (fault.StaffID != null && fault.StaffID != 0)
+                if (claim.StaffID != null && claim.StaffID != 0)
                 {
-                    Staff staff = Staff.Where(s => s.ID == fault.StaffID).FirstOrDefault();
+                    Staff staff = Staff.Where(s => s.ID == claim.StaffID).FirstOrDefault();
                     staffName = staff.FirstName + " " + staff.LastName;
                 }
 
-                //Create a new ExportFaultDataModel object, this is needed for the excel file.
-                ExportFaultData = new ExportFaultDataModel
+                //Create a new ExportClaimDataModel object, this is needed for the excel file.
+                ExportClaimData = new ExportClaimDataModel
                 {
-                    ID = fault.ID,
+                    ID = claim.ID,
                     Type = Type,
-                    PriorityRating = PriorityRating,
-                    Priority = Priority,
                     Status = Status,
-                    RoadNumber = fault.RoadNumber,
-                    RoadName = fault.RoadName,
-                    RoadTown = fault.RoadTown,
-                    RoadCounty = fault.RoadCounty,
-                    InputOn = fault.InputOn.ToString("dd/MM/yyyy"),
+                    FaultID = claim.FaultID.ToString(),
+                    IncidentDate = claim.IncidentDate.ToString("dd/MM/yyyy"),
+                    IncidentDescription = claim.IncidentDescription,
+                    IncidentLocationDescription = claim.IncidentLocationDescription,
+                    InjuryDescription = claim.InjuryDescription,
+                    DamageDescription = claim.DamageDescription,
+                    DamageClaimDescription = claim.DamageClaimDescription,
+                    InputOn = claim.InputOn.ToString("dd/MM/yyyy"),
                     Staff = staffName
                 };
 
-                ExportFaultDataList.Add(ExportFaultData);
+                ExportClaimDataList.Add(ExportClaimData);
             }
 
             //Set the license context to non commercial.
@@ -589,13 +542,13 @@ namespace DFI.FaultReporting.Admin.Pages.Faults.Reports
             using (ExcelPackage excelPackage = new ExcelPackage(memoryStream))
             {
                 var sheet = excelPackage.Workbook.Worksheets.Add("Sheet1");
-                sheet.Cells.LoadFromCollection(ExportFaultDataList, true);
+                sheet.Cells.LoadFromCollection(ExportClaimDataList, true);
                 excelPackage.Save();
             }
 
             memoryStream.Position = 0;
-            string excelName = "Faults Data Report.xlsx";
-            return File(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName);     
+            string excelName = "Claims Data Report.xlsx";
+            return File(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelName);
         }
         #endregion
     }

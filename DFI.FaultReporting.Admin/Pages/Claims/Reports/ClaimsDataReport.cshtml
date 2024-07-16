@@ -1,0 +1,262 @@
+﻿@page
+@using DFI.FaultReporting.Common.SessionStorage
+@using DFI.FaultReporting.Models.Claims
+@using DFI.FaultReporting.Models.Admin
+@model DFI.FaultReporting.Admin.Pages.Claims.Reports.ClaimsDataReportModel
+@{
+    ViewData["Title"] = "Claims data report";
+}
+<body onload="initCharts()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>Select from the options below to filter the results shown in the charts and table</h2>
+        <hr />
+        <div class="row">
+            <div class="col-md-12">
+                <form name="filterForm" id="filterForm" asp-page-handler="Filter" method="post">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="ClaimTypeFilter" class="form-select" asp-items="Model.ClaimTypesList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                </select>
+                                <label asp-for="ClaimTypeFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating mb-3">
+                                <select asp-for="ClaimStatusFilter" class="form-select" asp-items="Model.ClaimStatusList" onchange="this.form.submit()">
+                                    <option value="0">
+                                        All
+                                    </option>
+                                </select>
+                                <label asp-for="ClaimStatusFilter" class="form-label"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span class="form-label">From:</span>
+                            <div class="form-floating mb-3 input-group">
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="DayFrom" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="DayFrom" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="MonthFrom" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="MonthFrom" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-5">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="YearFrom" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="YearFrom" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="form-label">To:</span>
+                            <div class="form-floating mb-3 input-group">
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="DayTo" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="DayTo" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-3">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="MonthTo" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="MonthTo" class="form-label"></label>
+                                    </div>
+                                </div>
+                                &nbsp;
+                                <div class="col-5">
+                                    <div class="form-floating mb-3 input-group">
+                                        <input asp-for="YearTo" class="form-control" type="text" onchange="this.form.submit()" />
+                                        <label asp-for="YearTo" class="form-label"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        @if (!Model.ValidFromDate || !Model.ValidToDate)
+                        {
+                            <span class="text-danger">@Model.InvalidDateMessage</span>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Claim type data</h3>
+                <hr />
+                <canvas id="typeBarChart" class="chart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <h3>Claim status data</h3>
+                <hr />
+                <canvas id="statusBarChart" class="chart"></canvas>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Claim details
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var claim in Model.PagedClaims)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong>Assigned staff:</strong>
+                                        <br />
+                                        @foreach (var staff in Model.Staff)
+                                        {
+                                            if (staff.ID == claim.StaffID)
+                                            {
+                                                @staff.FirstName
+                                                <br />
+                                                @staff.LastName
+                                            }
+                                        }
+                                        <br />
+                                        <br />
+                                        <strong>Type:</strong>
+                                        <br />
+                                        @Model.ClaimTypes.FirstOrDefault(ct => ct.ID == claim.ClaimTypeID).ClaimTypeDescription
+                                        <br />
+                                        <br />
+                                        <strong>Status:</strong>
+                                        <br />
+                                        @Model.ClaimStatuses.FirstOrDefault(cs => cs.ID == claim.ClaimStatusID).ClaimStatusDescription
+                                        <br />
+                                        <br />
+                                        <strong>Incident description:</strong>
+                                        <br />
+                                        @claim.IncidentDescription
+                                        <br />
+                                        <br />
+                                        <strong>Incident date:</strong>
+                                        <br />
+                                        @claim.IncidentDate.ToShortDateString()
+                                        <br />
+                                        <br />
+                                        <strong>Location description:</strong>
+                                        <br />
+                                        @claim.IncidentLocationDescription
+                                        <br />
+                                        <br />
+                                        @if (claim.ClaimTypeID == 8)
+                                        {
+                                            <strong>Injury description:</strong>
+                                            <br />
+                                            @claim.InjuryDescription
+                                            <br />
+                                            <br />
+                                        }
+                                        else
+                                        {
+                                            <strong>Damage description:</strong>
+                                            <br />
+                                            @claim.DamageDescription
+                                            <br />
+                                            <br />
+                                            <strong>Damage claim description:</strong>
+                                            <br />
+                                            @claim.DamageClaimDescription
+                                            <br />
+                                            <br />
+                                        }
+                                    </td>                               
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @{
+                    var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                    var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+                }
+                <div>
+                    <ul class="pagination text-center">
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="First page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                               class="btn btn-outline-primary btn-sm @prevDisabled"
+                               aria-label="Previous page button" style="font-size: 1em !important;">
+                                <span class="fa fa-chevron-left"></span> Prev
+                            </a>
+                        </li>
+                        <li>
+                            &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                               class="btn btn-outline-primary btn-sm @nextDisabled"
+                               aria-label="Next page button"
+                               style="font-size: 1em !important;">
+                                Next <span class="fa fa-chevron-right"></span>
+                            </a>&nbsp;
+                        </li>
+                        <li>
+                            <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                               class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                               style="font-size: 1em !important;">
+                                Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="btn-group">
+            <form method="post">
+                <button id="btnExport" type="submit" asp-page-handler="ExportData" class="btn btn-outline-success btn-lg"><i class="fa-solid fa-file-excel"></i> Export</button>
+            </form>
+        </div>
+        <br />
+    </div>
+    <br />
+</body>
+
+<script type="text/javascript">
+
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+
+    //Retrieve session data to be used for displaying on map/popup.
+    var claims = @Json.Serialize(HttpContext.Session.GetFromSession<List<Claim>>("Claims"));
+    var claimTypes = @Json.Serialize(HttpContext.Session.GetFromSession<List<ClaimType>>("ClaimTypes"));
+    var claimStatuses = @Json.Serialize(HttpContext.Session.GetFromSession<List<ClaimStatus>>("ClaimStatuses"));
+    var chartColors = @Json.Serialize(HttpContext.Session.GetFromSession<List<string>>("ChartColors"));
+
+</script>
+<script src="~/lib/Chart.js/dist/chart.umd.js"></script>
+<script src="~/js/charts/ClaimsDataReportCharts.js"></script>
