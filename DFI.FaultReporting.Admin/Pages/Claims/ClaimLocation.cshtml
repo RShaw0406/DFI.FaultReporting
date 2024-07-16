@@ -1,0 +1,45 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Claims.ClaimLocationModel
+@{
+    ViewData["Title"] = "Claim location";
+}
+<body onload="initReviewMap()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>View the location of the incident</h2>
+        <hr />
+        <div class="row" hidden>
+            <div class="col-md-12">
+                <div class="form-floating mb-3">
+                    <input asp-for="Claim.IncidentLocationLatitude" id="lat" class="form-control" />
+                    <label asp-for="Claim.IncidentLocationLatitude" class="form-label"></label>
+
+                </div>
+            </div>
+        </div>
+        <div class="row" hidden>
+            <div class="col-md-12">
+                <div class="form-floating mb-3">
+                    <input asp-for="Claim.IncidentLocationLongitude" id="long" class="form-control" />
+                    <label asp-for="Claim.IncidentLocationLongitude" class="form-label"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-center">
+                    <div id="reviewMap" style="height: 1000px; width: 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="btn-group">
+            <a asp-page="./Claims" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+        </div>
+        <br />
+    </div>
+    <br />
+</body>
+<script src="~/js/mapping/ReviewMap.js"></script>

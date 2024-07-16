@@ -1,0 +1,119 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Claims.EditClaimModel
+@{
+    ViewData["Title"] = "Edit claim";
+}
+
+<body onload="initReviewMap()">
+    <div class="container">
+        <h1>@ViewData["Title"]</h1>
+        <br />
+        <h2>Edit the details of claim</h2>
+        <hr />
+        <form id="faultDetailsForm" method="post">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-center">
+                        <div id="reviewMap" style="height: 500px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            @if (Model.UpdateSuccess)
+            {
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    <strong>Success: </strong>
+                    <p>Claim details have been successfully updated.</p>
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger">
+                        <span><strong>Please review and correct the following errors:</strong></span>
+                    </div>
+                    <input type="hidden" asp-for="Claim.ID" />
+                    <input type="hidden" asp-for="Claim.UserID" />
+                    <input type="hidden" asp-for="Claim.StaffID" />
+                    <input type="hidden" asp-for="Claim.FaultID" />
+                    <div class="form-floating mb-3" hidden>
+                        <input id="lat" asp-for="Claim.IncidentLocationLatitude" class="form-control" />
+                        <label asp-for="Claim.IncidentLocationLatitude" class="control-label"></label>
+                        <span asp-validation-for="Claim.IncidentLocationLatitude" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input id="long" asp-for="Claim.IncidentLocationLongitude" class="form-control" />
+                        <label asp-for="Claim.IncidentLocationLongitude" class="control-label"></label>
+                        <span asp-validation-for="Claim.IncidentLocationLongitude" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <select asp-for="Claim.ClaimTypeID" class="form-select" asp-items="Model.ClaimTypesList">
+                        </select>
+                        <label asp-for="Claim.ClaimTypeID" class="form-label"></label>
+                        <span asp-validation-for="Claim.ClaimTypeID" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <select asp-for="Claim.ClaimStatusID" class="form-select" asp-items="Model.ClaimStatusList">
+                        </select>
+                        <label asp-for="Claim.ClaimStatusID" class="form-label"></label>
+                        <span asp-validation-for="Claim.ClaimStatusID" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.IncidentDate" class="form-control" />
+                        <label asp-for="Claim.IncidentDate" class="control-label"></label>
+                        <span asp-validation-for="Claim.IncidentDate" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.IncidentDescription" class="form-control" />
+                        <label asp-for="Claim.IncidentDescription" class="control-label"></label>
+                        <span asp-validation-for="Claim.IncidentDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.IncidentLocationDescription" class="form-control" />
+                        <label asp-for="Claim.IncidentLocationDescription" class="control-label"></label>
+                        <span asp-validation-for="Claim.IncidentLocationDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.InjuryDescription" class="form-control" />
+                        <label asp-for="Claim.InjuryDescription" class="control-label"></label>
+                        <span asp-validation-for="Claim.InjuryDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.DamageDescription" class="form-control" />
+                        <label asp-for="Claim.DamageDescription" class="control-label"></label>
+                        <span asp-validation-for="Claim.DamageDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.DamageClaimDescription" class="form-control" />
+                        <label asp-for="Claim.DamageClaimDescription" class="control-label"></label>
+                        <span asp-validation-for="Claim.DamageClaimDescription" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.InputBy" class="form-control" />
+                        <label asp-for="Claim.InputBy" class="control-label"></label>
+                        <span asp-validation-for="Claim.InputBy" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.InputOn" class="form-control" />
+                        <label asp-for="Claim.InputOn" class="control-label"></label>
+                        <span asp-validation-for="Claim.InputOn" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating mb-3" hidden>
+                        <input asp-for="Claim.Active" class="form-control" />
+                        <label asp-for="Claim.Active" class="control-label"></label>
+                        <span asp-validation-for="Claim.Active" class="text-danger"></span>
+                    </div>
+                    <div class="btn-group">
+                        <a asp-page="./Claims" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
+                        &nbsp;
+                        <button type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Update</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br />
+</body>
+
+<script src="~/js/mapping/ReviewMap.js"></script>

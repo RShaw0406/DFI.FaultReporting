@@ -1,0 +1,299 @@
+﻿@page
+@model DFI.FaultReporting.Admin.Pages.Claims.ClaimsModel
+@{
+    ViewData["Title"] = "My claims";
+}
+<div class="container">
+    <h1>@ViewData["Title"]</h1>
+    <br />
+    <h2>View the compensation claims you have made</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-12">
+            <form name="filterForm" id="filterForm" method="post" asp-page-handler="Filter">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <select asp-for="ClaimTypeFilter" class="form-select" asp-items="Model.ClaimTypesList" onchange="this.form.submit()">
+                                <option value="0">
+                                    All
+                                </option>
+                            </select>
+                            <label asp-for="ClaimTypeFilter" class="form-label"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-floating mb-3">
+                            <select asp-for="ClaimStatusFilter" class="form-select" asp-items="Model.ClaimStatusList" onchange="this.form.submit()">
+                                <option value="0">
+                                    All
+                                </option>
+                            </select>
+                            <label asp-for="ClaimStatusFilter" class="form-label"></label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                Claim details
+                            </th>
+                            <th>
+                                Legal rep details
+                            </th>
+                            <th>
+                                Witness details
+                            </th>
+                            <th class="text-center">
+                                View location
+                            </th>
+                            <th class="text-center">
+                                View images
+                            </th>
+                            <th class="text-center">
+                                View documents
+                            </th>
+                            @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite"))
+                            {
+                                <th class="text-center">Assign staff</th>
+                                <th class="text-center">Edit details</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var claim in Model.PagedClaims)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>Assigned staff:</strong>
+                                    <br />
+                                    @foreach (var staff in Model.Staff)
+                                    {
+                                        if (staff.ID == claim.StaffID)
+                                        {
+                                            @staff.FirstName
+                                            <br />
+                                            @staff.LastName
+                                        }
+                                    }
+                                    <br />
+                                    <br />
+                                    <strong>User:</strong>
+                                    <br />
+                                    @foreach (var user in Model.Users)
+                                    {
+                                        if (user.ID == claim.UserID)
+                                        {
+                                            @user.FirstName
+                                            <br />
+                                            @user.LastName
+                                            <br />
+                                            <br />
+                                            @user.Email
+                                            <br />
+                                            @user.ContactNumber
+                                        }
+                                    }
+                                    <br />
+                                    <br />
+                                    <strong>Type:</strong>
+                                    <br />
+                                    @Model.ClaimTypes.FirstOrDefault(ct => ct.ID == claim.ClaimTypeID).ClaimTypeDescription
+                                    <br />
+                                    <br />
+                                    <strong>Status:</strong>
+                                    <br />
+                                    @Model.ClaimStatuses.FirstOrDefault(cs => cs.ID == claim.ClaimStatusID).ClaimStatusDescription
+                                    <br />
+                                    <br />
+                                    <strong>Incident description:</strong>
+                                    <br />
+                                    @claim.IncidentDescription
+                                    <br />
+                                    <br />
+                                    <strong>Incident date:</strong>
+                                    <br />
+                                    @claim.IncidentDate.ToShortDateString()
+                                    <br />
+                                    <br />
+                                    <strong>Location description:</strong>
+                                    <br />
+                                    @claim.IncidentLocationDescription
+                                    <br />
+                                    <br />
+                                    @if (claim.ClaimTypeID == 8)
+                                    {
+                                        <strong>Injury description:</strong>
+                                        <br />
+                                        @claim.InjuryDescription
+                                        <br />
+                                        <br />
+                                    }
+                                    else
+                                    {
+                                        <strong>Damage description:</strong>
+                                        <br />
+                                        @claim.DamageDescription
+                                        <br />
+                                        <br />
+                                        <strong>Damage claim description:</strong>
+                                        <br />
+                                        @claim.DamageClaimDescription
+                                        <br />
+                                        <br />
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var legalRep in Model.LegalReps)
+                                    {
+                                        @if (legalRep.ClaimID == claim.ID)
+                                        {
+                                            <strong>Name:</strong>
+                                            <br />
+                                            @legalRep.FirstName
+                                            <br />
+                                            @legalRep.LastName
+                                            <br />
+                                            <br />
+                                            <strong>Company:</strong>
+                                            <br />
+                                            @legalRep.CompanyName
+                                            <br />
+                                            <br />
+                                            <strong>Address:</strong>
+                                            <br />
+                                            @legalRep.Postcode
+                                            <br />
+                                            @legalRep.AddressLine1
+                                            <br />
+                                            @legalRep.AddressLine2
+                                            <br />
+                                            @legalRep.AddressLine3
+                                            <br />
+                                            <br />
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    @foreach (var witness in Model.Witnesses)
+                                    {
+                                        @if (witness.ClaimID == claim.ID)
+                                        {
+                                            <strong>Name:</strong>
+                                            <br />
+                                            @witness.FirstName
+                                            <br />
+                                            @witness.LastName
+                                            <br />
+                                            <br />
+                                            <strong>Contact:</strong>
+                                            <br />
+                                            @witness.Email
+                                            <br />
+                                            @witness.ContactNumber
+                                            <br />
+                                            <br />
+                                            <strong>Address:</strong>
+                                            <br />
+                                            @witness.Postcode
+                                            <br />
+                                            @witness.AddressLine1
+                                            <br />
+                                            @witness.AddressLine2
+                                            <br />
+                                            @witness.AddressLine3
+                                            <br />
+                                            <br />
+                                        }
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a asp-page="./ClaimLocation" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-map-location-dot"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-page="./ClaimImages" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-image"></i></a>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-page="./ClaimDocuments" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-regular fa-file-lines"></i></a>
+                                </td>
+                                @if (User.Identity.IsAuthenticated == true && User.IsInRole("StaffReadWrite"))
+                                {
+                                    <td class="text-center">
+                                        @if (claim.StaffID == 0 || claim.StaffID == null)
+                                        {
+                                            <a asp-page="./AssignStaff" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-user-plus"></i></a>
+                                        }
+
+                                    </td>
+                                    <td class="text-center">
+                                        <a asp-page="./EditClaim" asp-route-id="@claim.ID" class="btn btn-outline-primary btn-lg"><i class="fa-solid fa-pen-to-square"></i></a>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @{
+                var prevDisabled = !Model.Pager.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.Pager.HasNextPage ? "disabled" : "";
+            }
+            <div>
+                <ul class="pagination text-center">
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="1"
+                           class="btn btn-outline-primary btn-sm @prevDisabled"
+                           aria-label="First page button" style="font-size: 1em !important;">
+                            <span class="fa fa-chevron-left"></span><span class="fa fa-chevron-left"></span> First
+                        </a>&nbsp;
+                    </li>
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage -1)"
+                           class="btn btn-outline-primary btn-sm @prevDisabled"
+                           aria-label="Previous page button" style="font-size: 1em !important;">
+                            <span class="fa fa-chevron-left"></span> Prev
+                        </a>
+                    </li>
+                    <li>
+                        &nbsp; Page @(Model.Pager.CurrentPage) of @(Model.Pager.TotalPages == 0 ? 1 : Model.Pager.TotalPages)  &nbsp;
+                    </li>
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="@(Model.Pager.CurrentPage + 1)"
+                           class="btn btn-outline-primary btn-sm @nextDisabled"
+                           aria-label="Next page button"
+                           style="font-size: 1em !important;">
+                            Next <span class="fa fa-chevron-right"></span>
+                        </a>&nbsp;
+                    </li>
+                    <li>
+                        <a asp-page-handler="Paging" asp-route-CurrentPage="@Model.Pager.TotalPages"
+                           class="btn btn-outline-primary btn-sm @nextDisabled" aria-label="Last page button"
+                           style="font-size: 1em !important;">
+                            Last <span class="fa fa-chevron-right"></span><span class="fa fa-chevron-right"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <div class="small-tile">
+                <a class="nav-link" aria-label="Submit a claim link" title="Submit claim" asp-page="/Claims/SubmitClaim/SubmitClaim"><i class="fa-solid fa-file-circle-plus"></i> Submit a claim</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>
