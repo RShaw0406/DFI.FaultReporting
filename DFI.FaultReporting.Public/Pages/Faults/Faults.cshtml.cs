@@ -175,6 +175,8 @@ namespace DFI.FaultReporting.Public.Pages.Faults
             //Get fault types by calling the GetFaultTypes method from the _faultTypeService.
             List<FaultType> faultTypes = await _faultTypeService.GetFaultTypes();
 
+            faultTypes = faultTypes.Where(ft => ft.Active == true).ToList();
+
             //Return fault types.
             return faultTypes;
         }
