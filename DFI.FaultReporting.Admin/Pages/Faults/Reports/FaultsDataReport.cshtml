@@ -6,6 +6,12 @@
 @{
     ViewData["Title"] = "Faults data report";
 }
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Fault Reporting faults data report">
+<meta name="theme-color" content="#142062" />
+
 <body onload="initCharts()">
     <div class="container">
         <h1>@ViewData["Title"]</h1>
@@ -112,7 +118,9 @@
             <div class="col-md-12">
                 <h3>Fault type data</h3>
                 <hr />
-                <canvas id="typeBarChart" class="chart"></canvas>
+                <div>
+                    <canvas id="typeBarChart" class="chart"></canvas>
+                </div>
             </div>
         </div>
         <br />
@@ -120,12 +128,16 @@
             <div class="col-md-6">
                 <h3>Fault status data</h3>
                 <hr />
-                <canvas id="statusBarChart" class="chart"></canvas>
+                <div>
+                    <canvas id="statusBarChart" class="chart"></canvas>
+                </div>
             </div>
             <div class="col-md-6">
                 <h3>Fault priority data</h3>
                 <hr />
-                <canvas id="priorityBarChart" class="chart"></canvas>
+                <div>
+                    <canvas id="priorityBarChart" class="chart"></canvas>
+                </div>
             </div>
         </div>
         <br />

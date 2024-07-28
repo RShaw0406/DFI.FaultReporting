@@ -3,6 +3,12 @@
 @{
     ViewData["Title"] = "Add images";
 }
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Fault Reporting add image">
+<meta name="theme-color" content="#142062" />
+
 <div class="container">
     <h1>@ViewData["Title"]</h1>
     <br />
@@ -50,7 +56,7 @@
         </div>
         <br />
         <div class="btn-group">
-            <button id="btnBack" asp-page-handler="Back" type="submit" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</button>
+            <a id="btnBack" asp-page="./ViewJobs" class="btn btn-lg btn-outline-secondary"><i class="fa-regular fa-circle-left"></i> Back</a>
             &nbsp;
             <button id="btnSubmit" asp-page-handler="SubmitPhotos" type="submit" class="btn btn-lg btn-outline-success"><i class="fa-regular fa-circle-check"></i> Submit</button>
         </div>

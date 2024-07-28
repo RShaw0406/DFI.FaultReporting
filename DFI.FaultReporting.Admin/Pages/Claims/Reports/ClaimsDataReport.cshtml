@@ -6,6 +6,12 @@
 @{
     ViewData["Title"] = "Claims data report";
 }
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Fault Reporting claims data report">
+<meta name="theme-color" content="#142062" />
+
 <body onload="initCharts()">
     <div class="container">
         <h1>@ViewData["Title"]</h1>
@@ -102,12 +108,16 @@
             <div class="col-md-6">
                 <h3>Claim type data</h3>
                 <hr />
-                <canvas id="typeBarChart" class="chart"></canvas>
+                <div>
+                    <canvas id="typeBarChart" class="chart"></canvas>
+                </div>
             </div>
             <div class="col-md-6">
                 <h3>Claim status data</h3>
                 <hr />
-                <canvas id="statusBarChart" class="chart"></canvas>
+                <div>
+                    <canvas id="statusBarChart" class="chart"></canvas>
+                </div>
             </div>
         </div>
         <br />
