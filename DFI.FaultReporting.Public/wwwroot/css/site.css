@@ -12,8 +12,13 @@ html {
 }
 
 body {
-    height: 100%;
-    margin-bottom: 60px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    margin-top: auto;
 }
 
 .container {
@@ -25,17 +30,16 @@ body {
     border: none;
 }
 
-    .navbar a, .dropdown-menu a, .dropdown-item {
+    .navbar a, .dropdown-menu a, .dropdown-item, .nav a {
         color: #142062 !important;
         font-size: 1.25rem !important;
         background-color: transparent !important;
     }
 
-        .navbar a:hover, .navbar a:focus, .dropdown-menu a:hover, .dropdown-menu a:focus, .dropdown-item:hover, .dropdown-item:focus {
+        .navbar a:hover, .navbar a:focus, .dropdown-menu a:hover, .dropdown-menu a:focus, .dropdown-item:hover, .dropdown-item:focus, .nav a:hover, .nav a:focus {
             color: #FEBA35 !important;
             background-color: transparent !important;
         }
-
 /* ---------- Styles for buttons and links ---------- */
 .tile {
     border: 0;

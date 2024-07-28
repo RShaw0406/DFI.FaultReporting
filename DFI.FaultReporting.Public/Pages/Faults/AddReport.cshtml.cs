@@ -21,6 +21,7 @@ using System.Security.Claims;
 using DFI.FaultReporting.Services.Interfaces.Files;
 using SendGrid.Helpers.Mail;
 using SendGrid;
+using Newtonsoft.Json.Linq;
 
 namespace DFI.FaultReporting.Public.Pages.Faults
 {
@@ -495,7 +496,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
                 if (insertedReport != null)
                 {
                     //Send an email to the user.
-                    Response emailResponse = await SendSubmittedReportEmail(CurrentUser.Email);
+                    Response emailResponse = await SendSubmittedReportEmail(CurrentUser.Email, insertedReport);
 
                     //If the email was sent successfully, redirect the user to the SubmittedReport page.
                     return Redirect("/Faults/ReportFault/SubmittedReport");
@@ -523,7 +524,7 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         //Method Summary:
         //This method is executed when the "Submit" button is clicked.
         //When executed this method attempts to send an email to the user and returns the response from the _emailService.
-        public async Task<Response> SendSubmittedReportEmail(string emailAddress)
+        public async Task<Response> SendSubmittedReportEmail(string emailAddress, Report insertedReport)
         {
             //Set the subject of the email explaining that the user has deleted their account.
             string subject = "DFI Fault Reporting: Fault Report Submitted";
@@ -534,14 +535,26 @@ namespace DFI.FaultReporting.Public.Pages.Faults
             //Set textContent to empty string as it will not be used here.
             string textContent = string.Empty;
 
+            //Get the fault from "Fault" object stored in session.
+            Fault? sessionFault = HttpContext.Session.GetFromSession<Fault>("Fault");
+
+            //Get the JWT token claim from the contexts current user, needed for populating CurrentUser property from DB.
+            Claim? jwtTokenClaim = _httpContextAccessor.HttpContext.User.FindFirst("Token");
+
+            //Set the jwtToken string to the JWT token claims value, needed for populating CurrentUser property from DB.
+            string? jwtToken = jwtTokenClaim.Value;
+
+            //Get the FaultType from the sessionFault.
+            FaultType = await _faultTypeService.GetFaultType(sessionFault.FaultTypeID, jwtToken);
+
             //Set the htmlContent to a message explaining to the user that their account has been successfully deleted.
             string htmlContent = "<p>Hello,</p><p>Thank you for submitting a fault report.</p>" +
                 "<p>DFI staff will now review your report and you will receive update emails as the status of the report progress.</p>" +
                 "<br/>" +
                 "<p><strong>Report details:</strong></p>" +
                 "<p>" + FaultType.FaultTypeDescription + "</p>" +
-                "<p>" + Fault.RoadNumber + ", " + Fault.RoadName + ", " + Fault.RoadTown + ", " + Fault.RoadCounty + "</p>" +
-                "<p>" + Report.AdditionalInfo + "</p>";
+                "<p>" + sessionFault.RoadNumber + ", " + sessionFault.RoadName + ", " + sessionFault.RoadTown + ", " + sessionFault.RoadCounty + "</p>" +
+                "<p>" + insertedReport.AdditionalInfo + "</p>";
 
             //Set the attachment to null as it will not be used here.
             SendGrid.Helpers.Mail.Attachment? attachment = null;
