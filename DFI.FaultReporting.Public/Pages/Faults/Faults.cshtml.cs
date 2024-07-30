@@ -112,6 +112,9 @@ namespace DFI.FaultReporting.Public.Pages.Faults
             //Get all current faults by calling the GetFaults method from the _faultService.
             Faults = await _faultService.GetFaults();
 
+            //Filter out repaired faults.
+            Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
+
             //Get all fault priorities by calling the GetFaultPriorities method from the _faultPriorityService.
             FaultPriorities = await _faultPriorityService.GetFaultPriorities();
 
@@ -140,6 +143,9 @@ namespace DFI.FaultReporting.Public.Pages.Faults
         {
             //Get all current faults by calling the GetFaults method from the _faultService.
             Faults = await _faultService.GetFaults();
+
+            //Filter out repaired faults.
+            Faults = Faults.Where(f => f.FaultStatusID != 4).ToList();
 
             //User has selected an type that is not "All"
             if (FaultTypeFilter != 0)

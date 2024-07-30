@@ -67,9 +67,9 @@ namespace DFI.FaultReporting.Services.Passwords
 
             for (int i = password.Count; i < requirements.Length; i++)
             {
-                string rcs = availableCharacters[random.Next(0, availableCharacters.Length)];
+                string randomCharacters = availableCharacters[random.Next(0, availableCharacters.Length)];
                 password.Insert(random.Next(0, password.Count),
-                    rcs[random.Next(0, rcs.Length)]);
+                    randomCharacters[random.Next(0, randomCharacters.Length)]);
             }
 
             return new string(password.ToArray());
