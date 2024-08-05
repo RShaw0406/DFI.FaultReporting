@@ -35,7 +35,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairPhoto)
             };
 
             var result = await client.SendAsync(request);
@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairPhoto + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -95,7 +95,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairPhoto),
                 Content = new StringContent(JsonConvert.SerializeObject(repairPhoto), Encoding.UTF8, "application/json")
             };
 
@@ -126,7 +126,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairPhoto),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairPhoto),
                 Content = new StringContent(JsonConvert.SerializeObject(repairPhoto), Encoding.UTF8, "application/json")
             };
 

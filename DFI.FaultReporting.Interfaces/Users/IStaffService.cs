@@ -23,7 +23,5 @@ namespace DFI.FaultReporting.Services.Interfaces.Users
         Task<Staff> CreateStaff(Staff staff, string token);
 
         Task<Staff> UpdateStaff(Staff staff, string token);
-
-        Task<int> DeleteStaff(int ID, string token);
     }
 }

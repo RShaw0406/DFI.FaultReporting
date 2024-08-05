@@ -35,7 +35,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.LegalRep)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.LegalRep)
             };
 
             var result = await client.SendAsync(request);
@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.LegalRep + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.LegalRep + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -95,7 +95,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.LegalRep),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.LegalRep),
                 Content = new StringContent(JsonConvert.SerializeObject(legalRep), Encoding.UTF8, "application/json")
             };
 
@@ -126,7 +126,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.LegalRep),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.LegalRep),
                 Content = new StringContent(JsonConvert.SerializeObject(legalRep), Encoding.UTF8, "application/json")
             };
 
@@ -138,7 +138,7 @@ namespace DFI.FaultReporting.Http.Claims
 
                 legalRep = JsonConvert.DeserializeObject<LegalRep>(response);
 
-                return LegalReps.FirstOrDefault();
+                return legalRep;
             }
             else
             {

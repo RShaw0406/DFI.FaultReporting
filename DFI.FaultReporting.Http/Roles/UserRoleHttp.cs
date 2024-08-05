@@ -34,7 +34,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.UserRole)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.UserRole)
             };
 
             var result = await client.SendAsync(request);
@@ -49,12 +49,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET User Roles data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserRoleHttp",
-                    ExceptionFunction = "GetUserRoles",
-                };
+                return null;
             }
         }
 
@@ -67,7 +62,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.UserRole + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.UserRole + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -82,12 +77,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET User Role data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserRoleHttp",
-                    ExceptionFunction = "GetUserRole",
-                };
+                return null;
             }
         }
 
@@ -104,7 +94,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.UserRole),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.UserRole),
                 Content = content
             };
 
@@ -120,12 +110,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST User Role data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserRoleHttp",
-                    ExceptionFunction = "CreateUserRole",
-                };
+                return null;
             }
         }
 
@@ -142,7 +127,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.UserRole),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.UserRole),
                 Content = content
             };
 
@@ -160,12 +145,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT User Role data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserRoleHttp",
-                    ExceptionFunction = "UpdateUserRole",
-                };
+                return null;
             }
         }
 
@@ -178,7 +158,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.UserRole + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.UserRole + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -189,12 +169,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to DELETE User Role data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "UserRoleHttp",
-                    ExceptionFunction = "DeleteUserRole",
-                };
+                return 0;
             }
         }
     }

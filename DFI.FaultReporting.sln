@@ -25,6 +25,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.SQL.Repo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.JWT", "DFI.FaultReporting.JWT\DFI.FaultReporting.JWT.csproj", "{1AA9622F-F4F9-44AE-8CB8-01F593C41C30}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DFI.FaultReporting.Services.Tests", "DFI.FaultReporting.Services.Tests\DFI.FaultReporting.Services.Tests.csproj", "{A8AC26F1-F67E-4BE7-9700-39D270827760}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{1AA9622F-F4F9-44AE-8CB8-01F593C41C30}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AA9622F-F4F9-44AE-8CB8-01F593C41C30}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AA9622F-F4F9-44AE-8CB8-01F593C41C30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8AC26F1-F67E-4BE7-9700-39D270827760}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8AC26F1-F67E-4BE7-9700-39D270827760}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8AC26F1-F67E-4BE7-9700-39D270827760}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8AC26F1-F67E-4BE7-9700-39D270827760}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

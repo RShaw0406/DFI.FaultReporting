@@ -35,7 +35,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Contractor)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Contractor)
             };
 
             var result = await client.SendAsync(request);
@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Contractor + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Contractor + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -93,7 +93,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Contractor + "/" + "check" + "/" + email)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Contractor + "/" + "check" + "/" + email)
             };
 
             var result = await client.SendAsync(request);
@@ -130,7 +130,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.Contractor),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Contractor),
                 Content = new StringContent(JsonConvert.SerializeObject(contractor), Encoding.UTF8, "application/json")
             };
 
@@ -161,7 +161,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Contractor),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Contractor),
                 Content = new StringContent(JsonConvert.SerializeObject(contractor), Encoding.UTF8, "application/json")
             };
 

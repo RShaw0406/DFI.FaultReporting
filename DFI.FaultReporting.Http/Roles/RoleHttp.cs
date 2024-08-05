@@ -38,7 +38,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Role)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Role)
             };
 
             var result = await client.SendAsync(request);
@@ -53,12 +53,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Roles data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "RoleHttp",
-                    ExceptionFunction = "GetRoles",
-                };
+                return null;
             }
         }
 
@@ -73,7 +68,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Role + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Role + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -88,12 +83,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Role data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "RoleHttp",
-                    ExceptionFunction = "GetRole",
-                };
+                return null;
             }
         }
 
@@ -112,7 +102,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.Role),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Role),
                 Content = content
             };
 
@@ -128,12 +118,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Role data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "RoleHttp",
-                    ExceptionFunction = "CreateRole",
-                };
+                return null;
             }
         }
 
@@ -152,7 +137,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Role),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Role),
                 Content = content
             };
 
@@ -168,12 +153,7 @@ namespace DFI.FaultReporting.Http.Roles
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Role data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "RoleHttp",
-                    ExceptionFunction = "UpdateRole",
-                };
+                return null;
             }
         }
     }

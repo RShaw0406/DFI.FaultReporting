@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.Interfaces.FaultReports
         Task<Report> CreateReport(Report report, string token);
 
         Task<Report> UpdateReport(Report report, string token);
-
-        Task<int> DeleteReport(int ID, string token);
     }
 }

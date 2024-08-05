@@ -45,7 +45,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.AuthRegister),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.AuthRegister),
                 Content = content
             };
 
@@ -78,7 +78,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.AuthLogin),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.AuthLogin),
                 Content = content
             };
 
@@ -104,7 +104,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.AuthLock),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.AuthLock),
                 Content = content
             };
 
@@ -128,7 +128,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.User)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.User)
             };
 
             var result = await client.SendAsync(request);
@@ -158,7 +158,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.User + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.User + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -186,7 +186,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.User + "/" + "check" + "/" + email)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.User + "/" + "check" + "/" + email)
             };
 
             var result = await client.SendAsync(request);
@@ -221,7 +221,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.User + "/" + "resetpassword" + "/" + email + "/" + password)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.User + "/" + "resetpassword" + "/" + email + "/" + password)
             };
 
             var result = await client.SendAsync(request);
@@ -260,7 +260,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.User),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.User),
                 Content = content
             };
 
@@ -295,7 +295,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.User),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.User),
                 Content = content
             };
 
@@ -326,7 +326,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.User + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.User + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);

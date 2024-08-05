@@ -34,7 +34,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Report)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Report)
             };
 
             var result = await client.SendAsync(request);
@@ -49,12 +49,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Reports data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ReportHttp",
-                    ExceptionFunction = "GetReports",
-                };
+                return null;
             }
         }
 
@@ -69,7 +64,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Report + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Report + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -84,12 +79,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to GET Report data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ReportHttp",
-                    ExceptionFunction = "GetReport",
-                };
+                return null;
             }
         }
 
@@ -108,7 +98,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.Report),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Report),
                 Content = content
             };
 
@@ -124,12 +114,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to POST Report data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ReportHttp",
-                    ExceptionFunction = "CreateReport",
-                };
+                return null;
             }
         }
 
@@ -148,11 +133,9 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Report),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Report),
                 Content = content
             };
-
-            //request.Headers.Add("Accept", "application/json");
 
             var result = await client.SendAsync(request);
 
@@ -166,43 +149,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             }
             else
             {
-                throw new CustomHttpException("Error when attempting to PUT Report data to API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ReportHttp",
-                    ExceptionFunction = "UpdateReport",
-                };
-            }
-        }
-
-        public async Task<int> DeleteReport(int ID, string token)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.Report + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Report data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ReportHttp",
-                    ExceptionFunction = "DeleteReport",
-                };
+                return null;
             }
         }
     }

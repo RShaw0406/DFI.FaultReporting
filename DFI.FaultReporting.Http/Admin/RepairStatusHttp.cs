@@ -36,7 +36,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairStatus)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairStatus)
             };
 
             var result = await client.SendAsync(request);
@@ -66,7 +66,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairStatus + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairStatus + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -96,7 +96,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairStatus),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairStatus),
                 Content = new StringContent(JsonConvert.SerializeObject(repairStatus), Encoding.UTF8, "application/json")
             };
 
@@ -127,7 +127,7 @@ namespace DFI.FaultReporting.Http.Admin
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.RepairStatus),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.RepairStatus),
                 Content = new StringContent(JsonConvert.SerializeObject(repairStatus), Encoding.UTF8, "application/json")
             };
 

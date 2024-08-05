@@ -206,6 +206,8 @@ namespace DFI.FaultReporting.Admin.Pages.Claims
             CurrentStaff = await _staffService.GetStaff(Convert.ToInt32(userID), jwtToken);
 
             ClaimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
+            ClaimTypes = ClaimTypes.Where(ct => ct.Active == true).ToList();
+
             ClaimTypesList = ClaimTypes.Select(ct => new SelectListItem
             {
                 Value = ct.ID.ToString(),
@@ -213,6 +215,8 @@ namespace DFI.FaultReporting.Admin.Pages.Claims
             });
 
             ClaimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
+            ClaimStatuses = ClaimStatuses.Where(cs => cs.Active == true).ToList();
+
             ClaimStatusList = ClaimStatuses.Select(cs => new SelectListItem
             {
                 Value = cs.ID.ToString(),

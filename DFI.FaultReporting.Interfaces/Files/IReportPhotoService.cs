@@ -16,7 +16,5 @@ namespace DFI.FaultReporting.Interfaces.Files
         Task<ReportPhoto> CreateReportPhoto(ReportPhoto reportPhoto, string token);
 
         Task<ReportPhoto> UpdateReportPhoto(ReportPhoto reportPhoto, string token);
-
-        Task<int> DeleteReportPhoto(int ID, string token);
     }
 }

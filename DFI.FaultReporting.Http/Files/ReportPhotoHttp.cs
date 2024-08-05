@@ -37,7 +37,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.ReportPhoto)
             };
 
             var result = await client.SendAsync(request);
@@ -67,7 +67,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.ReportPhoto + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -101,7 +101,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.ReportPhoto),
                 Content = content
             };
 
@@ -136,7 +136,7 @@ namespace DFI.FaultReporting.Http.Files
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.ReportPhoto),
                 Content = content
             };
 
@@ -153,37 +153,6 @@ namespace DFI.FaultReporting.Http.Files
             else
             {
                 return null;
-            }
-        }
-
-        public async Task<int> DeleteReportPhoto(int ID, string token)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.ReportPhoto + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                throw new CustomHttpException("Error when attempting to DELETE Report Photo data from API")
-                {
-                    ResponseStatus = result.StatusCode,
-                    ExceptionClass = "ReportPhotoHttp",
-                    ExceptionFunction = "DeleteReportPhoto",
-                };
             }
         }
     }

@@ -38,7 +38,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.AuthLogin),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.AuthLogin),
                 Content = content
             };
 
@@ -64,7 +64,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.AuthLock),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.AuthLock),
                 Content = content
             };
 
@@ -88,7 +88,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Staff)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Staff)
             };
 
             var result = await client.SendAsync(request);
@@ -118,7 +118,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Staff + "/" + ID)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Staff + "/" + ID)
             };
 
             var result = await client.SendAsync(request);
@@ -146,7 +146,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Staff + "/" + "check" + "/" + email)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Staff + "/" + "check" + "/" + email)
             };
 
             var result = await client.SendAsync(request);
@@ -181,7 +181,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Staff + "/" + "resetpassword" + "/" + email + "/" + password)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Staff + "/" + "resetpassword" + "/" + email + "/" + password)
             };
 
             var result = await client.SendAsync(request);
@@ -222,7 +222,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.Staff),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Staff),
                 Content = content
             };
 
@@ -257,7 +257,7 @@ namespace DFI.FaultReporting.Http.Users
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Staff),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Staff),
                 Content = content
             };
 
@@ -274,32 +274,6 @@ namespace DFI.FaultReporting.Http.Users
             else
             {
                 return null;
-            }
-        }
-
-        public async Task<int> DeleteStaff(int ID, string token)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.Staff + "/" + ID)
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                return 0;
             }
         }
     }

@@ -49,12 +49,5 @@ namespace DFI.FaultReporting.Services.FaultReports
 
             return fault;
         }
-
-        public async Task<int> DeleteFault(int ID, string token)
-        {
-            await _faultHttp.DeleteFault(ID, token);
-
-            return ID;
-        }
     }
 }

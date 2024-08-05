@@ -581,6 +581,8 @@ namespace DFI.FaultReporting.Public.Pages.Claims.SubmitClaim
             string? jwtToken = jwtTokenClaim.Value;
             ClaimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
 
+            ClaimTypes = ClaimTypes.Where(ct => ct.Active == true).ToList();
+
             ClaimTypesList = ClaimTypes.Select(ct => new SelectListItem()
             {
                 Text = ct.ClaimTypeDescription,

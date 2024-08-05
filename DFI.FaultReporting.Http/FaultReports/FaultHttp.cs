@@ -35,7 +35,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Fault)
             };
 
             var result = await client.SendAsync(request);
@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Fault + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -99,7 +99,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Fault),
                 Content = content
             };
 
@@ -134,7 +134,7 @@ namespace DFI.FaultReporting.Http.FaultReports
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Fault),
                 Content = content
             };
 
@@ -151,32 +151,6 @@ namespace DFI.FaultReporting.Http.FaultReports
             else
             {
                 return null;
-            }
-        }
-
-        public async Task<int> DeleteFault(int ID, string token)
-        {
-            var baseURL = await _settings.GetSettingString(Settings.APIURL);
-
-            var client = _client.CreateClient();
-
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.Fault + "/" + ID.ToString())
-            };
-
-            var result = await client.SendAsync(request);
-
-            if (result.IsSuccessStatusCode)
-            {
-                return ID;
-            }
-            else
-            {
-                return 0;
             }
         }
     }

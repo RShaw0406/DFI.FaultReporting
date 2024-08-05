@@ -49,12 +49,5 @@ namespace DFI.FaultReporting.Services.Files
 
             return reportPhoto;
         }
-
-        public async Task<int> DeleteReportPhoto(int ID, string token)
-        {
-            await _reportPhotoHttp.DeleteReportPhoto(ID, token);
-
-            return ID;
-        }
     }
 }

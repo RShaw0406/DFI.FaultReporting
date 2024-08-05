@@ -35,7 +35,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.StaffRole)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.StaffRole)
             };
 
             var result = await client.SendAsync(request);
@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.StaffRole + "/" + ID)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.StaffRole + "/" + ID)
             };
 
             var result = await client.SendAsync(request);
@@ -95,7 +95,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.StaffRole),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.StaffRole),
                 Content = new StringContent(JsonConvert.SerializeObject(staffRole), Encoding.UTF8, "application/json")
             };
 
@@ -126,7 +126,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.StaffRole),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.StaffRole),
                 Content = new StringContent(JsonConvert.SerializeObject(staffRole), Encoding.UTF8, "application/json")
             };
 
@@ -157,7 +157,7 @@ namespace DFI.FaultReporting.Http.Roles
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Delete,
-                RequestUri = new Uri(baseURL + APIEndPoints.StaffRole + "/" + ID)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.StaffRole + "/" + ID)
             };
 
             var result = await client.SendAsync(request);

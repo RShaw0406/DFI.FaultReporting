@@ -68,6 +68,7 @@ namespace DFI.FaultReporting.API.Controllers
         // PUT: api/Witnesses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
+        [Authorize(Roles = "User")]
         public async Task<ActionResult<Witness>> PutWitness(Witness witness)
         {
             try

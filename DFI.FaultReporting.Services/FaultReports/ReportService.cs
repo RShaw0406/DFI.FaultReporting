@@ -47,12 +47,5 @@ namespace DFI.FaultReporting.Services.FaultReports
 
             return report;
         }
-
-        public async Task<int> DeleteReport(int ID, string token)
-        {
-            await _reportHttp.DeleteReport(ID, token);
-
-            return ID;
-        }
     }
 }

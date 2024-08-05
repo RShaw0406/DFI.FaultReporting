@@ -35,7 +35,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Claim)
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Claim)
             };
 
             var result = await client.SendAsync(request);
@@ -65,7 +65,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(baseURL + APIEndPoints.Claim + "/" + ID.ToString())
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Claim + "/" + ID.ToString())
             };
 
             var result = await client.SendAsync(request);
@@ -95,7 +95,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
-                RequestUri = new Uri(baseURL + APIEndPoints.Claim),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Claim),
                 Content = new StringContent(JsonConvert.SerializeObject(claim), Encoding.UTF8, "application/json")
             };
 
@@ -126,7 +126,7 @@ namespace DFI.FaultReporting.Http.Claims
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Put,
-                RequestUri = new Uri(baseURL + APIEndPoints.Claim),
+                RequestUri = new Uri("https://localhost:7106" + APIEndPoints.Claim),
                 Content = new StringContent(JsonConvert.SerializeObject(claim), Encoding.UTF8, "application/json")
             };
 

@@ -77,12 +77,5 @@ namespace DFI.FaultReporting.Services.Users
 
             return updatedStaff;
         }
-
-        public async Task<int> DeleteStaff(int ID, string token)
-        {
-            await _staffHttp.DeleteStaff(ID, token);
-
-            return ID;
-        }
     }
 }
