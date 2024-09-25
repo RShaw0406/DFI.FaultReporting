@@ -64,7 +64,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/Staffs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<Staff>> PostStaff(Staff staff)
@@ -151,7 +150,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/Staffs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "StaffAdmin, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<Staff>> PutStaff(Staff staff)

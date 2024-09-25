@@ -56,7 +56,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/Repairs
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "StaffReadWrite")]
         public async Task<ActionResult<Repair>> PostRepair(Repair repair)
@@ -67,7 +66,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/Repairs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "Contractor, StaffReadWrite")]
         public async Task<ActionResult<Repair>> PutRepair(Repair repair)

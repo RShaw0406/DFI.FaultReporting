@@ -54,7 +54,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/ClaimFiles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<ClaimFile>> PostClaimFile(ClaimFile claimFile)
@@ -65,7 +64,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/ClaimFiles/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<ClaimFile>> PutClaimFile(ClaimFile claimFile)

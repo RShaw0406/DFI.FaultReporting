@@ -69,6 +69,7 @@ namespace DFI.FaultReporting.Admin.Pages.Claims.Reports
         [BindProperty(SupportsGet = true)]
         public Pager Pager { get; set; } = new Pager();
 
+        [BindProperty]
         public List<ClaimType> ClaimTypes { get; set; }
 
         [BindProperty]
@@ -78,6 +79,7 @@ namespace DFI.FaultReporting.Admin.Pages.Claims.Reports
         [BindProperty]
         public int ClaimTypeFilter { get; set; }
 
+        [BindProperty]
         public List<ClaimStatus> ClaimStatuses { get; set; }
 
         [BindProperty]
@@ -448,6 +450,7 @@ namespace DFI.FaultReporting.Admin.Pages.Claims.Reports
             Claims = await _claimService.GetClaims(jwtToken);
 
             ClaimTypes = await _claimTypeService.GetClaimTypes(jwtToken);
+            ClaimTypes = ClaimTypes.Where(ct => ct.Active == true).ToList();
             ClaimTypesList = ClaimTypes.Select(ct => new SelectListItem
             {
                 Value = ct.ID.ToString(),
@@ -455,6 +458,7 @@ namespace DFI.FaultReporting.Admin.Pages.Claims.Reports
             });
 
             ClaimStatuses = await _claimStatusService.GetClaimStatuses(jwtToken);
+            ClaimStatuses = ClaimStatuses.Where(cs => cs.Active == true).ToList();
             ClaimStatusList = ClaimStatuses.Select(cs => new SelectListItem
             {
                 Value = cs.ID.ToString(),

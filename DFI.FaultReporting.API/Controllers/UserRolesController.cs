@@ -53,7 +53,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/UserRoles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<UserRole>> PostUserRole(UserRole userRole)
         {
@@ -63,7 +62,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/UserRoles
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         public async Task<ActionResult<UserRole>> PutUserRole(UserRole userRole)
         {

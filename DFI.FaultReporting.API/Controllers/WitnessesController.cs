@@ -55,7 +55,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/Witnesses
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<Witness>> PostWitness(Witness witness)
@@ -66,7 +65,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/Witnesses/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<Witness>> PutWitness(Witness witness)

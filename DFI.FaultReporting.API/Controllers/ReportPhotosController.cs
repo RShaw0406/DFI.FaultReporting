@@ -58,7 +58,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/ReportPhotos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<ReportPhoto>> PostReportPhoto(ReportPhoto reportPhoto)
@@ -68,7 +67,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/ReportPhotos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize]
         public async Task<ActionResult<ReportPhoto>> PutReportPhoto(ReportPhoto reportPhoto)

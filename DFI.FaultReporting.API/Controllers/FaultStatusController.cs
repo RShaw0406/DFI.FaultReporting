@@ -53,7 +53,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/FaultStatus
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultStatus>> PostFaultStatus(FaultStatus faultStatus)
@@ -64,7 +63,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/FaultStatus
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<FaultStatus>> PutFaultStatus(FaultStatus faultStatus)

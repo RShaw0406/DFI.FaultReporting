@@ -127,7 +127,6 @@ function initJobsMap() {
 
                     //Create a new string of road details to display in popup and clean out any "undefined".
                     road = fault.roadNumber + ", " + fault.roadName + ", " + fault.roadTown + ", " + fault.RoadCounty;
-                    console.log(road);
                     road = road.replaceAll(", undefined", "");
                     road = road.replaceAll("undefined, ", "");
 
@@ -179,8 +178,6 @@ function initJobsMap() {
                 markerCallback: (id, position, properties) => {
                     //Marker will represent a cluster of repairs close together.
                     if (properties.cluster) {
-                        console.log("Properties:");
-                        console.log(properties);
 
                         //Return a created marker for the cluster.
                         return new atlas.HtmlMarker({
@@ -189,9 +186,6 @@ function initJobsMap() {
                             pixelOffset: [5, -18]
                         });
                     }
-
-                    console.log("Properties:");
-                    console.log(properties);
 
                     //Use a promise to create a marker.
                     return Promise.resolve(new atlas.HtmlMarker({
@@ -222,9 +216,6 @@ function markerClicked(e) {
 
     //Get the marker that was clicked from the target of the click.
     var marker = e.target;
-
-    console.log("Marker Properties:");
-    console.log(marker.properties);
 
     //The clicked marker represents a cluster of repairs.
     if (marker.properties.cluster) {

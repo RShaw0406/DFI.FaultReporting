@@ -317,16 +317,21 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs
             });
 
             Contractors = await _contractorService.GetContractors(jwtToken);
+            Contractors = Contractors.Where(c => c.Active == true).ToList();
 
             Faults = await _faultService.GetFaults();
 
             FaultTypes = await _faultTypeService.GetFaultTypes();
+            FaultTypes = FaultTypes.Where(ft => ft.Active == true).ToList();
 
             FaultPriorities = await _faultPriorityService.GetFaultPriorities();
+            FaultPriorities = FaultPriorities.Where(fp => fp.Active == true).ToList();
 
             FaultStatuses = await _faultStatusService.GetFaultStatuses();
+            FaultStatuses = FaultStatuses.Where(fs => fs.Active == true).ToList();
 
             Staff = await _staffService.GetAllStaff(jwtToken);
+            Staff = Staff.Where(s => s.Active == true).ToList();
 
             Repairs = await _repairService.GetRepairs(jwtToken);
 

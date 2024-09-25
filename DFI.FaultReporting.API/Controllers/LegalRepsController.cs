@@ -57,7 +57,6 @@ namespace DFI.FaultReporting.API.Controllers
 
 
         // POST: api/LegalReps
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<LegalRep>> PostLegalRep(LegalRep legalRep)
@@ -68,7 +67,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/LegalReps/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<LegalRep>> PutLegalRep(LegalRep legalRep)

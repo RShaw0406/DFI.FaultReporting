@@ -106,6 +106,8 @@ function initMap() {
     CheckForSessionMarker();
 }
 
+//FUNCTION SUMMARY:
+//This method is used for snapping a marker to the closest road on the map control.
 function snapMarkerToRoad(position) {
 
     //The max distance a coordinate needs to be from a road in meters if it is to snap to it.
@@ -136,18 +138,11 @@ function snapMarkerToRoad(position) {
             //Ensure that the closest point is closer than the previously calculated snapped coordinates for the point.
             if (cp && cp.properties.distance <= maxSnappingDistance && cp.properties.distance < minDistance) {
 
-                //console.log("Point Details:")
-                //console.log(cp);
-
-                console.log("Marker Location Details:")
-                console.log(cp);
-                console.log(lines[i]);
-
                 //Capture the distance and closest coordinate.
                 minDistance = cp.properties.distance;
                 closestCoord = cp.geometry.coordinates;
 
-
+                //Do a reverse geocode on the snapped coordinate to get the address of the location.
                 reverseAddressSearch(closestCoord);
             }
         }
@@ -157,38 +152,43 @@ function snapMarkerToRoad(position) {
 // METHOD SUMMARY - This method is used for placing the marker for the fault on the map control
 function placeMarker(position)
 {
+    // Clear any existing markers on the map, only 1 can be added at a time.
     map.markers.clear();
 
+    // Create a marker for the fault location.
     marker = new atlas.HtmlMarker({
         htmlContent: "<div><div class='marker'></div><div class='pulse'></div></div>",
         position: position,
         pixelOffset: [5, -18]
     });
 
+    // Add the marker to the map control.
     map.markers.add(marker);
 }
 
+// FUNCTION SUMMARY:
+// This method is used for reverse geocoding the snapped location to get the address of the location.
 function reverseAddressSearch(position) {
 
+    // Use the Azure Maps SearchURL client to reverse geocode the snapped location to get the address of marker location.
     searchURL.searchAddressReverse(atlas.service.Aborter.timeout(3000), position, {
         view: 'Auto',
         radius: 7
     }).then(results => {
 
-        console.log(results);
-
-        console.log("Snapped Location Results:");
-
+        //Get the features from the data of the marker location.
         var result = results.geojson.getFeatures();
 
-        console.log(result);
-
+        //Check if the marker is within Northern Ireland.
         if (result.features[0].properties.address.countrySubdivisionName == "Northern Ireland") {
 
+            // Hide the selection error message if it is displayed.
             document.getElementById('selectionError').style.display = "none";
 
+            // Place the marker on the map at the snapped location.
             placeMarker(position);
 
+            // Get the road number, road name, town and county of the snapped location and store them in the form fields.
             if (result.features.length > 0 && result.features[0].properties && result.features[0].properties.address) {
                 var roadNum = (result.features[0].properties.address.routeNumbers[0]);
                 var roadName = (result.features[0].properties.address.streetName);
@@ -200,14 +200,15 @@ function reverseAddressSearch(position) {
                 document.getElementById('roadName').value = roadName;
                 document.getElementById('roadTown').value = roadTown;
                 document.getElementById('roadCounty').value = roadCounty;
-                console.log(result.features[0].properties.address.freeformAddress);
             } else {
                 console.log("No address for that location!");
             }
         }
+        // Display an error message if the marker is not within Northern Ireland.
         else {
             document.getElementById('selectionError').style.display = "block";
 
+            // Hide the error message after 3 seconds.
             setTimeout(() => {
                 document.getElementById('selectionError').style.display = "none";
             }, 3000);
@@ -215,22 +216,29 @@ function reverseAddressSearch(position) {
     });
 }
 
+// FUNCTION SUMMARY:
+// This function is used to check if a session marker exists and if so place it on the map, needed for if a user navigates back to the page.
 function CheckForSessionMarker()
 {
+    // Check if the session storage contains a marker.
     if (document.getElementById('lat').value != "" && document.getElementById('long').value != "")
     {
+        // Get the lat/long of the marker from the session storage.
         const position = [];
         position[0] = document.getElementById('long').value;
         position[1] = document.getElementById('lat').value;
 
+        // Create a marker for the fault location.
         marker = new atlas.HtmlMarker({
             htmlContent: "<div><div class='marker'></div><div class='pulse'></div></div>",
             position: position,
             pixelOffset: [5, -18]
         });
 
+        // Add the marker to the map.
         map.markers.add(marker);
 
+        // Set the camera to the marker location.
         map.setCamera({
             // Center map on marker
             center: [Number(position[0]), Number(position[1])],

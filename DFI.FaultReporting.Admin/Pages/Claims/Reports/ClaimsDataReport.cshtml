@@ -152,12 +152,24 @@
                                         <br />
                                         <strong>Type:</strong>
                                         <br />
-                                        @Model.ClaimTypes.FirstOrDefault(ct => ct.ID == claim.ClaimTypeID).ClaimTypeDescription
+                                        @foreach (var type in Model.ClaimTypes)
+                                        {
+                                            if (type.ID == claim.ClaimTypeID)
+                                            {
+                                                @type.ClaimTypeDescription
+                                            }
+                                        }
                                         <br />
                                         <br />
                                         <strong>Status:</strong>
                                         <br />
-                                        @Model.ClaimStatuses.FirstOrDefault(cs => cs.ID == claim.ClaimStatusID).ClaimStatusDescription
+                                        @foreach (var status in Model.ClaimStatuses)
+                                        {
+                                            if (status.ID == claim.ClaimStatusID)
+                                            {
+                                                @status.ClaimStatusDescription
+                                            }
+                                        }
                                         <br />
                                         <br />
                                         <strong>Incident description:</strong>

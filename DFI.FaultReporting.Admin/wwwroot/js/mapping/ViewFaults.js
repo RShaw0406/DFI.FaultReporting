@@ -18,17 +18,17 @@ const mapBounds = [-8.3, 53.9, -5.3, 55.4]
 //In this instance a data source for displaying faults is creates and added to the map also.
 function initViewMap() {
 
-    //Create new map control
+    //Create new map control.
     map = new atlas.Map('faultsMap', {
-        //Center map on Northern Ireland
+        //Center map on Northern Ireland.
         center: [-6.8, 54.65],
-        //Set zoom to 3 to show as much of Northern Ireland as possible
+        //Set zoom to 3 to show as much of Northern Ireland as possible.
         zoom: 3,
-        //Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
+        //Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland.
         maxBounds: mapBounds,
-        //Set lanuage to GB for better localisation
+        //Set lanuage to GB for better localisation.
         language: 'en-GB',
-        //Set auth
+        //Set auth.
         authOptions: {
             authType: 'subscriptionKey',
             subscriptionKey: azureMapsSubscriptionKey
@@ -53,18 +53,14 @@ function initViewMap() {
         mapStyles: 'all'
     });
 
-    //Use MapControlCredential to share authentication between a map control and the service module
+    //Use MapControlCredential to share authentication between a map control and the service module.
     var pipeline = atlas.service.MapsURL.newPipeline(new atlas.service.MapControlCredential(map));
 
-    //Create an instance of the SearchURL client
+    //Create an instance of the SearchURL client.
     searchURL = new atlas.service.SearchURL(pipeline);
 
-    //Wait until map is ready to ensure data source is successully added..
+    //Wait until map is ready to ensure data source is successully added.
     map.events.add('ready', function () {
-        console.log(faults);
-        console.log(faultTypes);
-        console.log(faultPriorities);
-        console.log(faultStatuses);
 
         //Create a new dictionary to store the geo json representations of faults.
         const geoJsonFaults = [];
@@ -124,7 +120,6 @@ function initViewMap() {
 
             //Create a new string of road details to display in popup and clean out any "undefined".
             var road = fault.roadNumber + ", " + fault.roadName + ", " + fault.roadTown + ", " + fault.RoadCounty;
-            console.log(road);
             road = road.replaceAll(", undefined", "");
             road = road.replaceAll("undefined, ", "");
 
@@ -141,8 +136,6 @@ function initViewMap() {
             //Add the geo json representation of a faul to the dictionary.
             geoJsonFaults.push(geoJsonFault);
         });
-
-        console.log(geoJsonFaults);
 
         //Create the popup to be used to display the details of a fault when the user clicks a marker.
         popup = new atlas.Popup({
@@ -164,8 +157,6 @@ function initViewMap() {
             markerCallback: (id, position, properties) => {
                 //Marker will represent a cluster of faults close together.
                 if (properties.cluster) {
-                    console.log("Properties:");
-                    console.log(properties);
 
                     //Return a created marker for the cluster.
                     return new atlas.HtmlMarker({
@@ -174,9 +165,6 @@ function initViewMap() {
                         pixelOffset: [5, -18]
                     });
                 }
-
-                console.log("Properties:");
-                console.log(properties);
 
                 //Use a promise to create a marker.
                 return Promise.resolve(new atlas.HtmlMarker({
@@ -207,9 +195,6 @@ function markerClicked(e) {
     //Get the marker that was clicked from the target of the click.
     var marker = e.target;
 
-    console.log("Marker Properties:");
-    console.log(marker.properties);
-
     //The clicked marker represents a cluster of faults.
     if (marker.properties.cluster) {
 
@@ -233,6 +218,7 @@ function markerClicked(e) {
         var contentRoad = marker.properties.road;
         var contentReports = marker.properties.reportCount;
 
+        //Set the URLs for the different actions that can be taken on a fault.
         var urlStaff = "/Faults/AssignStaff/?ID=" + marker.properties.id;
         var urlReports = "/Faults/ReportDetails/?ID=" + marker.properties.id;
         var urlEdit = "/Faults/EditFault/?ID=" + marker.properties.id;
@@ -242,28 +228,34 @@ function markerClicked(e) {
         //Setup popup.
         if (readWrite == true) {
 
+            //Declare variables to store whether a fault has staff or repairs.
             var hasStaff = false;
-
             var hasRepair = false;
 
             //Loop over each of the faults in the session.
             faults.forEach(function (fault) {
 
-                staff.forEach(function (staffMember) {
+                if (fault.id == marker.properties.id) {
+                    //Loop over each of the staff in the session
+                    staff.forEach(function (staffMember) {
 
-                    if (fault.staffID == staffMember.id) {
-                        hasStaff = true;
-                    };
-                });
+                        //Check if the fault has staff assigned to it.
+                        if (fault.staffID == staffMember.id) {
+                            hasStaff = true;
+                        };
+                    });
 
-                repairs.forEach(function (repair) {
-                    if (repair.faultID == fault.id) {
-                        hasRepair = true;
-                    };
-                });
+                    //Loop over each of the repairs in the session.
+                    repairs.forEach(function (repair) {
+                        //Check if the fault has repairs scheduled.
+                        if (repair.faultID == fault.id) {
+                            hasRepair = true;
+                        };
+                    });
+                }
             });
 
-
+            //If a fault has staff create popup without assign staff button.
             if (hasStaff) {
                 popup.setOptions({
                     content: `<div style="padding:10px;">
@@ -283,6 +275,7 @@ function markerClicked(e) {
                 });
             }
 
+            //If a fault has repairs create popup without schedule repair button.
             if (hasRepair) {
                 popup.setOptions({
                     content: `<div style="padding:10px;">
@@ -302,6 +295,7 @@ function markerClicked(e) {
                 });
             }
 
+            //If a fault has staff and repairs create popup without assign staff or schedule repair buttons.
             if (hasStaff && hasRepair)
             {
                 popup.setOptions({
@@ -319,6 +313,7 @@ function markerClicked(e) {
                 });
             }
 
+            //If a fault has no staff or repairs create popup with all buttons.
             if (!hasStaff && !hasRepair)
             {
                 popup.setOptions({
@@ -340,6 +335,7 @@ function markerClicked(e) {
                 });
             }
 
+            //If a fault has no repairs and  staff create popup with all buttons except assign staff button.
             if (!hasRepair && hasStaff)
             {
                 popup.setOptions({
@@ -360,6 +356,7 @@ function markerClicked(e) {
                 });
             }
 
+            //If a fault has repairs and no staff create popup with all buttons except schedule repair button.
             if (hasRepair && !hasStaff)
             {
                 popup.setOptions({
@@ -379,6 +376,7 @@ function markerClicked(e) {
                 });
             }
         }
+        //If user is read only create popup with no buttons.
         else
         {
             popup.setOptions({

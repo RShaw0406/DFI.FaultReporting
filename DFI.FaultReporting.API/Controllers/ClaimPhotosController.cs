@@ -29,7 +29,7 @@ namespace DFI.FaultReporting.API.Controllers
 
         public List<ClaimPhoto>? ClaimPhotos { get; set; }
 
-        // GET: api/ClaimPhotoes
+        // GET: api/ClaimPhotos
         [HttpGet]
         [Authorize(Roles = "User, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<IEnumerable<ClaimPhoto>>> GetClaimPhoto()
@@ -38,7 +38,7 @@ namespace DFI.FaultReporting.API.Controllers
             return ClaimPhotos;
         }
 
-        // GET: api/ClaimPhotoes/5
+        // GET: api/ClaimPhotos/5
         [HttpGet("{ID}")]
         [Authorize(Roles = "User, StaffReadWrite, StaffRead")]
         public async Task<ActionResult<ClaimPhoto>> GetClaimPhoto(int ID)
@@ -53,8 +53,7 @@ namespace DFI.FaultReporting.API.Controllers
             return claimPhoto;
         }
 
-        // POST: api/ClaimPhotoes
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // POST: api/ClaimPhotos
         [HttpPost]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<ClaimPhoto>> PostClaimPhoto(ClaimPhoto claimPhoto)
@@ -63,8 +62,7 @@ namespace DFI.FaultReporting.API.Controllers
             return CreatedAtAction("GetClaimPhoto", new { claimPhoto.ID }, claimPhoto);
         }
 
-        // PUT: api/ClaimPhotoes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        // PUT: api/ClaimPhotos/5
         [HttpPut]
         [Authorize(Roles = "User")]
         public async Task<ActionResult<ClaimPhoto>> PutClaimPhoto(ClaimPhoto claimPhoto)

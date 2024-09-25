@@ -70,7 +70,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/Contractors
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<Contractor>> PostContractor(Contractor contractor)
@@ -82,7 +81,6 @@ namespace DFI.FaultReporting.API.Controllers
 
 
         // PUT: api/Contractors/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize(Roles = "StaffAdmin")]
         public async Task<ActionResult<Contractor>> PutContractor(Contractor contractor)

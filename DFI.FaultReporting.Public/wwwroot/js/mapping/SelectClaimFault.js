@@ -1,8 +1,7 @@
 ﻿//CODE SUMMARY:
-//This file controls the view faults map.A user can search for locations on the map using the autocomplete search,
-//when they click on a suggestion returned by the autocomplete the map will zoom to that location. Pins are added to the map corresponding
-//to each fault. If faults are close together a single marker will be used to represent the cluster of faults. When a user clicks
-//a pin a popup is shown displaying information about a fault.
+//This file controls the select claim location map. A user can search for locations on the map using the autocomplete search,
+//when they click on a suggestion returned by the autocomplete the map will zoom to that location. A user can choose to select a reported fault to associated with
+//the claim by clicking on a fault marker on the map. The selected fault will be stored in the session and the user will be redirected to the claim details page.
 
 ////Azure Maps Subscription Key - Needed to access the service
 //const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
@@ -81,8 +80,6 @@ function initFaultMap() {
             geoJsonFaults.push(geoJsonFault);
         });
 
-        console.log(geoJsonFaults);
-
         //Create the popup to be used to display the details of a fault when the user clicks a marker.
         popup = new atlas.Popup({
             pixelOffset: [0, -20],
@@ -103,8 +100,6 @@ function initFaultMap() {
             markerCallback: (id, position, properties) => {
                 //Marker will represent a cluster of faults close together.
                 if (properties.cluster) {
-                    console.log("Properties:");
-                    console.log(properties);
 
                     //Return a created marker for the cluster.
                     return new atlas.HtmlMarker({
@@ -113,9 +108,6 @@ function initFaultMap() {
                         pixelOffset: [5, -18]
                     });
                 }
-
-                console.log("Properties:");
-                console.log(properties);
 
                 //Use a promise to create a marker.
                 return Promise.resolve(new atlas.HtmlMarker({
@@ -151,9 +143,6 @@ function markerClicked(e) {
     //Get the marker that was clicked from the target of the click.
     var marker = e.target;
 
-    console.log("Marker Properties:");
-    console.log(marker.properties);
-
     //The clicked marker represents a cluster of faults.
     if (marker.properties.cluster) {
 
@@ -170,15 +159,11 @@ function markerClicked(e) {
     //The clicked marker represents a single fault.
     else {
 
-
         var position = marker.getOptions().position;
-
 
         document.getElementById("faultID").value = marker.properties.id;
         document.getElementById('lat').value = position[1];
         document.getElementById('long').value = position[0];
-
-
 
         //Setup popup.
         popup.setOptions({
@@ -202,14 +187,20 @@ function hidePopup() {
     popup.close();
 }
 
-
+// FUNCTION SUMMARY:
+//This function checks if a fault has been selected in the session and if so it will zoom the map to the location of the fault.
 function CheckForSessionClaimFaultMarker() {
+
+    //Get the claim from the session.
     if (claim != null) {
         if (claim.incidentLocationLatitude != null && claim.incidentLocationLongitude) {
+
+            //Create the position dictionary by getting the values of the lat/long hidden fields on the page.
             const position = [];
             position[0] = claim.incidentLocationLongitude;
             position[1] = claim.incidentLocationLatitude;
 
+            //Set the camera to the location of the fault.
             map.setCamera({
                 // Center map on marker
                 center: [Number(position[0]), Number(position[1])],
@@ -221,12 +212,15 @@ function CheckForSessionClaimFaultMarker() {
         }
     }
 
-
+    // Check if the lat and long hidden fields have been set and if so zoom to the location, this is used when a user has selected a fault and then navigated to the map page.
     if (document.getElementById('lat').value != "" && document.getElementById('long').value != "") {
+
+        //Create the position dictionary by getting the values of the lat/long hidden fields on the page.
         const position = [];
         position[0] = document.getElementById('long').value;
         position[1] = document.getElementById('lat').value;
 
+        //Set the camera to the location of the fault.
         map.setCamera({
             // Center map on marker
             center: [Number(position[0]), Number(position[1])],

@@ -54,7 +54,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // POST: api/Reports
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<Report>> PostReport(Report report)
@@ -65,7 +64,6 @@ namespace DFI.FaultReporting.API.Controllers
         }
 
         // PUT: api/Reports/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut]
         [Authorize]
         public async Task<ActionResult<Report>> PutReport(Report report)

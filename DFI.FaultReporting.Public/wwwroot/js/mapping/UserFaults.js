@@ -123,7 +123,6 @@ function initViewMap() {
 
                 //Create a new string of road details to display in popup and clean out any "undefined".
                 var road = fault.roadNumber + ", " + fault.roadName + ", " + fault.roadTown + ", " + fault.RoadCounty;
-                console.log(road);
                 road = road.replaceAll(", undefined", "");
                 road = road.replaceAll("undefined, ", "");
 
@@ -143,8 +142,6 @@ function initViewMap() {
                     geoJsonFaults.push(geoJsonFault);
                 }
             });
-
-            console.log(geoJsonFaults);
 
             //Create the popup to be used to display the details of a fault when the user clicks a marker.
             popup = new atlas.Popup({
@@ -166,8 +163,6 @@ function initViewMap() {
                 markerCallback: (id, position, properties) => {
                     //Marker will represent a cluster of faults close together.
                     if (properties.cluster) {
-                        console.log("Properties:");
-                        console.log(properties);
 
                         //Return a created marker for the cluster.
                         return new atlas.HtmlMarker({
@@ -176,9 +171,6 @@ function initViewMap() {
                             pixelOffset: [5, -18]
                         });
                     }
-
-                    console.log("Properties:");
-                    console.log(properties);
 
                     //Use a promise to create a marker.
                     return Promise.resolve(new atlas.HtmlMarker({
@@ -209,9 +201,6 @@ function markerClicked(e) {
 
     //Get the marker that was clicked from the target of the click.
     var marker = e.target;
-
-    console.log("Marker Properties:");
-    console.log(marker.properties);
 
     //The clicked marker represents a cluster of faults.
     if (marker.properties.cluster) {

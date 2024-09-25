@@ -385,12 +385,16 @@ namespace DFI.FaultReporting.Admin.Pages.Repairs.Reports
             });
 
             FaultPriorities = await _faultPriorityService.GetFaultPriorities();
+            FaultPriorities = FaultPriorities.Where(fp => fp.Active == true).ToList();
 
             FaultStatuses = await _faultStatusService.GetFaultStatuses();
+            FaultStatuses = FaultStatuses.Where(fs => fs.Active == true).ToList();
 
             FaultTypes = await _faultTypeService.GetFaultTypes();
+            FaultTypes = FaultTypes.Where(ft => ft.Active == true).ToList();
 
             Contractors = await _contractorService.GetContractors(jwtToken);
+            Contractors = Contractors.Where(c => c.Active == true).ToList();
         }
 
         //Method Summary:

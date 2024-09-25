@@ -1,4 +1,10 @@
-﻿//Azure Maps Subscription Key - Needed to access the service
+﻿//CODE SUMMARY:
+//This file controls the route plotting functionality on the map control.
+//The user can select a number of jobs and the system will calculate the best route between the jobs.
+//Route points are ordered based on the priority of the jobs.
+//The route will be displayed on the map control and the user can choose to optimise the route order or not.
+
+//Azure Maps Subscription Key - Needed to access the service
 const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
 
 var restRoutingRequestUrl = 'https://{azMapsDomain}/route/directions/json?api-version=1.0&query={query}&routeRepresentation=polyline&travelMode=car&view=Auto';
@@ -13,7 +19,7 @@ const mapBounds = [-8.3, 53.9, -5.3, 55.4]
 
 //FUNCTION SUMMARY:
 //This method is used for setting up the map control and adding event listeners to the map - uses the Azure Maps Web SDK.
-//In this instance a data source for displaying reapirs is created and added to the map also.
+//In this instance a data source for displaying selected repar jobs is created and added to the map also.
 function initRouteMap() {
 
     //Find map on page
@@ -113,17 +119,6 @@ function initRouteMap() {
                         }
                     }
                 }),
-
-
-                ////Render point data using a symbol layer.
-                //new atlas.layer.SymbolLayer(datasource, null, {
-                //    textOptions: {
-                //        textField: ['get', 'title'],
-                //        offset: [0, -1.2],
-                //        color: 'white'
-                //    },
-                //    filter: ['any', ['==', ['geometry-type'], 'Point'], ['==', ['geometry-type'], 'MultiPoint']] //Only render Point or MultiPoints in this layer.
-                //})
             ]);
 
             //Add routePoints to the map and build the waypoint query string.
@@ -150,6 +145,8 @@ function initRouteMap() {
     }
 }
 
+//FUNCTION SUMMARY:
+//This function is used to get the users current location and set the start position of the route.
 function GetUserLocation() {
 
     const geoLocationOptions = {
@@ -157,13 +154,18 @@ function GetUserLocation() {
         timeout: 300000
     };
 
+    //Get the users current location.
     navigator.geolocation.getCurrentPosition(SetStartPosition, GeoLocationError, geoLocationOptions);
 }
 
+//FUNCTION SUMMARY:
+//This function is executed when an error occurs when trying to get the users location.
 function GeoLocationError(error) {
     console.log('Error occurred. Error code: ' + error.code + ' Error message: ' + error.message);
 }
 
+//FUNCTION SUMMARY:
+//This function is used to set the start position of the route.
 function SetStartPosition(position) {
 
     var startPosition = [];
@@ -172,9 +174,12 @@ function SetStartPosition(position) {
 
     routePoints.push(startPosition)
 
+    //Initalise the map control after the start position has been set.
     initRouteMap();
 }
 
+//FUNCTION SUMMARY:
+//This function is used to calculate a route between the selected jobs.
 function GenerateRoute(optimized) {
 
     //Remove any previously calculated route information.
@@ -183,7 +188,7 @@ function GenerateRoute(optimized) {
         routeLine = null;
     }
 
-    //Create request to calculate a route in the order in which the routePoints are provided.
+    //Create request to calculate a route in the order in which the routePoints are provided (based on priority).
     var requestUrl = restRoutingRequestUrl.replace('{query}', routePointQuery);
 
     if (optimized) {
@@ -194,36 +199,39 @@ function GenerateRoute(optimized) {
     processRequest(requestUrl).then(r => {
         PlotRoute(r.routes[0]);
 
+        //If the route has been optimized, update the pin order to reflect the new order based on the most optimal route.
         if (optimized) {
             var pinOrder = ['0'];
 
             for (var i = 0; i < r.optimizedWaypoints.length; i++) {
-                //Increase index by one to account for origin index.
+                //Account for starting point by increasing the index by 1.
                 pinOrder.push(r.optimizedWaypoints[i].optimizedIndex + 1);
             }
 
-            //Add the desintation index to the end.
+            //Add the end point to the pin order.
             pinOrder.push(routePoints.length - 1);
         }
     });
 }
 
+//FUNCTION SUMMARY:
+//This function is used to plot the route on the map control.
 function PlotRoute(route) {
     var routeCoordinates = [];
 
     for (var legIndex = 0; legIndex < route.legs.length; legIndex++) {
         var leg = route.legs[legIndex];
 
-        //Convert the route point data into a format that the map control understands.
+        //Convert the route point data into lat long coordinates.
         var legCoordinates = leg.points.map(function (point) {
             return [point.longitude, point.latitude];
         });
 
-        //Combine the route point data for each route leg together to form a single path.
+        //Combine the route points into a single array to create the line.
         routeCoordinates = routeCoordinates.concat(legCoordinates);
     }
 
-    //Create a LineString from the route path points and add it to the data source.
+    //Create a line shape to represent the route.
     routeLine = new atlas.Shape(new atlas.data.LineString(routeCoordinates));
     datasource.add(routeLine);
 }

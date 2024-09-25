@@ -1,4 +1,9 @@
-﻿//Azure Maps Subscription Key - Needed to access the service
+﻿//CODE SUMMARY:
+//This file controls the heatmap report. The heatmap is used to display heat blooms depending on the number of reports for a fault. 
+//The more reports a fault has the more intense the heat bloom will be.
+
+
+//Azure Maps Subscription Key - Needed to access the service
 const azureMapsSubscriptionKey = "tVwRA8vhqB9AvHiYgZa1muR90phLPrp6qzmJFvjqa0Q";
 
 var map, datasource;

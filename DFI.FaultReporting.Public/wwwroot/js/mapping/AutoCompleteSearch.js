@@ -1,33 +1,45 @@
-﻿// FUNCTION SUMMARY:
-// This method is used for setting up the autocomplete search box
+﻿//CODE SUMMARY:
+//This file sets up and controls the autocomplete search used on map controls. 
+//A user can begin to type in a location and the search will return a list of possible locations that match the input. 
+//The user can then select a location from the list and the map will zoom to that location.
+
+
+// FUNCTION SUMMARY:
+// This method is used for setting up the autocomplete search box.
 function initSearch() {
-    // Find search box on page
+
     var searchBox = document.getElementById('searchBox');
 
     if (searchBox != null) {
-        // Add event for when user begins to input text
+        //Add input event to detect when user begins to type in search box.
         searchBox.addEventListener('input', search);
     }
 }
 
-// Initialise the search
+//Initialise the search
 initSearch();
 
 
+//FUNCTION SUMMARY:
+//This function is used to search for locations based on the user input in the search box.
+//This function is executed when the user begins to type in the search box.
 function search() {
+
+    //Get the user input from the search box.
     var query = document.getElementById('searchBox').value;
 
     if (query == "") {
         map.setCamera({
-            // Center map on Northern Ireland
+            //Center map on Northern Ireland.
             center: [-6.8, 54.65],
-            // Set zoom to 3 to show as much of Northern Ireland as possible
+            //Set zoom to 3 to show as much of Northern Ireland as possible.
             zoom: 3,
-            // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
+            //Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland.
             maxBounds: mapBounds,
         });
     }
     else {
+        //Search for locations based on the user input using Azure Maps Search Services.
         searchURL.searchFuzzy(atlas.service.Aborter.timeout(10000), query, {
             lat: 54.65,
             lon: -6.8,
@@ -37,17 +49,18 @@ function search() {
             view: 'Auto',
             language: 'en-GB'
         }).then(results => {
-            console.log(results);
+            //If results are returned, display the results in the autocomplete list.
             if (results.results.length > 0) {
-                autocomplete(document.getElementById("searchBox"), results);
+                autoCompleteSearch(document.getElementById("searchBox"), results);
             }
+            //If no results are returned, set the camera to the default location of Northern Ireland.
             else {
                 map.setCamera({
-                    // Center map on Northern Ireland
+                    //Center map on Northern Ireland.
                     center: [-6.8, 54.65],
-                    // Set zoom to 3 to show as much of Northern Ireland as possible
+                    //Set zoom to 3 to show as much of Northern Ireland as possible.
                     zoom: 3,
-                    // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
+                    //Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland.
                     maxBounds: mapBounds,
                 });
             }
@@ -55,117 +68,156 @@ function search() {
     }
 }
 
-function autocomplete(inp, results) {
+//FUNCTION SUMMARY:
+//This function is used to create the autocomplete list based on the search results.
+function autoCompleteSearch(searchControl, results) {
+
+    //Get the search result geojson data.
     var geoData = results.geojson.getFeatures();
 
-    console.log(geoData);
-    /*the autocomplete function takes two arguments,
-    the text field element and an array of possible autocompleted values:*/
-    var currentFocus;
-    var a, b, i, val = inp.value;
-    /*close any already open lists of autocompleted values*/
-    closeAllLists();
-    if (!val) { return false; }
-    currentFocus = -1;
-    /*create a DIV element that will contain the items (values):*/
-    a = document.createElement("DIV");
-    a.setAttribute("id", inp.id + "autocomplete-list");
-    a.setAttribute("class", "autocomplete-items");
-    /*append the DIV element as a child of the autocomplete container:*/
-    inp.parentNode.appendChild(a);
-    /*for each item in the array...*/
+    //Declare variable to store the index of the item the user is currently focused on.
+    var focusItem;
+
+    //Declare variables to store the search and create elements to display the search results.
+    var outerDiv, innerDiv, i, searchValue = searchControl.value;
+
+    //Close any previous search results.
+    closePrevSearchResults();
+
+    //If the search box is empty, return false.
+    if (!searchValue) { return false; }
+    focusItem = -1;
+
+    //Create outer div element to contain the search results.
+    outerDiv = document.createElement("DIV");
+    outerDiv.setAttribute("id", searchControl.id + "autocomplete-list");
+    outerDiv.setAttribute("class", "autocomplete-items");
+
+    //Append the outer div to the parent node of the search control.
+    searchControl.parentNode.appendChild(outerDiv);
+
+    //Loop through the search results.
     for (i = 0; i < geoData.features.length; i++) {
+
+        //Only display search results for Northern Ireland.
         if (geoData.features[i].properties.address.countrySubdivisionName == "Northern Ireland") {
-            /*create a DIV element for each matching element:*/
-            b = document.createElement("DIV");
-            /*make the matching letters bold:*/
-            b.innerHTML = "<strong>" + geoData.features[i].properties.address.freeformAddress.substr(0, val.length) + "</strong>";
-            b.innerHTML += geoData.features[i].properties.address.freeformAddress.substr(val.length);
-            /*insert a input field that will hold the current array item's value:*/
-            b.innerHTML += "<input type='hidden' value='" + geoData.features[i].properties.address.freeformAddress + "'>";
 
-            //var geoData = results[i].geojson.getFeatures();
+            //Create inner div element to display each search result.
+            innerDiv = document.createElement("DIV");
+            //Make the characters in the search result bold that match the user input.
+            innerDiv.innerHTML = "<strong>" + geoData.features[i].properties.address.freeformAddress.substr(0, searchValue.length) + "</strong>";
+            innerDiv.innerHTML += geoData.features[i].properties.address.freeformAddress.substr(searchValue.length);
+            //Add hidden input fields to store the address and bounding box of the search result.
+            innerDiv.innerHTML += "<input type='hidden' value='" + geoData.features[i].properties.address.freeformAddress + "'>";
+            innerDiv.innerHTML += "<input type='hidden' value='" + geoData.features[i].bbox + "'>";
 
-            console.log(geoData.features[i].bbox);
+            //When the user clicks on a search result, set the search box value to the selected location and zoom the map to that location.
+            innerDiv.addEventListener("click", function (e) {
+                //Set the search box value to the selected location.
+                searchControl.value = this.getElementsByTagName("input")[0].value;
 
-            b.innerHTML += "<input type='hidden' value='" + geoData.features[i].bbox + "'>";
-            /*execute a function when someone clicks on the item value (DIV element):*/
-            b.addEventListener("click", function (e) {
-                /*insert the value for the autocomplete text field:*/
-                inp.value = this.getElementsByTagName("input")[0].value;
-                /*close the list of autocompleted values,
-                (or any other open lists of autocompleted values:*/
-                //Set the camera to the bounds of the results.
+                //Get the bounding box of the selected location.
+                var boundingBox = this.getElementsByTagName("input")[1].value;
 
-                var boundingBox = this.getElementsByTagName("input")[1].value
-
-                console.log(boundingBox);
-
+                //Split the bounding box string into an array.
                 const boundingBoxArray = boundingBox.split(",");
 
+                //Zoom the map to the selected location.
                 map.setCamera({
                     bounds: boundingBoxArray,
-                    // Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland
+                    //Add boundaries to restrict how user can pan and zoom the map control - needed to stop user panning or zooming to a location outside of Northern Ireland.
                     maxBounds: mapBounds,
                 });
-                closeAllLists();
+
+                //Close the search results.
+                closePrevSearchResults();
             });
-            a.appendChild(b);
+
+            //Append the inner div to the outer div.
+            outerDiv.appendChild(innerDiv);
         }
     }
-    /*execute a function presses a key on the keyboard:*/
-    inp.addEventListener("keydown", function (e) {
-        var x = document.getElementById(inp.id + "autocomplete-list");
-        if (x) x = x.getElementsByTagName("div");
+
+    //Add event listeners to detect when the user presses the arrow keys or enter key to navigate the search results.
+    searchControl.addEventListener("keydown", function (e) {
+
+        //Get the search results list control.
+        var autocompleteList = document.getElementById(searchControl.id + "autocomplete-list");
+
+        if (autocompleteList) autocompleteList = autocompleteList.getElementsByTagName("div");
+
+        //If the arrow DOWN key is pressed.
         if (e.keyCode == 40) {
-            /*If the arrow DOWN key is pressed,
-            increase the currentFocus variable:*/
-            currentFocus++;
-            /*and and make the current item more visible:*/
-            addActive(x);
-        } else if (e.keyCode == 38) { //up
-            /*If the arrow UP key is pressed,
-            decrease the currentFocus variable:*/
-            currentFocus--;
-            /*and and make the current item more visible:*/
-            addActive(x);
-        } else if (e.keyCode == 13) {
-            /*If the ENTER key is pressed, prevent the form from being submitted,*/
+            //Increment the focusItem index.
+            focusItem++;
+            makeActive(autocompleteList);
+        }
+        //If the arrow UP key is pressed.
+        else if (e.keyCode == 38) {
+            //Decrement the focusItem index.
+            focusItem--;
+            makeActive(autocompleteList);
+        }
+        //If the ENTER key is pressed.
+        else if (e.keyCode == 13) {
+            //Prevent the form from being submitted.
             e.preventDefault();
-            if (currentFocus > -1) {
-                /*and simulate a click on the "active" item:*/
-                if (x) x[currentFocus].click();
+
+            //If the focusItem index is greater than -1.
+            if (focusItem > -1) {
+                //Execute the click event of the selected search result.
+                if (autocompleteList) autocompleteList[focusItem].click();
             }
         }
     });
-    function addActive(x) {
-        /*a function to classify an item as "active":*/
-        if (!x) return false;
-        /*start by removing the "active" class on all items:*/
-        removeActive(x);
-        if (currentFocus >= x.length) currentFocus = 0;
-        if (currentFocus < 0) currentFocus = (x.length - 1);
-        /*add class "autocomplete-active":*/
-        x[currentFocus].classList.add("autocomplete-active");
+
+    //FUNCTION SUMMARY:
+    //This function is used to classify an item as "active" in the search results.
+    function makeActive(searchItem) {
+
+        //If no search results are returned, return false.
+        if (!searchItem) return false;
+
+        //Call the makeInactive function to remove the "active" class from all search results.
+        makeInactive(searchItem);
+
+        //If the focusItem index is greater than the number of search results, set the focusItem index to 0.
+        if (focusItem >= searchItem.length) focusItem = 0;
+
+        //If the focusItem index is less than 0, set the focusItem index to the number of search results.
+        if (focusItem < 0) focusItem = (searchItem.length - 1);
+
+        //Add the "active" class to the search result the user is currently focused.
+        searchItem[focusItem].classList.add("autocomplete-active");
     }
-    function removeActive(x) {
-        /*a function to remove the "active" class from all autocomplete items:*/
-        for (var i = 0; i < x.length; i++) {
-            x[i].classList.remove("autocomplete-active");
+
+    //FUNCTION SUMMARY:
+    //This function is used to remove the "active" class from all search results.
+    function makeInactive(searchItem) {
+
+        //Loop through the search results and remove the "active" class.
+        for (var i = 0; i < searchItem.length; i++) {
+            searchItem[i].classList.remove("autocomplete-active");
         }
     }
-    function closeAllLists(elmnt) {
-        /*close all autocomplete lists in the document,
-        except the one passed as an argument:*/
-        var x = document.getElementsByClassName("autocomplete-items");
-        for (var i = 0; i < x.length; i++) {
-            if (elmnt != x[i] && elmnt != inp) {
-                x[i].parentNode.removeChild(x[i]);
+
+    //FUNCTION SUMMARY:
+    //This function is used to close any previous search results.
+    function closePrevSearchResults(outerDivElement) {
+
+        //Get the search results list control.
+        var autocompleteList = document.getElementsByClassName("autocomplete-items");
+
+        //Loop through the search results and remove the search results.
+        for (var i = 0; i < autocompleteList.length; i++) {
+            if (outerDivElement != autocompleteList[i] && outerDivElement != searchControl) {
+                autocompleteList[i].parentNode.removeChild(autocompleteList[i]);
             }
         }
     }
 
+    //Add event listener to detect when the user clicks outside of the search results to close the search results.
     document.addEventListener("click", function (e) {
-        closeAllLists(e.target);
+        closePrevSearchResults(e.target);
     });
 }
